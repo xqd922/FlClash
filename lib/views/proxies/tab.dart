@@ -167,7 +167,6 @@ class ProxiesTabViewState extends ConsumerState<ProxiesTabView>
 
   @override
   Widget build(BuildContext context) {
-    ref.watch(themeSettingProvider.select((state) => state.textScale));
     final state = ref.watch(proxiesTabStateProvider.select((state) => state));
     final groups = state.groups;
     if (groups.isEmpty || _tabController == null) {

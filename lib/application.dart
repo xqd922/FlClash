@@ -39,7 +39,6 @@ class ApplicationState extends ConsumerState<Application> {
 
   ColorScheme _getAppColorScheme({
     required Brightness brightness,
-    int? primaryColor,
   }) {
     return ref.read(genColorSchemeProvider(brightness));
   }
@@ -115,7 +114,9 @@ class ApplicationState extends ConsumerState<Application> {
         final locale = ref.watch(
           appSettingProvider.select((state) => state.locale),
         );
-        final themeProps = ref.watch(themeSettingProvider);
+        final themeMode = ref.watch(
+          themeSettingProvider.select((state) => state.themeMode),
+        );
         return MaterialApp(
           debugShowCheckedModeBanner: false,
           navigatorKey: globalState.navigatorKey,
@@ -138,13 +139,12 @@ class ApplicationState extends ConsumerState<Application> {
           title: appName,
           locale: utils.getLocaleForString(locale),
           supportedLocales: AppLocalizations.delegate.supportedLocales,
-          themeMode: themeProps.themeMode,
+          themeMode: themeMode,
           theme: ThemeData(
             useMaterial3: true,
             pageTransitionsTheme: _pageTransitionsTheme,
             colorScheme: _getAppColorScheme(
               brightness: Brightness.light,
-              primaryColor: themeProps.primaryColor,
             ),
           ),
           darkTheme: ThemeData(
@@ -152,8 +152,7 @@ class ApplicationState extends ConsumerState<Application> {
             pageTransitionsTheme: _pageTransitionsTheme,
             colorScheme: _getAppColorScheme(
               brightness: Brightness.dark,
-              primaryColor: themeProps.primaryColor,
-            ).toPureBlack(themeProps.pureBlack),
+            ),
           ),
           home: child!,
         );

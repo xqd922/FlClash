@@ -117,14 +117,3 @@ extension ColorExtension on Color {
     )!;
   }
 }
-
-extension ColorSchemeExtension on ColorScheme {
-  ColorScheme toPureBlack(bool isPrueBlack) => isPrueBlack
-      ? copyWith(
-          surface: Colors.black,
-          surfaceContainer: surfaceContainer.darken(
-            5,
-          ),
-        )
-      : this;
-}

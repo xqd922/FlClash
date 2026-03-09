@@ -17,8 +17,7 @@ const browserUa =
 const packageName = 'com.follow.clash';
 final unixSocketPath = '/tmp/FlClashSocket_${Random().nextInt(10000)}.sock';
 const helperPort = 47890;
-const maxTextScale = 1.4;
-const minTextScale = 0.8;
+
 final baseInfoEdgeInsets = EdgeInsets.symmetric(
   vertical: 16.mAp,
   horizontal: 16.mAp,
@@ -111,16 +110,6 @@ const maxLength = 1000;
 final mainIsolate = 'FlClashMainIsolate';
 
 final serviceIsolate = 'FlClashServiceIsolate';
-
-const defaultPrimaryColors = [
-  0xFF795548,
-  0xFF03A9F4,
-  0xFFFFFF00,
-  0XFFBBC9CC,
-  0XFFABD397,
-  defaultPrimaryColor,
-  0XFF665390,
-];
 
 const scriptTemplate = '''
 const main = (config) => {

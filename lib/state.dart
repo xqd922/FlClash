@@ -4,7 +4,7 @@ import 'dart:ffi' as ffi;
 
 import 'package:animations/animations.dart';
 import 'package:dynamic_color/dynamic_color.dart';
-import 'package:fl_clash/common/theme.dart';
+
 import 'package:fl_clash/core/core.dart';
 import 'package:fl_clash/plugins/service.dart';
 import 'package:fl_clash/providers/app.dart';
@@ -36,7 +36,6 @@ class GlobalState {
   late final PackageInfo packageInfo;
   Function? updateCurrentDelayDebounce;
   late Measure measure;
-  late CommonTheme theme;
   late Color accentColor;
   bool needInitStatus = true;
   CorePalette? corePalette;
