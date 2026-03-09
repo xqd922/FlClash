@@ -190,7 +190,7 @@ abstract class ProxiesStyleProps with _$ProxiesStyleProps {
 @freezed
 abstract class ThemeProps with _$ThemeProps {
   const factory ThemeProps({
-    @Default(ThemeMode.dark) ThemeMode themeMode,
+    @Default(ThemeMode.system) ThemeMode themeMode,
   }) = _ThemeProps;
 
   factory ThemeProps.fromJson(Map<String, Object?> json) =>
