@@ -179,7 +179,7 @@ abstract class ProxiesStyleProps with _$ProxiesStyleProps {
     @Default(ProxiesSortType.none) ProxiesSortType sortType,
     @Default(ProxiesLayout.standard) ProxiesLayout layout,
     @Default(ProxiesIconStyle.standard) ProxiesIconStyle iconStyle,
-    @Default(ProxyCardType.expand) ProxyCardType cardType,
+    @Default(ProxyCardType.min) ProxyCardType cardType,
   }) = _ProxiesStyleProps;
 
   factory ProxiesStyleProps.fromJson(Map<String, Object?>? json) => json == null
