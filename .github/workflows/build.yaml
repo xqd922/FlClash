@@ -184,7 +184,16 @@ jobs:
           merge-multiple: true
 
       - name: Generate release.md
-        run: cp RELEASE.md release.md
+        run: |
+          version="${{ github.ref_name }}"
+          awk -v ver="$version" '
+            /^## v\(/ {
+              tag = $0; gsub(/^## v\(|\)$/,"",tag)
+              if (found) exit
+              if ("v"tag == ver) found=1
+            }
+            found {print}
+          ' RELEASE.md > release.md
       - name: Push to telegram
         continue-on-error: true
         env:
