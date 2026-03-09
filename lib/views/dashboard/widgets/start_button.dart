@@ -31,7 +31,7 @@ class _StartButtonState extends ConsumerState<StartButton>
     );
     _animation = CurvedAnimation(
       parent: _controller!,
-      curve: Curves.easeOutCubic,
+      curve: Curves.easeOutBack,
     );
     ref.listenManual(isStartProvider, (prev, next) {
       if (next != isStart) {
