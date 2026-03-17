@@ -277,8 +277,11 @@ class _DisclaimerItem extends StatelessWidget {
     return ListItem(
       leading: const Icon(Icons.gavel),
       title: Text(context.appLocalizations.disclaimer),
-      onTap: () {
-        appController.showDisclaimer();
+      onTap: () async {
+        final isDisclaimerAccepted = await appController.showDisclaimer();
+        if (!isDisclaimerAccepted) {
+          appController.handleExit();
+        }
       },
     );
   }

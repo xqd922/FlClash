@@ -45,7 +45,6 @@ Future<void> proxyDelayTest(Proxy proxy, [String? testUrl]) async {
 
 Future<void> delayTest(List<Proxy> proxies, [String? testUrl]) async {
   final proxyNames = proxies
-      .where((proxy) => proxy.type != "Direct")
       .map((proxy) => proxy.name)
       .toSet()
       .toList();

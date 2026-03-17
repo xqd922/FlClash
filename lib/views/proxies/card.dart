@@ -32,7 +32,6 @@ class ProxyCard extends StatelessWidget {
   }
 
   Widget _buildDelayText() {
-    if (proxy.type == "Direct") return const SizedBox();
     return SizedBox(
       height: measure.labelSmallHeight,
       child: Consumer(
