@@ -194,9 +194,9 @@ class ProxiesTabViewState extends ConsumerState<ProxiesTabView>
                 children: [
                   TabBar(
                     controller: _tabController,
-                    padding: EdgeInsets.only(
+                    padding: const EdgeInsets.only(
                       left: 16,
-                      right: 16 + (value ? 16 : 0),
+                      right: 16,
                     ),
                     dividerColor: Colors.transparent,
                     isScrollable: true,
