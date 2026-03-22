@@ -48,7 +48,7 @@ class TrafficUsage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final primaryColor = context.colorScheme.primaryContainer.darken(10);
+    final primaryColor = context.colorScheme.primaryContainer.darken(8);
     final secondaryColor = context.colorScheme.secondaryContainer.darken(5);
     return SizedBox(
       height: getWidgetHeight(2),
