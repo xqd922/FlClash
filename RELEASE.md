@@ -1,5 +1,9 @@
 ## v(7.0.8)
 
+### 🐛 修复
+
+- 回退 systemExempted 前台服务类型（需系统级权限，导致启动崩溃）
+
 ### ✨ 优化
 
 - 构建标签添加 no_fake_tcp，禁用 gvisor 伪 TCP 栈，降低内核 CPU 开销
@@ -7,7 +11,6 @@
 - 默认日志级别从 info 改为 error，减少日志 I/O 开销
 - 应用后台时暂停流量/运行时间更新，避免无效 FFI 调用
 - Android 启用 Impeller 渲染引擎，降低 GPU 功耗
-- Android 前台服务类型改为 systemExempted，减少系统节流
 - VPN 服务声明 SUPPORTS_ALWAYS_ON，获得更优系统调度
 - 批量测速改为懒加载执行，避免同时启动大量协程导致 CPU 峰值
 - 配置应用完成后延迟触发 GC，及时回收 Go 核心内存
