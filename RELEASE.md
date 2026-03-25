@@ -1,3 +1,12 @@
+## v(7.0.10)
+
+### ✨ 优化
+
+- VpnService/CommonService 添加 onTrimMemory 回调，响应系统内存压力时主动触发 Go GC
+- VPN 启动前检测并清理残留 TUN 接口，防止 zombie FD 占用内存
+- 网络类型切换（WiFi↔移动数据）时自动关闭旧连接，强制通过新网络路径重连
+- FlutterEngine 缓存复用，Activity 重建时不再重复创建引擎，降低内存分配
+
 ## v(7.0.9)
 
 ### ✨ 优化
