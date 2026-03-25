@@ -124,6 +124,11 @@ class GlobalState {
   }
 
   Future<void> executorUpdateTask() async {
+    final lifecycleState = WidgetsBinding.instance.lifecycleState;
+    if (lifecycleState != null && lifecycleState != AppLifecycleState.resumed) {
+      timer = null;
+      return;
+    }
     for (final task in tasks) {
       await task();
     }
