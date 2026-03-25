@@ -223,7 +223,8 @@ class Build {
       final execLines = [
         'go',
         'build',
-        '-ldflags=-w -s',
+        '-trimpath',
+        '-ldflags=-w -s${item.target == Target.android && (item.arch == Arch.arm64 || item.arch == Arch.amd64) ? ' -extldflags "-Wl,-z,max-page-size=16384"' : ''}',
         '-tags=${getTags(item)}',
         if (isLib) '-buildmode=c-shared',
         '-o',

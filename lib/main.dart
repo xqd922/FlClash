@@ -12,6 +12,7 @@ import 'common/common.dart';
 Future<void> main() async {
   try {
     WidgetsFlutterBinding.ensureInitialized();
+    PaintingBinding.instance.imageCache.maximumSizeBytes = 50 * 1024 * 1024;
     final version = await system.version;
     final container = await globalState.init(version);
     HttpOverrides.global = FlClashHttpOverrides();

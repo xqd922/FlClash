@@ -1,3 +1,13 @@
+## v(7.0.9)
+
+### ✨ 优化
+
+- TUN MTU 从 9000 降为 4064，减少 gvisor 每包 buffer 分配，降低内核内存占用
+- Flutter 图片缓存上限从 100MB 降为 50MB
+- 图标加载使用 cacheWidth/cacheHeight 按实际显示尺寸解码，避免全尺寸缓存
+- Go 构建添加 -trimpath，减少二进制元数据内存占用
+- Android arm64/x86_64 构建添加 16KB 页对齐（-extldflags max-page-size=16384）
+
 ## v(7.0.8)
 
 ### ✨ 优化

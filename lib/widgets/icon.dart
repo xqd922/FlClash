@@ -20,10 +20,13 @@ class CommonTargetIcon extends StatelessWidget {
       return _defaultIcon();
     }
 
+    final cacheSize = (size * WidgetsBinding.instance.platformDispatcher.views.first.devicePixelRatio).ceil();
     final base64 = src.getBase64;
     if (base64 != null) {
       return Image.memory(
         base64,
+        cacheWidth: cacheSize,
+        cacheHeight: cacheSize,
         gaplessPlayback: true,
         errorBuilder: (_, error, _) {
           return _defaultIcon();
@@ -31,7 +34,7 @@ class CommonTargetIcon extends StatelessWidget {
       );
     }
 
-    return ImageCacheWidget(src: src, defaultWidget: _defaultIcon());
+    return ImageCacheWidget(src: src, size: size, defaultWidget: _defaultIcon());
   }
 
   @override
@@ -44,11 +47,13 @@ final _cacheMange = DefaultCacheManager();
 
 class ImageCacheWidget extends StatefulWidget {
   final String src;
+  final double size;
   final Widget defaultWidget;
 
   const ImageCacheWidget({
     super.key,
     required this.src,
+    required this.size,
     required this.defaultWidget,
   });
 
@@ -102,7 +107,15 @@ class _ImageCacheWidgetState extends State<ImageCacheWidget> {
                 data,
                 errorBuilder: (_, _, _) => widget.defaultWidget,
               )
-            : Image.file(data, errorBuilder: (_, _, _) => widget.defaultWidget);
+            : Builder(builder: (context) {
+                final cacheSize = (widget.size * MediaQuery.devicePixelRatioOf(context)).ceil();
+                return Image.file(
+                  data,
+                  cacheWidth: cacheSize,
+                  cacheHeight: cacheSize,
+                  errorBuilder: (_, _, _) => widget.defaultWidget,
+                );
+              });
       },
     );
   }
