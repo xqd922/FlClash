@@ -67,6 +67,7 @@ class _AppStateManagerState extends ConsumerState<AppStateManager>
     commonPrint.log('$state');
     if (state == AppLifecycleState.resumed) {
       render?.resume();
+      globalState.startUpdateTasks();
       WidgetsBinding.instance.addPostFrameCallback((_) {
         appController.tryCheckIp();
         if (system.isAndroid) {

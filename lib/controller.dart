@@ -663,6 +663,9 @@ extension SetupControllerExt on AppController {
       silence: true,
       tag: !silence ? LoadingTag.proxies : null,
     );
+    Future.delayed(const Duration(seconds: 2), () {
+      coreController.requestGc();
+    });
   }
 
   Future<Map<String, dynamic>> getProfile({

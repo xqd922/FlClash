@@ -130,7 +130,14 @@ class Build {
     return 'gcc';
   }
 
-  static String get tags => 'with_gvisor';
+  static String getTags(BuildItem buildItem) {
+    final baseTags = 'with_gvisor,no_fake_tcp';
+    if (buildItem.target == Target.android &&
+        buildItem.archName == 'armeabi-v7a') {
+      return '$baseTags,with_low_memory';
+    }
+    return baseTags;
+  }
 
   static Future<void> exec(
     List<String> executable, {
@@ -217,7 +224,7 @@ class Build {
         'go',
         'build',
         '-ldflags=-w -s',
-        '-tags=$tags',
+        '-tags=${getTags(item)}',
         if (isLib) '-buildmode=c-shared',
         '-o',
         realOutPath,

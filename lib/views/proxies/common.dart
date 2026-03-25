@@ -49,28 +49,30 @@ Future<void> delayTest(List<Proxy> proxies, [String? testUrl]) async {
       .toSet()
       .toList();
 
-  final delayProxies = proxyNames.map<Future>((proxyName) async {
-    final groups = appController.groups;
-    final selectedMap = appController.currentProfile?.selectedMap ?? {};
-    final state = computeRealSelectedProxyState(
-      proxyName,
-      groups: groups,
-      selectedMap: selectedMap,
-    );
-    final url = state.testUrl.takeFirstValid([
-      appController.getRealTestUrl(testUrl),
-    ]);
-    final name = state.proxyName;
-    if (name.isEmpty) {
-      return;
-    }
-    appController.setDelay(Delay(url: url, name: name, value: 0));
-    appController.setDelay(await coreController.getDelay(url, name));
+  final delayTasks = proxyNames.map<Future Function()>((proxyName) {
+    return () async {
+      final groups = appController.groups;
+      final selectedMap = appController.currentProfile?.selectedMap ?? {};
+      final state = computeRealSelectedProxyState(
+        proxyName,
+        groups: groups,
+        selectedMap: selectedMap,
+      );
+      final url = state.testUrl.takeFirstValid([
+        appController.getRealTestUrl(testUrl),
+      ]);
+      final name = state.proxyName;
+      if (name.isEmpty) {
+        return;
+      }
+      appController.setDelay(Delay(url: url, name: name, value: 0));
+      appController.setDelay(await coreController.getDelay(url, name));
+    };
   }).toList();
 
-  final batchesDelayProxies = delayProxies.batch(100);
-  for (final batchDelayProxies in batchesDelayProxies) {
-    await Future.wait(batchDelayProxies);
+  final batchesDelayTasks = delayTasks.batch(100);
+  for (final batchDelayTasks in batchesDelayTasks) {
+    await Future.wait(batchDelayTasks.map((task) => task()));
   }
   appController.addSortNum();
 }
