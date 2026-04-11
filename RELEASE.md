@@ -1,3 +1,12 @@
+## v(7.0.11)
+
+### ✨ 优化
+
+- Android 内存回收策略调整：仅在 `onTrimMemory(TRIM_MEMORY_RUNNING_LOW+)` 时触发 Go GC，减少非必要 GC 带来的电量与性能抖动
+- 前台通知更新策略优化：首次使用 `startForeground`，后续改为 `NotificationManager.notify` 增量更新，降低服务更新开销
+- 挂起策略重构：改为联合判断「熄屏 + Doze 空闲模式」后再挂起核心，避免仅熄屏场景的误挂起
+- 新增 Doze 状态切换监听与挂起状态去抖，卸载模块时强制恢复核心，降低后台驻留期间的异常状态风险
+
 ## v(7.0.10)
 
 ### ✨ 优化
