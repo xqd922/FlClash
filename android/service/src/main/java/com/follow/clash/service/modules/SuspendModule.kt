@@ -2,60 +2,78 @@ package com.follow.clash.service.modules
 
 import android.app.Service
 import android.content.Intent
+import android.os.Build
 import android.os.PowerManager
+import android.util.Log
 import androidx.core.content.getSystemService
 import com.follow.clash.common.receiveBroadcastFlow
 import com.follow.clash.core.Core
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.cancel
-import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.onStart
 import kotlinx.coroutines.launch
 
 
 class SuspendModule(private val service: Service) : Module() {
-    private val scope = CoroutineScope(Dispatchers.Default)
-
-    private fun isScreenOn(): Boolean {
-        val pm = service.getSystemService<PowerManager>()
-        return when (pm != null) {
-            true -> pm.isInteractive
-            false -> true
-        }
+    companion object {
+        private const val TAG = "SuspendModule"
     }
 
-    val isDeviceIdleMode: Boolean
-        get() {
-            return service.getSystemService<PowerManager>()?.isDeviceIdleMode ?: true
-        }
+    private val scope = CoroutineScope(Dispatchers.Default)
+    private var isSuspended = false
 
-    private fun onUpdate(isScreenOn: Boolean) {
-        if (isScreenOn) {
-            Core.suspended(false)
-            return
+    private val powerManager: PowerManager? by lazy {
+        service.getSystemService<PowerManager>()
+    }
+
+    private val isScreenOn: Boolean
+        get() = powerManager?.isInteractive ?: true
+
+    private val isDeviceIdleMode: Boolean
+        get() = Build.VERSION.SDK_INT >= Build.VERSION_CODES.M && powerManager?.isDeviceIdleMode == true
+
+    private val shouldSuspend: Boolean
+        get() = !isScreenOn && isDeviceIdleMode
+
+    private fun updateSuspendState() {
+        val shouldSuspendNow = shouldSuspend
+        when {
+            shouldSuspendNow && !isSuspended -> {
+                Log.i(TAG, "Entering Doze - Suspending core")
+                Core.suspended(true)
+                isSuspended = true
+            }
+            !shouldSuspendNow && isSuspended -> {
+                Log.i(TAG, "Exiting Doze - Resuming core")
+                Core.suspended(false)
+                isSuspended = false
+            }
         }
-        Core.suspended(isDeviceIdleMode)
     }
 
     override fun onInstall() {
+        isSuspended = false
         scope.launch {
-            val screenFlow = service.receiveBroadcastFlow {
+            service.receiveBroadcastFlow {
                 addAction(Intent.ACTION_SCREEN_ON)
                 addAction(Intent.ACTION_SCREEN_OFF)
-            }.map { intent ->
-                intent.action == Intent.ACTION_SCREEN_ON
-            }.onStart {
-                emit(isScreenOn())
-            }
-
-            screenFlow.collect {
-                    onUpdate(it)
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+                    addAction(PowerManager.ACTION_DEVICE_IDLE_MODE_CHANGED)
                 }
+            }.onStart {
+                emit(Intent())
+            }.collect {
+                updateSuspendState()
+            }
         }
     }
 
     override fun onUninstall() {
+        if (isSuspended) {
+            Core.suspended(false)
+            isSuspended = false
+        }
         scope.cancel()
     }
 }

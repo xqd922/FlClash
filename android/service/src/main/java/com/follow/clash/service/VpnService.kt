@@ -98,14 +98,11 @@ class VpnService : SystemVpnService(), IBaseService,
         }
 
 
-    override fun onLowMemory() {
-        Core.forceGC()
-        super.onLowMemory()
-    }
-
     override fun onTrimMemory(level: Int) {
         super.onTrimMemory(level)
-        Core.forceGC()
+        if (level >= android.content.ComponentCallbacks2.TRIM_MEMORY_RUNNING_LOW) {
+            Core.forceGC()
+        }
     }
 
     private val binder = LocalBinder()

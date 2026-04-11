@@ -1,6 +1,7 @@
 package com.follow.clash.service.modules
 
 import android.app.Notification.FOREGROUND_SERVICE_IMMEDIATE
+import android.app.NotificationManager
 import android.app.Service
 import android.app.Service.STOP_FOREGROUND_REMOVE
 import android.content.Intent
@@ -45,6 +46,12 @@ val NotificationParams.extended: ExtendedNotificationParams
 
 class NotificationModule(private val service: Service) : Module() {
     private val scope = CoroutineScope(Dispatchers.Default)
+    @Volatile
+    private var hasStartedForeground = false
+
+    private val notificationManager by lazy {
+        service.getSystemService<NotificationManager>()
+    }
 
     override fun onInstall() {
         scope.launch {
@@ -105,18 +112,24 @@ class NotificationModule(private val service: Service) : Module() {
     }
 
     private fun update(params: ExtendedNotificationParams) {
-        service.startForeground(
-            with(notificationBuilder) {
-                setContentTitle(params.title)
-                setContentText(params.contentText)
-                clearActions()
-                addAction(
-                    0, params.stopText, QuickAction.STOP.quickIntent.toPendingIntent
-                ).build()
-            })
+        val notification = with(notificationBuilder) {
+            setContentTitle(params.title)
+            setContentText(params.contentText)
+            clearActions()
+            addAction(
+                0, params.stopText, QuickAction.STOP.quickIntent.toPendingIntent
+            ).build()
+        }
+        if (!hasStartedForeground) {
+            service.startForeground(notification)
+            hasStartedForeground = true
+        } else {
+            notificationManager?.notify(GlobalState.NOTIFICATION_ID, notification)
+        }
     }
 
     override fun onUninstall() {
+        hasStartedForeground = false
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
             service.stopForeground(STOP_FOREGROUND_REMOVE)
         } else {
