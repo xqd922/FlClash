@@ -59,9 +59,15 @@ class ProxiesTabViewState extends ConsumerState<ProxiesTabView>
   }
 
   Future<void> delayTestCurrentGroup() async {
-    final currentGroupName = appController.getCurrentGroupName();
-    final currentState = _keyMap[currentGroupName]?.currentState;
-    await delayTest(currentState?.currentProxies ?? [], currentState?.testUrl);
+    final groups = ref.read(
+      proxiesTabStateProvider.select((state) => state.groups),
+    );
+    final groupIndex = _tabController?.index;
+    if (groupIndex == null || groupIndex < 0 || groupIndex >= groups.length) {
+      return;
+    }
+    final currentGroup = groups[groupIndex];
+    await delayTest(currentGroup.all, currentGroup.testUrl);
   }
 
   Widget _buildMoreButton() {
@@ -136,7 +142,7 @@ class ProxiesTabViewState extends ConsumerState<ProxiesTabView>
         groupIndex = currentIndex;
       }
       final currentGroups = appController.getCurrentGroups();
-      if (groupIndex == null || groupIndex > currentGroups.length) {
+      if (groupIndex == null || groupIndex >= currentGroups.length) {
         return;
       }
       final currentGroup = currentGroups[groupIndex];
