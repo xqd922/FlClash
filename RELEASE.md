@@ -1,3 +1,16 @@
+## v(7.0.12)
+
+### 🐛 修复
+
+- 修复 Android 网络检测失败后可能长期停留在 loading，导致回前台后不再自动刷新 IP 的问题
+- 修复 VPN 状态切换时 IP 刷新的触发条件异常，避免状态变化后漏刷
+
+### ✨ 优化
+
+- 回前台时基于 Android service 实际运行态做轻量自愈，降低 core、service 与界面状态不一致的概率
+- 首次 URL 导入订阅后追加 providers、groups 和 IP 的补刷新，并为 providers 增加短重试
+- IP 检查不再依赖 dashboard 的网络检测卡片是否显示
+
 ## v(7.0.11)
 
 ### ✨ 优化
