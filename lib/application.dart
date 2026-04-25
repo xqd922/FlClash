@@ -85,8 +85,8 @@ class ApplicationState extends ConsumerState<Application> {
             commonPrint.log('connectivityChanged ${results.toString()}');
             appController.updateLocalIp();
             final hasVpn = results.contains(ConnectivityResult.vpn);
-            if (_preHasVpn == hasVpn) {
-              appController.addCheckIp();
+            if (_preHasVpn != hasVpn) {
+              appController.tryCheckIp();
             }
             _preHasVpn = hasVpn;
           },

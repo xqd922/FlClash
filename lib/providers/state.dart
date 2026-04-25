@@ -500,16 +500,10 @@ String getProxyDesc(Ref ref, Proxy proxy) {
 }
 
 @riverpod
-VM3<bool, int, bool> checkIp(Ref ref) {
+VM2<bool, int> checkIp(Ref ref) {
   final isInit = ref.watch(initProvider);
   final checkIpNum = ref.watch(checkIpNumProvider);
-  final containsDetection = ref.watch(
-    dashboardStateProvider.select(
-      (state) =>
-          state.dashboardWidgets.contains(DashboardWidget.networkDetection),
-    ),
-  );
-  return VM3(isInit, checkIpNum, containsDetection);
+  return VM2(isInit, checkIpNum);
 }
 
 @riverpod

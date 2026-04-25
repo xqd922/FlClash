@@ -20,6 +20,7 @@ class AppController {
   late final BuildContext _context;
   late final WidgetRef _ref;
   bool isAttach = false;
+  int _lastCheckIpAt = 0;
 
   static AppController? _instance;
 
@@ -337,11 +338,19 @@ extension ProfilesControllerExt on AppController {
       globalState.navigatorKey.currentState?.popUntil((route) => route.isFirst);
     }
     toProfiles();
+    final isFirstProfile = _ref.read(currentProfileIdProvider) == null;
     final profile = await loadingRun(tag: LoadingTag.profiles, () async {
       return await Profile.normal(url: url).update();
     }, title: appLocalizations.addProfile);
     if (profile != null) {
       putProfile(profile);
+      if (isFirstProfile) {
+        Future.delayed(commonDuration, () async {
+          await updateProviders();
+          updateGroupsDebounce();
+          tryCheckIp(force: true);
+        });
+      }
     }
   }
 
@@ -510,8 +519,26 @@ extension ProxiesControllerExt on AppController {
   }
 
   Future<void> updateProviders() async {
-    _ref.read(providersProvider.notifier).value = await coreController
-        .getExternalProviders();
+    List<ExternalProvider> providers = [];
+    Object? error;
+    for (var attempt = 0; attempt < 3; attempt++) {
+      try {
+        providers = await coreController.getExternalProviders();
+        if (providers.isNotEmpty || attempt == 2) {
+          break;
+        }
+      } catch (e) {
+        error = e;
+        if (attempt == 2) {
+          rethrow;
+        }
+      }
+      await Future.delayed(commonDuration);
+    }
+    if (error != null && providers.isEmpty) {
+      throw error!;
+    }
+    _ref.read(providersProvider.notifier).value = providers;
   }
 
   Future<String> updateProvider(
@@ -609,19 +636,36 @@ extension SetupControllerExt on AppController {
   }
 
   void addCheckIp() {
+    _lastCheckIpAt = DateTime.now().millisecondsSinceEpoch;
     _ref.read(checkIpNumProvider.notifier).add();
   }
 
-  void tryCheckIp() {
-    final isTimeout = _ref.read(
-      networkDetectionProvider.select(
-        (state) => state.ipInfo == null && state.isLoading == false,
-      ),
+  void tryCheckIp({bool force = false}) {
+    final isLoading = _ref.read(
+      networkDetectionProvider.select((state) => state.isLoading),
     );
-    if (!isTimeout) {
+    if (isLoading) {
       return;
     }
-    _ref.read(checkIpNumProvider.notifier).add();
+    final now = DateTime.now().millisecondsSinceEpoch;
+    if (!force && now - _lastCheckIpAt < commonDuration.inMilliseconds) {
+      return;
+    }
+    addCheckIp();
+  }
+
+  Future<void> handleAndroidResume() async {
+    await globalState.updateStartTime();
+    updateRunTime();
+    final hasServiceRunTime = globalState.startTime != null;
+    final isStart = _ref.read(isStartProvider);
+    final coreStatus = _ref.read(coreStatusProvider);
+    if (hasServiceRunTime && (!isStart || coreStatus == CoreStatus.disconnected)) {
+      await tryStartCore(true);
+    } else if (!hasServiceRunTime && isStart) {
+      await updateStatus(false, isInit: true);
+    }
+    tryCheckIp(force: true);
   }
 
   void applyProfileDebounce({bool silence = false, bool force = false}) {

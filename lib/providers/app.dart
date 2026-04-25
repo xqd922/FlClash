@@ -327,7 +327,7 @@ class NetworkDetection extends _$NetworkDetection
 
   @override
   NetworkDetectionState build() {
-    return NetworkDetectionState(isLoading: true, ipInfo: null);
+    return NetworkDetectionState(isLoading: false, ipInfo: null);
   }
 
   void startCheck() {
@@ -351,18 +351,18 @@ class NetworkDetection extends _$NetworkDetection
     _cancelToken?.cancel();
     _cancelToken = CancelToken();
     commonPrint.log('checkIp start');
-    state = state.copyWith(isLoading: true, ipInfo: null);
+    state = state.copyWith(isLoading: true);
     _preIsStart = isStart;
     final res = await request.checkIp(cancelToken: _cancelToken);
     commonPrint.log('checkIp res: $res');
-    if (res.isError && runTime > _startMillisecondsEpoch) {
-      state = state.copyWith(isLoading: true, ipInfo: null);
+    if (runTime <= _startMillisecondsEpoch) {
+      return;
+    }
+    if (res.isError) {
+      state = state.copyWith(isLoading: false, ipInfo: null);
       return;
     }
     final ipInfo = res.data;
-    if (ipInfo == null) {
-      return;
-    }
     state = state.copyWith(isLoading: false, ipInfo: ipInfo);
   }
 }
