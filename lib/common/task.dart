@@ -103,7 +103,13 @@ Future<Map<String, dynamic>> _makeRealProfileTask(
     );
   }
 
-  rawConfig['external-controller'] = realPatchConfig.externalController.value;
+  // yaml 优先：profile 里写了 external-controller 就用那份，UI 开关只在 yaml 留空时兜底
+  final yamlExternalController = rawConfig['external-controller'];
+  if (yamlExternalController == null ||
+      (yamlExternalController is String && yamlExternalController.isEmpty)) {
+    rawConfig['external-controller'] =
+        realPatchConfig.externalController.value;
+  }
   rawConfig['external-ui'] = '';
   rawConfig['interface-name'] = '';
   rawConfig['external-ui-url'] = '';
