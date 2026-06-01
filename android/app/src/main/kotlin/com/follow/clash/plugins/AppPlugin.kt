@@ -333,9 +333,6 @@ class AppPlugin : FlutterPlugin, MethodChannel.MethodCallHandler, ActivityAware 
             packageInfo.applicationInfo?.publicSourceDir?.let {
                 ZipFile(File(it)).use {
                     for (packageEntry in it.entries()) {
-                        if (packageEntry.name.startsWith("firebase-")) return false
-                    }
-                    for (packageEntry in it.entries()) {
                         if (!(packageEntry.name.startsWith("classes") && packageEntry.name.endsWith(
                                 ".dex"
                             ))

@@ -32,8 +32,4 @@ object GlobalState : CoroutineScope by CoroutineScope(Dispatchers.Default) {
     fun init(application: Application) {
         _application = application
     }
-
-    fun setCrashlytics(enable: Boolean) {
-        // Firebase removed
-    }
 }
