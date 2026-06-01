@@ -1828,13 +1828,8 @@ final class GetProxyDescFamily extends $Family
 const checkIpProvider = CheckIpProvider._();
 
 final class CheckIpProvider
-    extends
-        $FunctionalProvider<
-          VM3<bool, int, bool>,
-          VM3<bool, int, bool>,
-          VM3<bool, int, bool>
-        >
-    with $Provider<VM3<bool, int, bool>> {
+    extends $FunctionalProvider<VM2<bool, int>, VM2<bool, int>, VM2<bool, int>>
+    with $Provider<VM2<bool, int>> {
   const CheckIpProvider._()
     : super(
         from: null,
@@ -1851,25 +1846,24 @@ final class CheckIpProvider
 
   @$internal
   @override
-  $ProviderElement<VM3<bool, int, bool>> $createElement(
-    $ProviderPointer pointer,
-  ) => $ProviderElement(pointer);
+  $ProviderElement<VM2<bool, int>> $createElement($ProviderPointer pointer) =>
+      $ProviderElement(pointer);
 
   @override
-  VM3<bool, int, bool> create(Ref ref) {
+  VM2<bool, int> create(Ref ref) {
     return checkIp(ref);
   }
 
   /// {@macro riverpod.override_with_value}
-  Override overrideWithValue(VM3<bool, int, bool> value) {
+  Override overrideWithValue(VM2<bool, int> value) {
     return $ProviderOverride(
       origin: this,
-      providerOverride: $SyncValueProvider<VM3<bool, int, bool>>(value),
+      providerOverride: $SyncValueProvider<VM2<bool, int>>(value),
     );
   }
 }
 
-String _$checkIpHash() => r'7d8be66f0e8164bcf20c32659da2a4bea9893596';
+String _$checkIpHash() => r'e11c5e5957097038679cdb5b79ef9ecc4e41614b';
 
 @ProviderFor(genColorScheme)
 const genColorSchemeProvider = GenColorSchemeFamily._();
@@ -1879,7 +1873,7 @@ final class GenColorSchemeProvider
     with $Provider<ColorScheme> {
   const GenColorSchemeProvider._({
     required GenColorSchemeFamily super.from,
-    required (Brightness, {Color? color, bool ignoreConfig}) super.argument,
+    required Brightness super.argument,
   }) : super(
          retry: null,
          name: r'genColorSchemeProvider',
@@ -1895,7 +1889,7 @@ final class GenColorSchemeProvider
   String toString() {
     return r'genColorSchemeProvider'
         ''
-        '$argument';
+        '($argument)';
   }
 
   @$internal
@@ -1905,14 +1899,8 @@ final class GenColorSchemeProvider
 
   @override
   ColorScheme create(Ref ref) {
-    final argument =
-        this.argument as (Brightness, {Color? color, bool ignoreConfig});
-    return genColorScheme(
-      ref,
-      argument.$1,
-      color: argument.color,
-      ignoreConfig: argument.ignoreConfig,
-    );
+    final argument = this.argument as Brightness;
+    return genColorScheme(ref, argument);
   }
 
   /// {@macro riverpod.override_with_value}
@@ -1934,14 +1922,10 @@ final class GenColorSchemeProvider
   }
 }
 
-String _$genColorSchemeHash() => r'25f648db7c33ac00e7152f3d304da372a4de9fdd';
+String _$genColorSchemeHash() => r'42245df13fadafb70c2f2b390891007512682e08';
 
 final class GenColorSchemeFamily extends $Family
-    with
-        $FunctionalFamilyOverride<
-          ColorScheme,
-          (Brightness, {Color? color, bool ignoreConfig})
-        > {
+    with $FunctionalFamilyOverride<ColorScheme, Brightness> {
   const GenColorSchemeFamily._()
     : super(
         retry: null,
@@ -1951,14 +1935,8 @@ final class GenColorSchemeFamily extends $Family
         isAutoDispose: true,
       );
 
-  GenColorSchemeProvider call(
-    Brightness brightness, {
-    Color? color,
-    bool ignoreConfig = false,
-  }) => GenColorSchemeProvider._(
-    argument: (brightness, color: color, ignoreConfig: ignoreConfig),
-    from: this,
-  );
+  GenColorSchemeProvider call(Brightness brightness) =>
+      GenColorSchemeProvider._(argument: brightness, from: this);
 
   @override
   String toString() => r'genColorSchemeProvider';

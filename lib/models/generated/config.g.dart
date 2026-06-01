@@ -19,7 +19,7 @@ _AppSettingProps _$AppSettingPropsFromJson(Map<String, dynamic> json) =>
       openLogs: json['openLogs'] as bool? ?? false,
       closeConnections: json['closeConnections'] as bool? ?? true,
       testUrl: json['testUrl'] as String? ?? defaultTestUrl,
-      isAnimateToPage: json['isAnimateToPage'] as bool? ?? true,
+      isAnimateToPage: json['isAnimateToPage'] as bool? ?? false,
       autoCheckUpdate: json['autoCheckUpdate'] as bool? ?? true,
       showLabel: json['showLabel'] as bool? ?? false,
       disclaimerAccepted: json['disclaimerAccepted'] as bool? ?? false,
@@ -144,7 +144,7 @@ Map<String, dynamic> _$WindowPropsToJson(_WindowProps instance) =>
 _VpnProps _$VpnPropsFromJson(Map<String, dynamic> json) => _VpnProps(
   enable: json['enable'] as bool? ?? true,
   systemProxy: json['systemProxy'] as bool? ?? true,
-  ipv6: json['ipv6'] as bool? ?? false,
+  ipv6: json['ipv6'] as bool? ?? true,
   allowBypass: json['allowBypass'] as bool? ?? true,
   dnsHijacking: json['dnsHijacking'] as bool? ?? false,
   accessControlProps: json['accessControlProps'] == null
@@ -208,7 +208,7 @@ _ProxiesStyleProps _$ProxiesStylePropsFromJson(Map<String, dynamic> json) =>
           ProxiesIconStyle.standard,
       cardType:
           $enumDecodeNullable(_$ProxyCardTypeEnumMap, json['cardType']) ??
-          ProxyCardType.expand,
+          ProxyCardType.shrink,
     );
 
 Map<String, dynamic> _$ProxiesStylePropsToJson(_ProxiesStyleProps instance) =>
@@ -246,62 +246,19 @@ const _$ProxyCardTypeEnumMap = {
   ProxyCardType.min: 'min',
 };
 
-_TextScale _$TextScaleFromJson(Map<String, dynamic> json) => _TextScale(
-  enable: json['enable'] as bool? ?? false,
-  scale: (json['scale'] as num?)?.toDouble() ?? 1.0,
-);
-
-Map<String, dynamic> _$TextScaleToJson(_TextScale instance) =>
-    <String, dynamic>{'enable': instance.enable, 'scale': instance.scale};
-
 _ThemeProps _$ThemePropsFromJson(Map<String, dynamic> json) => _ThemeProps(
-  primaryColor: (json['primaryColor'] as num?)?.toInt(),
-  primaryColors:
-      (json['primaryColors'] as List<dynamic>?)
-          ?.map((e) => (e as num).toInt())
-          .toList() ??
-      defaultPrimaryColors,
   themeMode:
       $enumDecodeNullable(_$ThemeModeEnumMap, json['themeMode']) ??
-      ThemeMode.dark,
-  schemeVariant:
-      $enumDecodeNullable(
-        _$DynamicSchemeVariantEnumMap,
-        json['schemeVariant'],
-      ) ??
-      DynamicSchemeVariant.content,
-  pureBlack: json['pureBlack'] as bool? ?? false,
-  textScale: json['textScale'] == null
-      ? const TextScale()
-      : TextScale.fromJson(json['textScale'] as Map<String, dynamic>),
+      ThemeMode.system,
 );
 
 Map<String, dynamic> _$ThemePropsToJson(_ThemeProps instance) =>
-    <String, dynamic>{
-      'primaryColor': instance.primaryColor,
-      'primaryColors': instance.primaryColors,
-      'themeMode': _$ThemeModeEnumMap[instance.themeMode]!,
-      'schemeVariant': _$DynamicSchemeVariantEnumMap[instance.schemeVariant]!,
-      'pureBlack': instance.pureBlack,
-      'textScale': instance.textScale,
-    };
+    <String, dynamic>{'themeMode': _$ThemeModeEnumMap[instance.themeMode]!};
 
 const _$ThemeModeEnumMap = {
   ThemeMode.system: 'system',
   ThemeMode.light: 'light',
   ThemeMode.dark: 'dark',
-};
-
-const _$DynamicSchemeVariantEnumMap = {
-  DynamicSchemeVariant.tonalSpot: 'tonalSpot',
-  DynamicSchemeVariant.fidelity: 'fidelity',
-  DynamicSchemeVariant.monochrome: 'monochrome',
-  DynamicSchemeVariant.neutral: 'neutral',
-  DynamicSchemeVariant.vibrant: 'vibrant',
-  DynamicSchemeVariant.expressive: 'expressive',
-  DynamicSchemeVariant.content: 'content',
-  DynamicSchemeVariant.rainbow: 'rainbow',
-  DynamicSchemeVariant.fruitSalad: 'fruitSalad',
 };
 
 _Config _$ConfigFromJson(Map<String, dynamic> json) => _Config(
