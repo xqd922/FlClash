@@ -1,3 +1,11 @@
+## v(7.0.18)
+
+### 🔒 安全
+
+- Android 移除 `QUERY_ALL_PACKAGES` 和未使用的 `CHANGE_NETWORK_STATE` 权限，降低应用包可见性和静态扫描风险
+- Android 停止扫描其他应用 APK / dex 内容，改为仅枚举桌面启动应用
+- Android 内部广播接收器改为不可导出，收紧应用内服务广播暴露面
+
 ## v(7.0.17)
 
 ### 🔧 变更
