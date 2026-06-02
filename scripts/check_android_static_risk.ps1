@@ -62,6 +62,11 @@ if (Test-Path $manifestPath) {
     if ($broadcastReceiver -and $broadcastReceiver.GetAttribute('exported', $androidNs) -ne 'false') {
         $failures += 'BroadcastReceiver must not be exported; service broadcasts are in-app only'
     }
+
+    $releaseLabel = $application.GetAttribute('label', $androidNs)
+    if ($releaseLabel -eq 'FlClash') {
+        $failures += 'Android release label must be distinct from upstream FlClash to reduce impersonation false positives'
+    }
 }
 
 if ($failures.Count -gt 0) {
