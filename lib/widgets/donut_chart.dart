@@ -8,10 +8,8 @@ class DonutChartData {
   final double _value;
   final Color color;
 
-  const DonutChartData({
-    required double value,
-    required this.color,
-  }) : _value = value + 1;
+  const DonutChartData({required double value, required this.color})
+    : _value = value + 1;
 
   double get value => _value;
 
@@ -30,6 +28,34 @@ class DonutChartData {
 
   @override
   int get hashCode => _value.hashCode ^ color.hashCode;
+}
+
+const _donutChartLogBase = 10.0;
+const _donutChartMinValue = 0.1;
+final _donutChartLogBaseInv = 1.0 / log(_donutChartLogBase);
+
+double _logDonutChartValue(double value) {
+  if (value < _donutChartMinValue) return 0;
+  return log(value) * _donutChartLogBaseInv + 1;
+}
+
+double _expDonutChartValue(double value) {
+  if (value <= 0) return 0;
+  return pow(_donutChartLogBase, value - 1).toDouble();
+}
+
+double interpolateDonutChartValue(
+  double oldValue,
+  double newValue,
+  double progress,
+) {
+  if (progress <= 0) return oldValue;
+  if (progress >= 1) return newValue;
+  final logOldValue = _logDonutChartValue(oldValue);
+  final logNewValue = _logDonutChartValue(newValue);
+  return _expDonutChartValue(
+    logOldValue + (logNewValue - logOldValue) * progress,
+  );
 }
 
 class DonutChart extends StatefulWidget {
@@ -100,78 +126,36 @@ class DonutChartPainter extends CustomPainter {
 
   late final Paint _arcPaint;
 
-  List<DonutChartData>? _cachedInterpolatedData;
-  double? _cachedProgress;
-
   DonutChartPainter(this.oldData, this.newData, this.progress) {
     _arcPaint = Paint()
       ..style = PaintingStyle.stroke
       ..strokeCap = StrokeCap.round;
   }
 
-  static const _logBase = 10.0;
-  static const _minValue = 0.1;
-  static final _logBaseInv = 1.0 / log(_logBase);
-
-  double _logTransform(double value) {
-    if (value < _minValue) return 0;
-    return log(value) * _logBaseInv + 1;
-  }
-
-  double _expTransform(double value) {
-    if (value <= 0) return 0;
-    return pow(_logBase, value - 1).toDouble();
-  }
-
-  List<DonutChartData> get _interpolatedData {
-    if (_cachedInterpolatedData != null && _cachedProgress == progress) {
-      return _cachedInterpolatedData!;
-    }
-
-    if (newData.isEmpty) {
-      _cachedInterpolatedData = newData;
-      _cachedProgress = progress;
-      return newData;
-    }
-
+  double _getValue(int index) {
     if (oldData.length != newData.length) {
-      _cachedInterpolatedData = newData;
-      _cachedProgress = progress;
-      return newData;
+      return newData[index].value;
     }
+    return interpolateDonutChartValue(
+      oldData[index].value,
+      newData[index].value,
+      progress,
+    );
+  }
 
-    final result = <DonutChartData>[];
+  double _getTotalValue() {
+    var total = 0.0;
     for (var i = 0; i < newData.length; i++) {
-      final oldValue = oldData[i].value;
-      final newValue = newData[i].value;
-      final logOldValue = _logTransform(oldValue);
-      final logNewValue = _logTransform(newValue);
-      final interpolatedLogValue =
-          logOldValue + (logNewValue - logOldValue) * progress;
-
-      final interpolatedValue = _expTransform(interpolatedLogValue);
-
-      result.add(DonutChartData(
-        value: interpolatedValue,
-        color: newData[i].color,
-      ));
+      total += _getValue(i);
     }
-
-    _cachedInterpolatedData = result;
-    _cachedProgress = progress;
-    return result;
+    return total;
   }
 
   @override
   void paint(Canvas canvas, Size size) {
-    final data = _interpolatedData;
-    if (data.isEmpty) return;
+    if (newData.isEmpty) return;
 
-    double total = 0;
-    for (final item in data) {
-      total += item.value;
-    }
-
+    final total = _getTotalValue();
     if (total <= 0) return;
 
     final center = Offset(size.width / 2, size.height / 2);
@@ -179,19 +163,19 @@ class DonutChartPainter extends CustomPainter {
     final radius = min(size.width / 2, size.height / 2) - strokeWidth / 2;
 
     final gapAngle = 2 * asin(strokeWidth * 1 / (2 * radius)) * 1.2;
-    final availableAngle = 2 * pi - (data.length * gapAngle);
+    final availableAngle = 2 * pi - (newData.length * gapAngle);
     final totalInv = 1.0 / total;
 
     double startAngle = -pi / 2 + gapAngle / 2;
 
     _arcPaint.strokeWidth = strokeWidth;
 
-    for (final item in data) {
-      final sweepAngle = availableAngle * (item.value * totalInv);
+    for (var i = 0; i < newData.length; i++) {
+      final sweepAngle = availableAngle * (_getValue(i) * totalInv);
 
       if (sweepAngle <= 0) continue;
 
-      _arcPaint.color = item.color;
+      _arcPaint.color = newData[i].color;
 
       canvas.drawArc(
         Rect.fromCircle(center: center, radius: radius),
