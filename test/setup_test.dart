@@ -1,4 +1,7 @@
+import 'dart:io';
+
 import 'package:flutter_test/flutter_test.dart';
+import 'package:path/path.dart';
 
 import '../setup.dart';
 
@@ -50,6 +53,24 @@ void main() {
         environment['Path'],
         r'C:\Users\Seven\AppData\Local\Pub\Cache\bin;C:\tools',
       );
+    });
+
+    test('copies files over existing dist artifacts', () async {
+      final tempDir = await Directory.systemTemp.createTemp('flclash-setup-');
+      addTearDown(() async {
+        if (tempDir.existsSync()) {
+          await tempDir.delete(recursive: true);
+        }
+      });
+
+      final source = File(join(tempDir.path, 'source.apk'));
+      final target = File(join(tempDir.path, 'target.apk'));
+      await source.writeAsString('new apk');
+      await target.writeAsString('old apk');
+
+      await Build.copyFileReplacing(source, target);
+
+      expect(await target.readAsString(), 'new apk');
     });
   });
 }

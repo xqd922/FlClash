@@ -440,10 +440,22 @@ class Build {
       if (!source.existsSync()) {
         throw 'Android APK not found: ${source.path}';
       }
-      await source.copy(
-        join(distPath, androidDistApkFileName(item, versionName)),
+      await copyFileReplacing(
+        source,
+        File(join(distPath, androidDistApkFileName(item, versionName))),
       );
     }
+  }
+
+  static Future<void> copyFileReplacing(File source, File destination) async {
+    final destinationDirectory = destination.parent;
+    if (!destinationDirectory.existsSync()) {
+      destinationDirectory.createSync(recursive: true);
+    }
+    if (destination.existsSync()) {
+      await destination.delete();
+    }
+    await source.copy(destination.path);
   }
 
   static void copyFile(String sourceFilePath, String destinationFilePath) {
