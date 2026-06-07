@@ -26,8 +26,6 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.cancel
 import kotlinx.coroutines.flow.combine
-import kotlinx.coroutines.flow.distinctUntilChanged
-import kotlinx.coroutines.flow.filter
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.onStart
 import kotlinx.coroutines.launch
@@ -39,6 +37,50 @@ data class ExtendedNotificationParams(
     val contentText: String,
 )
 
+class NotificationUpdatePolicy(
+    private val minUpdateIntervalMillis: Long = 3_000L,
+) {
+    private var lastUpdateMillis: Long? = null
+    private var lastParams: ExtendedNotificationParams? = null
+
+    fun shouldUpdate(
+        nowMillis: Long,
+        screenOn: Boolean,
+        params: ExtendedNotificationParams,
+    ): Boolean {
+        val previousParams = lastParams
+        if (previousParams == null || lastUpdateMillis == null) {
+            record(nowMillis, params)
+            return true
+        }
+        if (!screenOn && params.isSpeedOnlyChangeFrom(previousParams)) {
+            return false
+        }
+        if (params == previousParams) {
+            return false
+        }
+        if (nowMillis - lastUpdateMillis!! < minUpdateIntervalMillis) {
+            return false
+        }
+        record(nowMillis, params)
+        return true
+    }
+
+    private fun record(nowMillis: Long, params: ExtendedNotificationParams) {
+        lastUpdateMillis = nowMillis
+        lastParams = params
+    }
+
+    private fun ExtendedNotificationParams.isSpeedOnlyChangeFrom(
+        previous: ExtendedNotificationParams,
+    ): Boolean {
+        return title == previous.title &&
+                stopText == previous.stopText &&
+                onlyStatisticsProxy == previous.onlyStatisticsProxy &&
+                contentText != previous.contentText
+    }
+}
+
 val NotificationParams.extended: ExtendedNotificationParams
     get() = ExtendedNotificationParams(
         title, stopText, onlyStatisticsProxy, Core.getSpeedTrafficText(onlyStatisticsProxy)
@@ -46,6 +88,7 @@ val NotificationParams.extended: ExtendedNotificationParams
 
 class NotificationModule(private val service: Service) : Module() {
     private val scope = CoroutineScope(Dispatchers.Default)
+    private val updatePolicy = NotificationUpdatePolicy()
     @Volatile
     private var hasStartedForeground = false
 
@@ -68,16 +111,16 @@ class NotificationModule(private val service: Service) : Module() {
                 tickerFlow(1000, 0), State.notificationParamsFlow, screenFlow
             ) { _, params, screenOn ->
                 params?.extended to screenOn
-            }.filter { (params, screenOn) -> params != null && screenOn }
-                .distinctUntilChanged { old, new -> old.first == new.first && old.second == new.second }
-                .collect { (params, _) ->
-                    update(params!!)
+            }
+                .collect { (params, screenOn) ->
+                    if (params == null) return@collect
+                    update(params, screenOn)
                 }
 
             State.notificationParamsFlow.value?.let {
-                update(it.extended)
+                update(it.extended, isScreenOn())
             } ?: run {
-                update(NotificationParams().extended)
+                update(NotificationParams().extended, isScreenOn())
             }
         }
     }
@@ -111,7 +154,15 @@ class NotificationModule(private val service: Service) : Module() {
         }
     }
 
-    private fun update(params: ExtendedNotificationParams) {
+    private fun update(params: ExtendedNotificationParams, screenOn: Boolean) {
+        if (!updatePolicy.shouldUpdate(
+                nowMillis = System.currentTimeMillis(),
+                screenOn = screenOn,
+                params = params,
+            )
+        ) {
+            return
+        }
         val notification = with(notificationBuilder) {
             setContentTitle(params.title)
             setContentText(params.contentText)
