@@ -25,7 +25,7 @@ import 'database/database.dart';
 import 'l10n/l10n.dart';
 import 'models/models.dart';
 
-typedef UpdateTasks = List<FutureOr Function()>;
+typedef UpdateTasks = List<ScheduledUpdateTask>;
 
 class GlobalState {
   static GlobalState? _instance;
@@ -40,7 +40,7 @@ class GlobalState {
   bool needInitStatus = true;
   CorePalette? corePalette;
   DateTime? startTime;
-  UpdateTasks tasks = [];
+  UpdateTaskScheduler updateTaskScheduler = UpdateTaskScheduler(const []);
   SetupState? lastSetupState;
   VpnState? lastVpnState;
 
@@ -112,9 +112,9 @@ class GlobalState {
   Future<void> startUpdateTasks([UpdateTasks? tasks]) async {
     if (timer != null && timer!.isActive == true) return;
     if (tasks != null) {
-      this.tasks = tasks;
+      updateTaskScheduler = UpdateTaskScheduler(tasks);
     }
-    if (this.tasks.isEmpty) {
+    if (updateTaskScheduler.isEmpty) {
       return;
     }
     await executorUpdateTask();
@@ -129,9 +129,7 @@ class GlobalState {
       timer = null;
       return;
     }
-    for (final task in tasks) {
-      await task();
-    }
+    await updateTaskScheduler.runDueTasks();
     timer = null;
   }
 

@@ -571,14 +571,14 @@ extension SetupControllerExt on AppController {
         if (!_ref.read(initProvider)) {
           return;
         }
-        await globalState.handleStart([updateRunTime, updateTraffic]);
+        await startRuntimeUpdates();
         applyProfileDebounce(force: true, silence: true);
       } else {
         globalState.needInitStatus = false;
         await applyProfile(
           force: true,
           preloadInvoke: () async {
-            await globalState.handleStart([updateRunTime, updateTraffic]);
+            await startRuntimeUpdates();
           },
         );
       }
@@ -643,7 +643,8 @@ extension SetupControllerExt on AppController {
     final hasServiceRunTime = globalState.startTime != null;
     final isStart = _ref.read(isStartProvider);
     final coreStatus = _ref.read(coreStatusProvider);
-    if (hasServiceRunTime && (!isStart || coreStatus == CoreStatus.disconnected)) {
+    if (hasServiceRunTime &&
+        (!isStart || coreStatus == CoreStatus.disconnected)) {
       await tryStartCore(true);
     } else if (!hasServiceRunTime && isStart) {
       await updateStatus(false, isInit: true);
@@ -1160,12 +1161,34 @@ extension CommonControllerExt on AppController {
     }
   }
 
+  Future<void> startRuntimeUpdates() async {
+    await globalState.handleStart([
+      ScheduledUpdateTask(updateRunTime),
+      ScheduledUpdateTask(updateSpeedTraffic),
+      ScheduledUpdateTask(
+        updateTotalTraffic,
+        interval: const Duration(seconds: 5),
+      ),
+    ]);
+  }
+
   Future<void> updateTraffic() async {
+    await updateSpeedTraffic();
+    await updateTotalTraffic();
+  }
+
+  Future<void> updateSpeedTraffic() async {
     final onlyStatisticsProxy = _ref.read(
       appSettingProvider.select((state) => state.onlyStatisticsProxy),
     );
     final traffic = await coreController.getTraffic(onlyStatisticsProxy);
     _ref.read(trafficsProvider.notifier).addTraffic(traffic);
+  }
+
+  Future<void> updateTotalTraffic() async {
+    final onlyStatisticsProxy = _ref.read(
+      appSettingProvider.select((state) => state.onlyStatisticsProxy),
+    );
     _ref.read(totalTrafficProvider.notifier).value = await coreController
         .getTotalTraffic(onlyStatisticsProxy);
   }
