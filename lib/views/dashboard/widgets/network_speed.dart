@@ -5,6 +5,8 @@ import 'package:fl_clash/widgets/widgets.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
+import 'network_speed_chart_data.dart';
+
 class NetworkSpeed extends StatefulWidget {
   const NetworkSpeed({super.key});
 
@@ -13,29 +15,6 @@ class NetworkSpeed extends StatefulWidget {
 }
 
 class _NetworkSpeedState extends State<NetworkSpeed> {
-  List<Point> initPoints = const [Point(0, 0), Point(1, 0)];
-
-  List<Point> _getPoints(List<Traffic> traffics) {
-    List<Point> trafficPoints = traffics
-        .toList()
-        .asMap()
-        .map(
-          (index, e) => MapEntry(
-            index,
-            Point((index + initPoints.length).toDouble(), e.speed.toDouble()),
-          ),
-        )
-        .values
-        .toList();
-
-    return [...initPoints, ...trafficPoints];
-  }
-
-  Traffic _getLastTraffic(List<Traffic> traffics) {
-    if (traffics.isEmpty) return Traffic();
-    return traffics.last;
-  }
-
   @override
   Widget build(BuildContext context) {
     final color = context.colorScheme.onSurfaceVariant.opacity80;
@@ -65,7 +44,7 @@ class _NetworkSpeedState extends State<NetworkSpeed> {
                         ),
                         SizedBox(width: 8),
                         Text(
-                          _getLastTraffic(traffics).speedText,
+                          lastNetworkSpeedTraffic(traffics).speedText,
                           style: context.textTheme.bodySmall?.copyWith(
                             color: color,
                           ),
@@ -81,7 +60,7 @@ class _NetworkSpeedState extends State<NetworkSpeed> {
                       child: LineChart(
                         gradient: true,
                         color: Theme.of(context).colorScheme.primary,
-                        points: _getPoints(traffics),
+                        points: buildNetworkSpeedPoints(traffics),
                       ),
                     ),
                   ),
