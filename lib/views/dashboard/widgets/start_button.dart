@@ -3,7 +3,6 @@ import 'package:fl_clash/controller.dart';
 import 'package:fl_clash/enum/enum.dart';
 import 'package:fl_clash/providers/database.dart';
 import 'package:fl_clash/providers/providers.dart';
-import 'package:fl_clash/state.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
@@ -118,11 +117,7 @@ class _StartButtonState extends ConsumerState<StartButton>
             final text = utils.getTimeText(runTime);
             final style = Theme.of(context).textTheme.titleMedium?.toSoftBold
                 .copyWith(color: context.colorScheme.onPrimaryContainer);
-            final textWidth = startButtonTextWidth(
-              globalState.measure
-                  .computeTextSize(Text(text, style: style, maxLines: 1))
-                  .width,
-            );
+            final textWidth = estimatedStartButtonTextWidth(text);
             return SizedBox(
               width: textWidth,
               child: Text(

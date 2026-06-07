@@ -10,5 +10,10 @@ void main() {
     test('never returns a negative width', () {
       expect(startButtonTextWidth(-8), 16);
     });
+
+    test('estimates runtime text width from character count', () {
+      expect(estimatedStartButtonTextWidth('00:00'), 61);
+      expect(estimatedStartButtonTextWidth('100:00:00'), 97);
+    });
   });
 }
