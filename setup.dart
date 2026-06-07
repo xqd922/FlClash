@@ -81,6 +81,18 @@ class BuildItem {
 }
 
 class Build {
+  static const _androidArches = [Arch.arm, Arch.arm64, Arch.amd64];
+  static const _androidTargetPlatforms = {
+    Arch.arm: 'android-arm',
+    Arch.arm64: 'android-arm64',
+    Arch.amd64: 'android-x64',
+  };
+  static const _androidAbiNames = {
+    Arch.arm: 'armeabi-v7a',
+    Arch.arm64: 'arm64-v8a',
+    Arch.amd64: 'x86_64',
+  };
+
   static List<BuildItem> get buildItems => [
     BuildItem(target: Target.macos, arch: Arch.arm64),
     BuildItem(target: Target.macos, arch: Arch.amd64),
@@ -297,8 +309,62 @@ class Build {
     return target == Target.windows;
   }
 
+  static List<String> androidBuildTargetPlatforms(Arch? arch) {
+    return _androidArches
+        .where((element) => arch == null ? true : element == arch)
+        .map((e) => _androidTargetPlatforms[e]!)
+        .toList();
+  }
+
+  static String androidAbiName(Arch arch) {
+    return _androidAbiNames[arch]!;
+  }
+
+  static String androidDistApkFileName(Arch arch, String versionName) {
+    return '$appName-$versionName-android-${androidAbiName(arch)}.apk';
+  }
+
+  static String versionNameFromPubspec(String pubspecContent) {
+    final versionLine = pubspecContent
+        .split('\n')
+        .map((line) => line.trim())
+        .firstWhere((line) => line.startsWith('version:'));
+    final version = versionLine.substring('version:'.length).trim();
+    return version.split('+').first;
+  }
+
+  static Map<String, String> prependPathEntry(
+    Map<String, String> environment,
+    String pathEntry, {
+    String pathSeparator = ';',
+  }) {
+    final nextEnvironment = Map<String, String>.from(environment);
+    final pathKey = nextEnvironment.containsKey('Path') ? 'Path' : 'PATH';
+    final currentPath = nextEnvironment[pathKey];
+    nextEnvironment[pathKey] = [
+      pathEntry,
+      if (currentPath != null && currentPath.isNotEmpty) currentPath,
+    ].join(pathSeparator);
+    return nextEnvironment;
+  }
+
   static List<String> getExecutable(String command) {
     return command.split(' ');
+  }
+
+  static String get pubCacheBinPath {
+    final environment = Platform.environment;
+    if (Platform.isWindows) {
+      final localAppData = environment['LOCALAPPDATA'];
+      if (localAppData != null && localAppData.isNotEmpty) {
+        return join(localAppData, 'Pub', 'Cache', 'bin');
+      }
+    }
+    final home = environment[Platform.isWindows ? 'USERPROFILE' : 'HOME'];
+    if (home == null || home.isEmpty) {
+      return '';
+    }
+    return join(home, '.pub-cache', 'bin');
   }
 
   static Future<void> getDistributor() async {
@@ -324,6 +390,60 @@ class Build {
       name: 'get distributor',
       Build.getExecutable('dart pub global activate -s path $distributorDir'),
     );
+  }
+
+  static Future<void> buildAndroidApk({required Arch? arch}) async {
+    final targetPlatforms = androidBuildTargetPlatforms(arch);
+    final args = [
+      'flutter',
+      'build',
+      'apk',
+      '--verbose',
+      '--dart-define-from-file',
+      'env.json',
+      '--split-per-abi',
+      '--target-platform',
+      targetPlatforms.join(','),
+    ];
+    await exec(args, name: 'android apk');
+    await copyAndroidApksToDist(
+      arch: arch,
+      versionName: versionNameFromPubspec(
+        await File('pubspec.yaml').readAsString(),
+      ),
+    );
+  }
+
+  static Future<void> copyAndroidApksToDist({
+    required Arch? arch,
+    required String versionName,
+  }) async {
+    final distDirectory = Directory(distPath);
+    if (!distDirectory.existsSync()) {
+      distDirectory.createSync(recursive: true);
+    }
+    final arches = _androidArches.where(
+      (element) => arch == null ? true : element == arch,
+    );
+    for (final item in arches) {
+      final abiName = androidAbiName(item);
+      final source = File(
+        join(
+          current,
+          'build',
+          'app',
+          'outputs',
+          'flutter-apk',
+          'app-$abiName-release.apk',
+        ),
+      );
+      if (!source.existsSync()) {
+        throw 'Android APK not found: ${source.path}';
+      }
+      await source.copy(
+        join(distPath, androidDistApkFileName(item, versionName)),
+      );
+    }
   }
 
   static void copyFile(String sourceFilePath, String destinationFilePath) {
@@ -427,14 +547,22 @@ class BuildCommand extends Command {
     required Target target,
     required String targets,
     String args = '',
-    required String env,
   }) async {
     await Build.getDistributor();
+    final pubCacheBin = Build.pubCacheBinPath;
+    final environment = pubCacheBin.isEmpty
+        ? null
+        : Build.prependPathEntry(
+            Platform.environment,
+            pubCacheBin,
+            pathSeparator: Platform.isWindows ? ';' : ':',
+          );
     await Build.exec(
       name: name,
       Build.getExecutable(
         'flutter_distributor package --skip-clean --platform ${target.name} --targets $targets --flutter-build-args=verbose,dart-define-from-file=env.json$args',
       ),
+      environment: environment,
     );
   }
 
@@ -486,7 +614,6 @@ class BuildCommand extends Command {
           target: target,
           targets: 'exe,zip',
           args: ' --description $archName',
-          env: env,
         );
         return;
       case Target.linux:
@@ -503,27 +630,10 @@ class BuildCommand extends Command {
           targets: targets,
           args:
               ' --description $archName --build-target-platform $defaultTarget',
-          env: env,
         );
         return;
       case Target.android:
-        final targetMap = {
-          Arch.arm: 'android-arm',
-          Arch.arm64: 'android-arm64',
-          Arch.amd64: 'android-x64',
-        };
-        final defaultArches = [Arch.arm, Arch.arm64, Arch.amd64];
-        final defaultTargets = defaultArches
-            .where((element) => arch == null ? true : element == arch)
-            .map((e) => targetMap[e])
-            .toList();
-        _buildDistributor(
-          target: target,
-          targets: 'apk',
-          args:
-              ",split-per-abi --build-target-platform ${defaultTargets.join(",")}",
-          env: env,
-        );
+        await Build.buildAndroidApk(arch: arch);
         return;
       case Target.macos:
         await _getMacosDependencies();
@@ -531,7 +641,6 @@ class BuildCommand extends Command {
           target: target,
           targets: 'dmg',
           args: ' --description $archName',
-          env: env,
         );
         return;
     }
