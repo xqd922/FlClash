@@ -157,10 +157,10 @@ class Build {
       runInShell: runInShell,
     );
     process.stdout.listen((data) {
-      print(utf8.decode(data));
+      print(utf8.decode(data, allowMalformed: true));
     });
     process.stderr.listen((data) {
-      print(utf8.decode(data));
+      print(utf8.decode(data, allowMalformed: true));
     });
     final exitCode = await process.exitCode;
     if (exitCode != 0 && name != null) throw '$name error';
@@ -291,6 +291,10 @@ class Build {
       'FlClashHelperService${target.executableExtensionName}',
     );
     await File(outPath).copy(targetPath);
+  }
+
+  static bool shouldBuildHelper(Target target) {
+    return target == Target.windows;
   }
 
   static List<String> getExecutable(String command) {
@@ -467,7 +471,7 @@ class BuildCommand extends Command {
 
     String? coreSha256;
 
-    if (Platform.isWindows) {
+    if (Build.shouldBuildHelper(target)) {
       coreSha256 = await Build.calcSha256(corePaths.first);
       await Build.buildHelper(target, coreSha256);
     }
