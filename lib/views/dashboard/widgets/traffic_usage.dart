@@ -1,11 +1,10 @@
-import 'dart:math';
-
 import 'package:fl_clash/common/common.dart';
 import 'package:fl_clash/providers/app.dart';
-import 'package:fl_clash/state.dart';
 import 'package:fl_clash/widgets/widgets.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+
+import 'traffic_usage_data.dart';
 
 class TrafficUsage extends StatelessWidget {
   const TrafficUsage({super.key});
@@ -60,9 +59,11 @@ class TrafficUsage extends StatelessWidget {
         onPressed: () {},
         child: Consumer(
           builder: (_, ref, _) {
-            final totalTraffic = ref.watch(totalTrafficProvider);
-            final upTotalTrafficValue = totalTraffic.up;
-            final downTotalTrafficValue = totalTraffic.down;
+            final viewData = buildTrafficUsageViewData(
+              ref.watch(totalTrafficProvider),
+              uploadColor: primaryColor,
+              downloadColor: secondaryColor,
+            );
             return Padding(
               padding: baseInfoEdgeInsets.copyWith(top: 0),
               child: Column(
@@ -79,44 +80,13 @@ class TrafficUsage extends StatelessWidget {
                         children: [
                           AspectRatio(
                             aspectRatio: 1,
-                            child: DonutChart(
-                              data: [
-                                DonutChartData(
-                                  value: upTotalTrafficValue.toDouble(),
-                                  color: primaryColor,
-                                ),
-                                DonutChartData(
-                                  value: downTotalTrafficValue.toDouble(),
-                                  color: secondaryColor,
-                                ),
-                              ],
-                            ),
+                            child: DonutChart(data: viewData.donutData),
                           ),
                           SizedBox(width: 8),
                           Flexible(
                             child: LayoutBuilder(
                               builder: (_, container) {
-                                final uploadText = Text(
-                                  maxLines: 1,
-                                  appLocalizations.upload,
-                                  overflow: TextOverflow.ellipsis,
-                                  style: context.textTheme.bodySmall,
-                                );
-                                final downloadText = Text(
-                                  maxLines: 1,
-                                  appLocalizations.download,
-                                  overflow: TextOverflow.ellipsis,
-                                  style: context.textTheme.bodySmall,
-                                );
-                                final uploadTextSize = globalState.measure
-                                    .computeTextSize(uploadText);
-                                final downloadTextSize = globalState.measure
-                                    .computeTextSize(downloadText);
-                                final maxTextWidth = max(
-                                  uploadTextSize.width,
-                                  downloadTextSize.width,
-                                );
-                                if (maxTextWidth + 24 > container.maxWidth) {
+                                if (container.maxWidth <= 24) {
                                   return Container();
                                 }
                                 return Column(
@@ -181,13 +151,13 @@ class TrafficUsage extends StatelessWidget {
                   _buildTrafficDataItem(
                     context,
                     Icon(Icons.arrow_upward, color: primaryColor, size: 14),
-                    upTotalTrafficValue,
+                    viewData.uploadValue,
                   ),
                   const SizedBox(height: 8),
                   _buildTrafficDataItem(
                     context,
                     Icon(Icons.arrow_downward, color: secondaryColor, size: 14),
-                    downTotalTrafficValue,
+                    viewData.downloadValue,
                   ),
                 ],
               ),
