@@ -72,5 +72,18 @@ void main() {
 
       expect(await target.readAsString(), 'new apk');
     });
+
+    test('retries transient file operations', () async {
+      var attempts = 0;
+
+      await Build.retryFileOperation(() async {
+        attempts += 1;
+        if (attempts < 3) {
+          throw const FileSystemException('locked');
+        }
+      }, retryDelay: Duration.zero);
+
+      expect(attempts, 3);
+    });
   });
 }

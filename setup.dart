@@ -453,9 +453,34 @@ class Build {
       destinationDirectory.createSync(recursive: true);
     }
     if (destination.existsSync()) {
-      await destination.delete();
+      await retryFileOperation(() => destination.delete());
     }
-    await source.copy(destination.path);
+    await retryFileOperation(() => source.copy(destination.path));
+  }
+
+  static Future<void> retryFileOperation(
+    Future<void> Function() operation, {
+    int maxAttempts = 5,
+    Duration retryDelay = const Duration(milliseconds: 300),
+  }) async {
+    Object? lastError;
+    StackTrace? lastStackTrace;
+    for (var attempt = 0; attempt < maxAttempts; attempt++) {
+      try {
+        await operation();
+        return;
+      } catch (error, stackTrace) {
+        lastError = error;
+        lastStackTrace = stackTrace;
+        if (attempt == maxAttempts - 1) {
+          break;
+        }
+        if (retryDelay > Duration.zero) {
+          await Future<void>.delayed(retryDelay);
+        }
+      }
+    }
+    Error.throwWithStackTrace(lastError!, lastStackTrace!);
   }
 
   static void copyFile(String sourceFilePath, String destinationFilePath) {
