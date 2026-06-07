@@ -14,13 +14,12 @@ mixin AutoDisposeNotifierMixin<T> on AnyNotifier<T, T> {
 
   @override
   bool updateShouldNotify(previous, next) {
-    final res = !equals(previous, next)
-        ? super.updateShouldNotify(previous, next)
-        : true;
-    if (res) {
+    final shouldNotify =
+        !equals(previous, next) && super.updateShouldNotify(previous, next);
+    if (shouldNotify) {
       onUpdate(next);
     }
-    return res;
+    return shouldNotify;
   }
 
   void onUpdate(T value) {}
