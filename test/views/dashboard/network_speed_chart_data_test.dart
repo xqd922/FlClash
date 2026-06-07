@@ -32,5 +32,15 @@ void main() {
         latest,
       );
     });
+
+    test('builds view data for chart and current speed text', () {
+      final viewData = buildNetworkSpeedViewData([
+        Traffic(up: 2, down: 3),
+        Traffic(up: 5, down: 8),
+      ]);
+
+      expect(viewData.points.map((point) => point.y), [0, 0, 5, 13]);
+      expect(viewData.currentSpeedText, Traffic(up: 5, down: 8).speedText);
+    });
   });
 }

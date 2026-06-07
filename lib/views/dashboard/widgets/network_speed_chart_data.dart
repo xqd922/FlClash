@@ -3,6 +3,24 @@ import 'package:fl_clash/widgets/widgets.dart';
 
 const networkSpeedBaselinePoints = [Point(0, 0), Point(1, 0)];
 
+class NetworkSpeedViewData {
+  const NetworkSpeedViewData({
+    required this.currentSpeedText,
+    required this.points,
+  });
+
+  final String currentSpeedText;
+  final List<Point> points;
+}
+
+NetworkSpeedViewData buildNetworkSpeedViewData(List<Traffic> traffics) {
+  final currentTraffic = lastNetworkSpeedTraffic(traffics);
+  return NetworkSpeedViewData(
+    currentSpeedText: currentTraffic.speedText,
+    points: buildNetworkSpeedPoints(traffics),
+  );
+}
+
 List<Point> buildNetworkSpeedPoints(List<Traffic> traffics) {
   final points = List<Point>.filled(
     networkSpeedBaselinePoints.length + traffics.length,

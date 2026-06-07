@@ -1,5 +1,4 @@
 import 'package:fl_clash/common/common.dart';
-import 'package:fl_clash/models/models.dart';
 import 'package:fl_clash/providers/app.dart';
 import 'package:fl_clash/widgets/widgets.dart';
 import 'package:flutter/material.dart';
@@ -25,7 +24,9 @@ class _NetworkSpeedState extends State<NetworkSpeed> {
           onPressed: () {},
           child: Consumer(
             builder: (_, ref, _) {
-              final traffics = ref.watch(trafficsProvider).list;
+              final viewData = buildNetworkSpeedViewData(
+                ref.watch(trafficsProvider).list,
+              );
               return Column(
                 children: [
                   Padding(
@@ -44,7 +45,7 @@ class _NetworkSpeedState extends State<NetworkSpeed> {
                         ),
                         SizedBox(width: 8),
                         Text(
-                          lastNetworkSpeedTraffic(traffics).speedText,
+                          viewData.currentSpeedText,
                           style: context.textTheme.bodySmall?.copyWith(
                             color: color,
                           ),
@@ -60,7 +61,7 @@ class _NetworkSpeedState extends State<NetworkSpeed> {
                       child: LineChart(
                         gradient: true,
                         color: Theme.of(context).colorScheme.primary,
-                        points: buildNetworkSpeedPoints(traffics),
+                        points: viewData.points,
                       ),
                     ),
                   ),
