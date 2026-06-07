@@ -1,3 +1,4 @@
+import 'dart:convert';
 import 'dart:io';
 
 import 'package:flutter_test/flutter_test.dart';
@@ -32,6 +33,49 @@ void main() {
         Build.androidDistApkFileName(Arch.arm, '7.0.20'),
         'FlClash-7.0.20-android-armeabi-v7a.apk',
       );
+    });
+
+    test('keeps dart define env file outside the repository root', () {
+      expect(
+        Build.envFilePath,
+        join(current, '.dart_tool', 'flclash', 'env.json'),
+      );
+    });
+
+    test('uses generated dart define file for android apk builds', () {
+      expect(Build.androidBuildApkArgs(Arch.arm64), [
+        'flutter',
+        'build',
+        'apk',
+        '--verbose',
+        '--dart-define-from-file',
+        Build.envFilePath,
+        '--split-per-abi',
+        '--target-platform',
+        'android-arm64',
+      ]);
+    });
+
+    test('writes dart define env file with parent directories', () async {
+      final tempDir = await Directory.systemTemp.createTemp('flclash-env-');
+      addTearDown(() async {
+        if (tempDir.existsSync()) {
+          await tempDir.delete(recursive: true);
+        }
+      });
+
+      final envFile = File(join(tempDir.path, 'nested', 'env.json'));
+      await Build.writeDartDefineEnvFile(
+        'stable',
+        coreSha256: 'core-sha',
+        path: envFile.path,
+      );
+
+      expect(envFile.existsSync(), isTrue);
+      expect(jsonDecode(await envFile.readAsString()), {
+        'APP_ENV': 'stable',
+        'CORE_SHA256': 'core-sha',
+      });
     });
 
     test('extracts version name without build number', () {

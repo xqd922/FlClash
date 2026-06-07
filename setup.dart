@@ -119,6 +119,9 @@ class Build {
 
   static String get distPath => join(current, 'dist');
 
+  static String get envFilePath =>
+      join(current, '.dart_tool', 'flclash', 'env.json');
+
   static String _getCc(BuildItem buildItem) {
     final environment = Platform.environment;
     if (buildItem.target == Target.android) {
@@ -393,25 +396,28 @@ class Build {
   }
 
   static Future<void> buildAndroidApk({required Arch? arch}) async {
-    final targetPlatforms = androidBuildTargetPlatforms(arch);
-    final args = [
-      'flutter',
-      'build',
-      'apk',
-      '--verbose',
-      '--dart-define-from-file',
-      'env.json',
-      '--split-per-abi',
-      '--target-platform',
-      targetPlatforms.join(','),
-    ];
-    await exec(args, name: 'android apk');
+    await exec(androidBuildApkArgs(arch), name: 'android apk');
     await copyAndroidApksToDist(
       arch: arch,
       versionName: versionNameFromPubspec(
         await File('pubspec.yaml').readAsString(),
       ),
     );
+  }
+
+  static List<String> androidBuildApkArgs(Arch? arch) {
+    final targetPlatforms = androidBuildTargetPlatforms(arch);
+    return [
+      'flutter',
+      'build',
+      'apk',
+      '--verbose',
+      '--dart-define-from-file',
+      envFilePath,
+      '--split-per-abi',
+      '--target-platform',
+      targetPlatforms.join(','),
+    ];
   }
 
   static Future<void> copyAndroidApksToDist({
@@ -483,6 +489,20 @@ class Build {
     Error.throwWithStackTrace(lastError!, lastStackTrace!);
   }
 
+  static Future<void> writeDartDefineEnvFile(
+    String env, {
+    String? coreSha256,
+    String? path,
+  }) async {
+    final data = {
+      'APP_ENV': env,
+      if (coreSha256 != null) 'CORE_SHA256': coreSha256,
+    };
+    final envFile = File(path ?? envFilePath);
+    await envFile.parent.create(recursive: true);
+    await envFile.writeAsString(json.encode(data));
+  }
+
   static void copyFile(String sourceFilePath, String destinationFilePath) {
     final sourceFile = File(sourceFilePath);
     if (!sourceFile.existsSync()) {
@@ -539,12 +559,7 @@ class BuildCommand extends Command {
       .toList();
 
   Future<void> _buildEnvFile(String env, {String? coreSha256}) async {
-    final data = {
-      'APP_ENV': env,
-      if (coreSha256 != null) 'CORE_SHA256': coreSha256,
-    };
-    final envFile = File(join(current, 'env.json'))..create();
-    await envFile.writeAsString(json.encode(data));
+    await Build.writeDartDefineEnvFile(env, coreSha256: coreSha256);
   }
 
   Future<void> _getLinuxDependencies(Arch arch) async {
