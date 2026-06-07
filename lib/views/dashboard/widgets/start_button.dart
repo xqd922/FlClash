@@ -7,6 +7,8 @@ import 'package:fl_clash/state.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
+import 'start_button_width.dart';
+
 class StartButton extends ConsumerStatefulWidget {
   const StartButton({super.key});
 
@@ -84,16 +86,6 @@ class _StartButtonState extends ConsumerState<StartButton>
       child: AnimatedBuilder(
         animation: _controller!.view,
         builder: (_, child) {
-          final textWidth =
-              globalState.measure
-                  .computeTextSize(
-                    Text(
-                      utils.getTimeDifference(DateTime.now()),
-                      style: context.textTheme.titleMedium?.toSoftBold,
-                    ),
-                  )
-                  .width +
-              16;
           return FloatingActionButton(
             clipBehavior: Clip.antiAlias,
             materialTapTargetSize: MaterialTapTargetSize.padded,
@@ -113,7 +105,9 @@ class _StartButtonState extends ConsumerState<StartButton>
                     progress: _animation,
                   ),
                 ),
-                SizedBox(width: textWidth * _animation.value, child: child!),
+                ClipRect(
+                  child: Align(widthFactor: _animation.value, child: child!),
+                ),
               ],
             ),
           );
@@ -122,12 +116,21 @@ class _StartButtonState extends ConsumerState<StartButton>
           builder: (_, ref, _) {
             final runTime = ref.watch(runTimeProvider);
             final text = utils.getTimeText(runTime);
-            return Text(
-              text,
-              maxLines: 1,
-              overflow: TextOverflow.visible,
-              style: Theme.of(context).textTheme.titleMedium?.toSoftBold
-                  .copyWith(color: context.colorScheme.onPrimaryContainer),
+            final style = Theme.of(context).textTheme.titleMedium?.toSoftBold
+                .copyWith(color: context.colorScheme.onPrimaryContainer);
+            final textWidth = startButtonTextWidth(
+              globalState.measure
+                  .computeTextSize(Text(text, style: style, maxLines: 1))
+                  .width,
+            );
+            return SizedBox(
+              width: textWidth,
+              child: Text(
+                text,
+                maxLines: 1,
+                overflow: TextOverflow.visible,
+                style: style,
+              ),
             );
           },
         ),
