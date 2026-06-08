@@ -13,6 +13,7 @@ import 'package:url_launcher/url_launcher.dart';
 
 import 'auto_check_update_policy.dart';
 import 'common/common.dart';
+import 'core_startup_policy.dart';
 import 'database/database.dart';
 import 'models/models.dart';
 import 'providers/database.dart';
@@ -809,7 +810,10 @@ extension CoreControllerExt on AppController {
     final version = _ref.read(versionProvider);
     if (!isInit) {
       await coreController.init(version);
-    } else {
+    } else if (shouldRefreshGroupsAfterCoreInit(
+      coreAlreadyInitialized: isInit,
+      needsInitialStatusSetup: globalState.needInitStatus,
+    )) {
       await updateGroups();
     }
   }
