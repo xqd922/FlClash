@@ -136,21 +136,7 @@ class _RequestsViewState extends ConsumerState<RequestsView> {
               label: appLocalizations.nullTip(appLocalizations.requests),
             );
           }
-          final items = requests
-              .map<Widget>(
-                (trackerInfo) => TrackerInfoItem(
-                  key: Key(trackerInfo.id),
-                  trackerInfo: trackerInfo,
-                  onClickKeyword: (value) {
-                    context.commonScaffoldState?.addKeyword(value);
-                  },
-                  detailTitle: appLocalizations.details(
-                    appLocalizations.request,
-                  ),
-                ),
-              )
-              .separated(const Divider(height: 0))
-              .toList();
+          final items = LazySeparatedList(requests);
           return Align(
             alignment: Alignment.topCenter,
             child: CommonScrollBar(
@@ -170,7 +156,20 @@ class _RequestsViewState extends ConsumerState<RequestsView> {
                   physics: NextClampingScrollPhysics(),
                   controller: _scrollController,
                   itemBuilder: (_, index) {
-                    return items[index];
+                    if (items.isSeparator(index)) {
+                      return const Divider(height: 0);
+                    }
+                    final trackerInfo = items.itemAt(index);
+                    return TrackerInfoItem(
+                      key: Key(trackerInfo.id),
+                      trackerInfo: trackerInfo,
+                      onClickKeyword: (value) {
+                        context.commonScaffoldState?.addKeyword(value);
+                      },
+                      detailTitle: appLocalizations.details(
+                        appLocalizations.request,
+                      ),
+                    );
                   },
                   itemCount: items.length,
                 ),

@@ -153,18 +153,7 @@ class _LogsViewState extends ConsumerState<LogsView> {
               label: appLocalizations.nullTip(appLocalizations.logs),
             );
           }
-          final items = logs
-              .map<Widget>(
-                (log) => LogItem(
-                  key: Key(log.dateTime),
-                  log: log,
-                  onClick: (value) {
-                    context.commonScaffoldState?.addKeyword(value);
-                  },
-                ),
-              )
-              .separated(const Divider(height: 0))
-              .toList();
+          final items = LazySeparatedList(logs);
           return Align(
             alignment: Alignment.topCenter,
             child: ScrollToEndBox(
@@ -184,7 +173,17 @@ class _LogsViewState extends ConsumerState<LogsView> {
                   shrinkWrap: true,
                   controller: _scrollController,
                   itemBuilder: (_, index) {
-                    return items[index];
+                    if (items.isSeparator(index)) {
+                      return const Divider(height: 0);
+                    }
+                    final log = items.itemAt(index);
+                    return LogItem(
+                      key: Key(log.dateTime),
+                      log: log,
+                      onClick: (value) {
+                        context.commonScaffoldState?.addKeyword(value);
+                      },
+                    );
                   },
                   itemCount: items.length,
                 ),
