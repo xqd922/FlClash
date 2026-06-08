@@ -93,27 +93,31 @@ class _StartButtonState extends ConsumerState<StartButton>
               onPressed: () {
                 handleSwitchStart();
               },
-              child: Row(
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  Container(
-                    height: startButtonIconHeight,
-                    padding: EdgeInsets.only(
-                      left: startButtonIconLeftPadding,
-                      right: startButtonExpandedIconRightPadding(
-                        _animation.value,
+              child: SizedBox(
+                height: startButtonIconHeight,
+                child: Row(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Container(
+                      height: startButtonIconHeight,
+                      padding: EdgeInsets.only(
+                        left: startButtonIconLeftPadding,
+                        right: startButtonExpandedIconRightPadding(
+                          _animation.value,
+                        ),
+                      ),
+                      alignment: Alignment.centerLeft,
+                      child: AnimatedIcon(
+                        icon: AnimatedIcons.play_pause,
+                        progress: _animation,
                       ),
                     ),
-                    alignment: Alignment.centerLeft,
-                    child: AnimatedIcon(
-                      icon: AnimatedIcons.play_pause,
-                      progress: _animation,
+                    _ExpandableStartButtonLabel(
+                      progress: _animation.value,
+                      child: child!,
                     ),
-                  ),
-                  ClipRect(
-                    child: Align(widthFactor: _animation.value, child: child!),
-                  ),
-                ],
+                  ],
+                ),
               ),
             );
           },
@@ -133,6 +137,28 @@ class _StartButtonState extends ConsumerState<StartButton>
             },
           ),
         ),
+      ),
+    );
+  }
+}
+
+class _ExpandableStartButtonLabel extends StatelessWidget {
+  const _ExpandableStartButtonLabel({
+    required this.progress,
+    required this.child,
+  });
+
+  final double progress;
+  final Widget child;
+
+  @override
+  Widget build(BuildContext context) {
+    return ClipRect(
+      child: Align(
+        widthFactor: progress,
+        heightFactor: 1,
+        alignment: Alignment.centerLeft,
+        child: child,
       ),
     );
   }
