@@ -76,65 +76,70 @@ class _StartButtonState extends ConsumerState<StartButton>
       return Container();
     }
     final theme = Theme.of(context);
-    return RepaintBoundary(
-      child: Theme(
-        data: theme.copyWith(
-          floatingActionButtonTheme: theme.floatingActionButtonTheme.copyWith(
-            sizeConstraints: const BoxConstraints(minWidth: 56, maxWidth: 200),
+    return Align(
+      widthFactor: 1,
+      heightFactor: 1,
+      alignment: AlignmentDirectional.bottomEnd,
+      child: RepaintBoundary(
+        child: Theme(
+          data: theme.copyWith(
+            floatingActionButtonTheme: theme.floatingActionButtonTheme.copyWith(
+              sizeConstraints: startButtonSizeConstraints,
+            ),
           ),
-        ),
-        child: AnimatedBuilder(
-          animation: _controller!.view,
-          builder: (_, child) {
-            return FloatingActionButton(
-              clipBehavior: Clip.antiAlias,
-              materialTapTargetSize: MaterialTapTargetSize.padded,
-              heroTag: null,
-              onPressed: () {
-                handleSwitchStart();
-              },
-              child: SizedBox(
-                height: startButtonIconHeight,
-                child: Row(
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    Container(
-                      height: startButtonIconHeight,
-                      padding: EdgeInsets.only(
-                        left: startButtonIconLeftPadding,
-                        right: startButtonExpandedIconRightPadding(
-                          _animation.value,
+          child: AnimatedBuilder(
+            animation: _controller!.view,
+            builder: (_, child) {
+              return FloatingActionButton(
+                clipBehavior: Clip.antiAlias,
+                materialTapTargetSize: MaterialTapTargetSize.padded,
+                heroTag: null,
+                onPressed: () {
+                  handleSwitchStart();
+                },
+                child: SizedBox(
+                  height: startButtonIconHeight,
+                  child: Row(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      Container(
+                        height: startButtonIconHeight,
+                        padding: EdgeInsets.only(
+                          left: startButtonIconLeftPadding,
+                          right: startButtonExpandedIconRightPadding(
+                            _animation.value,
+                          ),
+                        ),
+                        alignment: Alignment.centerLeft,
+                        child: AnimatedIcon(
+                          icon: AnimatedIcons.play_pause,
+                          progress: _animation,
                         ),
                       ),
-                      alignment: Alignment.centerLeft,
-                      child: AnimatedIcon(
-                        icon: AnimatedIcons.play_pause,
-                        progress: _animation,
+                      _ExpandableStartButtonLabel(
+                        progress: _animation.value,
+                        child: child!,
                       ),
-                    ),
-                    _ExpandableStartButtonLabel(
-                      progress: _animation.value,
-                      child: child!,
-                    ),
-                  ],
+                    ],
+                  ),
                 ),
-              ),
-            );
-          },
-          child: Consumer(
-            builder: (_, ref, _) {
-              final runTime = ref.watch(runTimeProvider);
-              final text = utils.getTimeText(runTime);
-              final style = theme.textTheme.titleMedium?.toSoftBold.copyWith(
-                color: context.colorScheme.onPrimaryContainer,
-              );
-              final textWidth = estimatedStartButtonTextWidth(text);
-              return _StartButtonLabel(
-                text: text,
-                width: textWidth,
-                style: style,
               );
             },
+            child: Consumer(
+              builder: (_, ref, _) {
+                final runTime = ref.watch(runTimeProvider);
+                final text = utils.getTimeText(runTime);
+                final style = theme.textTheme.titleMedium?.toSoftBold.copyWith(
+                  color: context.colorScheme.onPrimaryContainer,
+                );
+                final textWidth = estimatedStartButtonTextWidth(text);
+                return _StartButtonLabel(
+                  text: text,
+                  width: textWidth,
+                  style: style,
+                );
+              },
+            ),
           ),
         ),
       ),

@@ -1,4 +1,5 @@
 import 'package:fl_clash/views/dashboard/widgets/start_button_width.dart';
+import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 
 void main() {
@@ -25,6 +26,16 @@ void main() {
     test('clamps icon right padding progress', () {
       expect(startButtonExpandedIconRightPadding(-1), 16);
       expect(startButtonExpandedIconRightPadding(2), 8);
+    });
+
+    test('keeps floating action button height bounded', () {
+      const constraints = startButtonSizeConstraints;
+
+      expect(constraints.minWidth, startButtonIconHeight);
+      expect(constraints.minHeight, startButtonIconHeight);
+      expect(constraints.maxHeight, startButtonIconHeight);
+      expect(constraints.maxWidth, 200);
+      expect(constraints, isA<BoxConstraints>());
     });
   });
 }

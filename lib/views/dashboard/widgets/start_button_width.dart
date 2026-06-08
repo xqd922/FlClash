@@ -1,9 +1,18 @@
+import 'package:flutter/material.dart';
+
 const startButtonRuntimeCharacterWidth = 9.0;
 const startButtonRuntimeHorizontalPadding = 16.0;
 const startButtonIconHeight = 56.0;
 const startButtonIconLeftPadding = 16.0;
 const startButtonIconRightPadding = 16.0;
 const startButtonIconExpandedRightPadding = 8.0;
+const startButtonMaxWidth = 200.0;
+const startButtonSizeConstraints = BoxConstraints(
+  minWidth: startButtonIconHeight,
+  maxWidth: startButtonMaxWidth,
+  minHeight: startButtonIconHeight,
+  maxHeight: startButtonIconHeight,
+);
 
 double startButtonTextWidth(double measuredTextWidth) {
   return _paddedWidth(measuredTextWidth, startButtonRuntimeHorizontalPadding);

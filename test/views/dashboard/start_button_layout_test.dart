@@ -18,11 +18,22 @@ void main() {
 
     expectStartButtonSize(tester, maxWidth: 160, maxHeight: 72);
   });
+
+  testWidgets('Start button height remains bounded in tall constraints', (
+    tester,
+  ) async {
+    await pumpStartButton(tester, runTime: 60 * 60, constrainFabHeight: 640);
+
+    final buttonSize = tester.getSize(find.byType(FloatingActionButton));
+
+    expect(buttonSize.height, 56);
+  });
 }
 
 Future<void> pumpStartButton(
   WidgetTester tester, {
   required int? runTime,
+  double? constrainFabHeight,
 }) async {
   tester.view.physicalSize = const Size(390, 844);
   tester.view.devicePixelRatio = 1;
@@ -41,10 +52,15 @@ Future<void> pumpStartButton(
         ]),
         runTimeProvider.overrideWithValue(runTime),
       ],
-      child: const MaterialApp(
+      child: MaterialApp(
         home: Scaffold(
-          body: SizedBox.expand(),
-          floatingActionButton: StartButton(),
+          body: const SizedBox.expand(),
+          floatingActionButton: constrainFabHeight == null
+              ? const StartButton()
+              : SizedBox(
+                  height: constrainFabHeight,
+                  child: const StartButton(),
+                ),
         ),
       ),
     ),
