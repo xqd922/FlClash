@@ -8,6 +8,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:super_sliver_list/super_sliver_list.dart';
 
 import 'item.dart';
+import 'requests_updates.dart';
 
 class RequestsView extends ConsumerStatefulWidget {
   const RequestsView({super.key});
@@ -22,6 +23,10 @@ class _RequestsViewState extends ConsumerState<RequestsView> {
   );
   List<TrackerInfo> _requests = [];
   late final ScrollController _scrollController;
+
+  bool get _shouldUpdateView => shouldUpdateRequestsView(
+    isRequestsCurrent: ref.read(isCurrentPageProvider(PageLabel.requests)),
+  );
 
   void _onSearch(String value) {
     _requestsStateNotifier.value = _requestsStateNotifier.value.copyWith(
@@ -48,7 +53,18 @@ class _RequestsViewState extends ConsumerState<RequestsView> {
       next,
     ) {
       _requests = next;
+      if (!_shouldUpdateView) {
+        return;
+      }
       updateRequestsThrottler();
+    });
+    ref.listenManual(isCurrentPageProvider(PageLabel.requests), (
+      previous,
+      next,
+    ) {
+      if (next) {
+        updateRequestsThrottler();
+      }
     });
   }
 
@@ -60,8 +76,11 @@ class _RequestsViewState extends ConsumerState<RequestsView> {
   }
 
   void updateRequestsThrottler() {
+    if (!_shouldUpdateView) {
+      return;
+    }
     throttler.call(FunctionTag.requests, () {
-      if (!mounted) {
+      if (!mounted || !_shouldUpdateView) {
         return;
       }
       final isEquality = trackerInfoListEquality.equals(
@@ -72,7 +91,7 @@ class _RequestsViewState extends ConsumerState<RequestsView> {
         return;
       }
       WidgetsBinding.instance.addPostFrameCallback((_) {
-        if (mounted) {
+        if (mounted && _shouldUpdateView) {
           _requestsStateNotifier.value = _requestsStateNotifier.value.copyWith(
             trackerInfos: _requests,
           );
