@@ -327,7 +327,7 @@ class NetworkDetection extends _$NetworkDetection
 
   @override
   NetworkDetectionState build() {
-    return NetworkDetectionState(isLoading: true, ipInfo: null);
+    return NetworkDetectionState(isLoading: false, ipInfo: null);
   }
 
   void startCheck() {

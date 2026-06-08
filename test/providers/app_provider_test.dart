@@ -40,4 +40,11 @@ void main() {
 
     expect(notifications, [1000, null]);
   });
+
+  test('NetworkDetection starts idle until a check is requested', () {
+    final container = ProviderContainer();
+    addTearDown(container.dispose);
+
+    expect(container.read(networkDetectionProvider).isLoading, isFalse);
+  });
 }

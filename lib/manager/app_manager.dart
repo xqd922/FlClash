@@ -4,6 +4,7 @@ import 'package:fl_clash/common/common.dart';
 import 'package:fl_clash/controller.dart';
 import 'package:fl_clash/enum/enum.dart';
 import 'package:fl_clash/manager/window_manager.dart';
+import 'package:fl_clash/network_detection_policy.dart';
 import 'package:fl_clash/providers/providers.dart';
 import 'package:fl_clash/state.dart';
 import 'package:flutter/foundation.dart';
@@ -27,7 +28,15 @@ class _AppStateManagerState extends ConsumerState<AppStateManager>
     super.initState();
     WidgetsBinding.instance.addObserver(this);
     ref.listenManual(checkIpProvider, (prev, next) {
-      if (prev != next && next.a) {
+      final shouldStart =
+          prev != null &&
+          shouldStartNetworkDetection(
+            previousIsInitialized: prev.a,
+            previousCheckRequest: prev.b,
+            nextIsInitialized: next.a,
+            nextCheckRequest: next.b,
+          );
+      if (shouldStart) {
         ref.read(networkDetectionProvider.notifier).startCheck();
       }
     });
