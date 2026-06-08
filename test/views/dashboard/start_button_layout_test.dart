@@ -6,7 +6,6 @@ import 'package:fl_clash/providers/database.dart';
 import 'package:fl_clash/providers/providers.dart';
 import 'package:fl_clash/state.dart';
 import 'package:fl_clash/views/dashboard/dashboard.dart';
-import 'package:fl_clash/views/dashboard/widgets/dashboard_start_button.dart';
 import 'package:fl_clash/views/dashboard/widgets/start_button.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
@@ -37,6 +36,16 @@ void main() {
 
     expect(rootSize.width, lessThanOrEqualTo(200));
     expect(rootSize.height, 56);
+  });
+
+  testWidgets('Start button collapses when there is no profile', (
+    tester,
+  ) async {
+    await pumpStartButton(tester, runTime: null, hasProfile: false);
+
+    final rootSize = tester.getSize(find.byType(StartButton));
+
+    expect(rootSize, Size.zero);
   });
 
   testWidgets('Start button height remains bounded in tall constraints', (
@@ -76,26 +85,38 @@ void main() {
     expectStartButtonSize(tester, maxWidth: 200, maxHeight: 72);
   });
 
-  testWidgets('Dashboard start button shell shrinks when stopped', (
+  testWidgets('Dashboard start button root shrinks when stopped', (
     tester,
   ) async {
     await pumpDashboard(tester, runTime: null);
 
-    final rootSize = tester.getSize(find.byType(DashboardStartButton));
+    final rootSize = tester.getSize(find.byType(StartButton));
 
     expect(rootSize.width, lessThanOrEqualTo(72));
     expect(rootSize.height, 56);
   });
 
-  testWidgets('Dashboard start button shell follows running width', (
+  testWidgets('Dashboard start button root follows running width', (
     tester,
   ) async {
     await pumpDashboard(tester, runTime: _oneHourRuntime);
 
-    final rootSize = tester.getSize(find.byType(DashboardStartButton));
+    final rootSize = tester.getSize(find.byType(StartButton));
 
     expect(rootSize.width, lessThanOrEqualTo(160));
     expect(rootSize.height, 56);
+  });
+
+  testWidgets('Dashboard FAB transition slot stays compact', (tester) async {
+    await pumpDashboard(tester, runTime: _oneHourRuntime);
+
+    final fabSlot = find
+        .ancestor(of: find.byType(StartButton), matching: find.byType(Stack))
+        .last;
+    final fabSlotSize = tester.getSize(fabSlot);
+
+    expect(fabSlotSize.width, lessThanOrEqualTo(200));
+    expect(fabSlotSize.height, 56);
   });
 
   testWidgets('Dashboard core status action stays compact', (tester) async {
@@ -120,6 +141,7 @@ void main() {
 Future<void> pumpStartButton(
   WidgetTester tester, {
   required int? runTime,
+  bool hasProfile = true,
   double? constrainFabWidth,
   double? constrainFabHeight,
 }) async {
@@ -131,13 +153,17 @@ Future<void> pumpStartButton(
   await tester.pumpWidget(
     ProviderScope(
       overrides: [
-        profilesProvider.overrideWithValue([
-          const Profile(
-            id: 1,
-            label: 'test',
-            autoUpdateDuration: Duration.zero,
-          ),
-        ]),
+        profilesProvider.overrideWithValue(
+          hasProfile
+              ? [
+                  const Profile(
+                    id: 1,
+                    label: 'test',
+                    autoUpdateDuration: Duration.zero,
+                  ),
+                ]
+              : [],
+        ),
         runTimeProvider.overrideWithValue(runTime),
       ],
       child: MaterialApp(

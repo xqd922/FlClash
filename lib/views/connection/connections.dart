@@ -139,39 +139,61 @@ class _ConnectionsViewState extends ConsumerState<ConnectionsView> {
               illustration: ConnectionEmptyIllustration(),
             );
           }
-          final items = connections
-              .map<Widget>(
-                (trackerInfo) => TrackerInfoItem(
-                  key: Key(trackerInfo.id),
-                  trackerInfo: trackerInfo,
-                  onClickKeyword: (value) {
-                    context.commonScaffoldState?.addKeyword(value);
-                  },
-                  trailing: IconButton(
-                    padding: EdgeInsets.zero,
-                    visualDensity: VisualDensity.compact,
-                    style: IconButton.styleFrom(minimumSize: Size.zero),
-                    icon: const Icon(Icons.block),
-                    onPressed: () {
-                      _handleBlockConnection(trackerInfo.id);
-                    },
-                  ),
-                  detailTitle: appLocalizations.details(
-                    appLocalizations.connection,
-                  ),
-                ),
-              )
-              .separated(const Divider(height: 0))
-              .toList();
-          return SuperListView.builder(
+          return ConnectionsList(
             controller: _scrollController,
-            itemBuilder: (context, index) {
-              return items[index];
+            connections: connections,
+            onClickKeyword: (value) {
+              context.commonScaffoldState?.addKeyword(value);
             },
-            itemCount: connections.length,
+            onBlockConnection: _handleBlockConnection,
           );
         },
       ),
+    );
+  }
+}
+
+class ConnectionsList extends StatelessWidget {
+  const ConnectionsList({
+    super.key,
+    required this.connections,
+    required this.onClickKeyword,
+    required this.onBlockConnection,
+    this.controller,
+  });
+
+  final List<TrackerInfo> connections;
+  final ValueChanged<String> onClickKeyword;
+  final ValueChanged<String> onBlockConnection;
+  final ScrollController? controller;
+
+  @override
+  Widget build(BuildContext context) {
+    final items = LazySeparatedList(connections);
+    return SuperListView.builder(
+      controller: controller,
+      itemBuilder: (context, index) {
+        if (items.isSeparator(index)) {
+          return const Divider(height: 0);
+        }
+        final trackerInfo = items.itemAt(index);
+        return TrackerInfoItem(
+          key: Key(trackerInfo.id),
+          trackerInfo: trackerInfo,
+          onClickKeyword: onClickKeyword,
+          trailing: IconButton(
+            padding: EdgeInsets.zero,
+            visualDensity: VisualDensity.compact,
+            style: IconButton.styleFrom(minimumSize: Size.zero),
+            icon: const Icon(Icons.block),
+            onPressed: () {
+              onBlockConnection(trackerInfo.id);
+            },
+          ),
+          detailTitle: appLocalizations.details(appLocalizations.connection),
+        );
+      },
+      itemCount: items.length,
     );
   }
 }

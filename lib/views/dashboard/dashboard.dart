@@ -12,7 +12,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import 'dashboard_widget_layout.dart';
 import 'widgets/core_status_action.dart';
-import 'widgets/dashboard_start_button.dart';
+import 'widgets/start_button.dart';
 
 typedef _IsEditWidgetBuilder = Widget Function(bool isEdit);
 
@@ -184,7 +184,7 @@ class _DashboardViewState extends ConsumerState<DashboardView> {
       (isEdit) => CommonScaffold(
         title: appLocalizations.dashboard,
         actions: _buildActions(isEdit),
-        floatingActionButton: const DashboardStartButton(),
+        floatingActionButton: const StartButton(),
         body: Align(
           alignment: Alignment.topCenter,
           child: SingleChildScrollView(

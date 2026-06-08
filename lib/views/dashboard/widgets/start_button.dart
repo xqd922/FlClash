@@ -73,7 +73,7 @@ class _StartButtonState extends ConsumerState<StartButton>
       profilesProvider.select((state) => state.isNotEmpty),
     );
     if (!hasProfile) {
-      return Container();
+      return const SizedBox.shrink();
     }
     final theme = Theme.of(context);
     return Align(
