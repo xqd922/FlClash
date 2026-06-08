@@ -171,12 +171,17 @@ abstract class LogsState with _$LogsState {
 
 extension LogsStateExt on LogsState {
   List<Log> get list {
-    final lowQuery = query.toLowerCase();
+    if (query.isEmpty && keywords.isEmpty) {
+      return logs;
+    }
+    final lowerQuery = query.toLowerCase();
     return logs.where((log) {
       final logLevelName = log.logLevel.name;
-      return {logLevelName}.containsAll(keywords) &&
-          ((log.payload.toLowerCase().contains(lowQuery)) ||
-              logLevelName.contains(lowQuery));
+      if (!_containsAllKeywordsInValue(logLevelName, keywords)) {
+        return false;
+      }
+      return log.payload.toLowerCase().contains(lowerQuery) ||
+          logLevelName.contains(lowerQuery);
     }).toList();
   }
 }
@@ -193,25 +198,56 @@ abstract class TrackerInfosState with _$TrackerInfosState {
 
 extension TrackerInfosStateExt on TrackerInfosState {
   List<TrackerInfo> get list {
-    final lowerQuery = query.toLowerCase().trim();
-    final lowQuery = query.toLowerCase();
+    if (query.isEmpty && keywords.isEmpty) {
+      return trackerInfos;
+    }
+    final rawLowerQuery = query.toLowerCase();
+    final lowerQuery = rawLowerQuery.trim();
     return trackerInfos.where((trackerInfo) {
       final chains = trackerInfo.chains;
       final process = trackerInfo.metadata.process;
+      if (!_containsAllKeywords(chains, keywords, extra: process)) {
+        return false;
+      }
       final networkText = trackerInfo.metadata.network.toLowerCase();
       final hostText = trackerInfo.metadata.host.toLowerCase();
       final destinationIPText = trackerInfo.metadata.destinationIP
           .toLowerCase();
       final processText = trackerInfo.metadata.process.toLowerCase();
       final chainsText = chains.join('').toLowerCase();
-      return {...chains, process}.containsAll(keywords) &&
-          (networkText.contains(lowerQuery) ||
-              hostText.contains(lowerQuery) ||
-              destinationIPText.contains(lowQuery) ||
-              processText.contains(lowerQuery) ||
-              chainsText.contains(lowerQuery));
+      return networkText.contains(lowerQuery) ||
+          hostText.contains(lowerQuery) ||
+          destinationIPText.contains(rawLowerQuery) ||
+          processText.contains(lowerQuery) ||
+          chainsText.contains(lowerQuery);
     }).toList();
   }
+}
+
+bool _containsAllKeywordsInValue(String value, List<String> keywords) {
+  for (final keyword in keywords) {
+    if (value != keyword) {
+      return false;
+    }
+  }
+  return true;
+}
+
+bool _containsAllKeywords(
+  List<String> values,
+  List<String> keywords, {
+  String? extra,
+}) {
+  for (final keyword in keywords) {
+    var contains = extra == keyword;
+    if (!contains) {
+      contains = values.contains(keyword);
+    }
+    if (!contains) {
+      return false;
+    }
+  }
+  return true;
 }
 
 const defaultDavFileName = 'backup.zip';
