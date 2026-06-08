@@ -2,16 +2,24 @@ import 'package:fl_clash/common/common.dart';
 import 'package:fl_clash/controller.dart';
 import 'package:fl_clash/providers/app.dart';
 import 'package:fl_clash/state.dart';
+import 'package:fl_clash/system_ui_overlay_style_updater.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../providers/state.dart';
 
-class ThemeManager extends ConsumerWidget {
+class ThemeManager extends ConsumerStatefulWidget {
   final Widget child;
 
   const ThemeManager({super.key, required this.child});
+
+  @override
+  ConsumerState<ThemeManager> createState() => _ThemeManagerState();
+}
+
+class _ThemeManagerState extends ConsumerState<ThemeManager> {
+  SystemUiOverlayStyleUpdater? _systemUiOverlayStyleUpdater;
 
   Widget _buildSystemUi(Widget child) {
     if (!system.isAndroid) {
@@ -23,30 +31,13 @@ class ThemeManager extends ConsumerWidget {
       child: Consumer(
         builder: (context, ref, _) {
           final brightness = ref.watch(currentBrightnessProvider);
-          final iconBrightness = brightness == Brightness.light
-              ? Brightness.dark
-              : Brightness.light;
-          WidgetsBinding.instance.addPostFrameCallback((_) {
-            ref
-                .read(systemUiOverlayStyleStateProvider.notifier)
-                .update(
-                  (state) => state.copyWith(
-                    statusBarColor: Colors.transparent,
-                    statusBarIconBrightness: iconBrightness,
-                    systemNavigationBarIconBrightness: iconBrightness,
-                    systemNavigationBarColor: context.colorScheme.surface,
-                    systemNavigationBarDividerColor: Colors.transparent,
-                  ),
-                );
-          });
+          final style = buildAndroidSystemUiOverlayStyle(
+            brightness: brightness,
+            surface: context.colorScheme.surface,
+          );
+          _updateSystemUiOverlayStyle(style);
           return AnnotatedRegion<SystemUiOverlayStyle>(
-            value: SystemUiOverlayStyle(
-              statusBarColor: Colors.transparent,
-              statusBarIconBrightness: iconBrightness,
-              systemNavigationBarIconBrightness: iconBrightness,
-              systemNavigationBarColor: context.colorScheme.surface,
-              systemNavigationBarDividerColor: Colors.transparent,
-            ),
+            value: style,
             sized: false,
             child: child,
           );
@@ -56,7 +47,7 @@ class ThemeManager extends ConsumerWidget {
   }
 
   @override
-  Widget build(BuildContext context, ref) {
+  Widget build(BuildContext context) {
     globalState.measure = Measure.of(context, defaultTextScaleFactor);
     final padding = MediaQuery.of(context).padding;
     final height = MediaQuery.of(context).size.height;
@@ -80,10 +71,28 @@ class ThemeManager extends ConsumerWidget {
             appController.updateViewSize(
               Size(container.maxWidth, container.maxHeight),
             );
-            return _buildSystemUi(child);
+            return _buildSystemUi(widget.child);
           },
         ),
       ),
     );
+  }
+
+  void _updateSystemUiOverlayStyle(SystemUiOverlayStyle style) {
+    final updater = _systemUiOverlayStyleUpdater ??=
+        SystemUiOverlayStyleUpdater(
+          read: () => ref.read(systemUiOverlayStyleStateProvider),
+          write: (value) {
+            ref.read(systemUiOverlayStyleStateProvider.notifier).value = value;
+          },
+          schedule: (callback) {
+            WidgetsBinding.instance.addPostFrameCallback((_) {
+              if (mounted) {
+                callback();
+              }
+            });
+          },
+        );
+    updater.update(style);
   }
 }
