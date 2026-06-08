@@ -9,6 +9,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:super_sliver_list/super_sliver_list.dart';
 
+import 'logs_updates.dart';
+
 class LogsView extends ConsumerStatefulWidget {
   const LogsView({super.key});
 
@@ -22,6 +24,10 @@ class _LogsViewState extends ConsumerState<LogsView> {
 
   List<Log> _logs = [];
 
+  bool get _shouldUpdateView => shouldUpdateLogsView(
+    isLogsCurrent: ref.read(isCurrentPageProvider(PageLabel.logs)),
+  );
+
   @override
   void initState() {
     super.initState();
@@ -30,11 +36,19 @@ class _LogsViewState extends ConsumerState<LogsView> {
     _logsStateNotifier.value = _logsStateNotifier.value.copyWith(logs: _logs);
     ref.listenManual(logsProvider.select((state) => state.list), (prev, next) {
       if (prev != next) {
+        _logs = next;
+        if (!_shouldUpdateView) {
+          return;
+        }
         final isEquality = logListEquality.equals(prev, next);
         if (!isEquality) {
-          _logs = next;
           updateLogsThrottler();
         }
+      }
+    });
+    ref.listenManual(isCurrentPageProvider(PageLabel.logs), (previous, next) {
+      if (next) {
+        updateLogsThrottler();
       }
     });
   }
@@ -79,8 +93,11 @@ class _LogsViewState extends ConsumerState<LogsView> {
   }
 
   void updateLogsThrottler() {
+    if (!_shouldUpdateView) {
+      return;
+    }
     throttler.call(FunctionTag.logs, () {
-      if (!mounted) {
+      if (!mounted || !_shouldUpdateView) {
         return;
       }
       final isEquality = logListEquality.equals(
@@ -91,7 +108,7 @@ class _LogsViewState extends ConsumerState<LogsView> {
         return;
       }
       WidgetsBinding.instance.addPostFrameCallback((_) {
-        if (mounted) {
+        if (mounted && _shouldUpdateView) {
           _logsStateNotifier.value = _logsStateNotifier.value.copyWith(
             logs: _logs,
           );
