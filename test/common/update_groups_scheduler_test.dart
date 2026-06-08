@@ -58,5 +58,19 @@ void main() {
 
       expect(runs, 2);
     });
+
+    test('records when the latest update completed', () async {
+      var now = DateTime.fromMillisecondsSinceEpoch(1000);
+      final scheduler = UpdateGroupsScheduler(now: () => now);
+
+      await scheduler.run(() async {
+        now = DateTime.fromMillisecondsSinceEpoch(1500);
+      });
+
+      expect(
+        scheduler.lastCompletedAt,
+        DateTime.fromMillisecondsSinceEpoch(1500),
+      );
+    });
   });
 }

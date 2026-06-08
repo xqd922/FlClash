@@ -4,6 +4,8 @@ class UpdateGroupsScheduler {
   Future<void>? _inFlight;
   DateTime? _lastCompletedAt;
 
+  DateTime? get lastCompletedAt => _lastCompletedAt;
+
   UpdateGroupsScheduler({
     this.minInterval = const Duration(milliseconds: 1000),
     DateTime Function()? now,

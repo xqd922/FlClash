@@ -66,7 +66,7 @@ class _CoreContainerState extends ConsumerState<CoreManager>
     super.onDelay(delay);
     appController.setDelay(delay);
     debouncer.call(FunctionTag.updateDelay, () async {
-      appController.updateGroupsDebounce();
+      appController.updateGroupsAfterCoreEvent();
     }, duration: const Duration(milliseconds: 5000));
   }
 
@@ -91,7 +91,7 @@ class _CoreContainerState extends ConsumerState<CoreManager>
         .read(providersProvider.notifier)
         .setProvider(await coreController.getExternalProvider(providerName));
     debouncer.call(FunctionTag.loadedProvider, () async {
-      appController.updateGroupsDebounce();
+      appController.updateGroupsAfterCoreEvent();
     }, duration: const Duration(milliseconds: 5000));
     super.onLoaded(providerName);
   }

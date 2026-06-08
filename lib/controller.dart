@@ -13,6 +13,7 @@ import 'package:url_launcher/url_launcher.dart';
 
 import 'auto_check_update_policy.dart';
 import 'common/common.dart';
+import 'core_event_update_groups_policy.dart';
 import 'core_startup_policy.dart';
 import 'database/database.dart';
 import 'models/models.dart';
@@ -419,6 +420,16 @@ extension ProxiesControllerExt on AppController {
 
   Future<void> updateGroups() async {
     await _updateGroupsScheduler.run(_updateGroupsNow);
+  }
+
+  void updateGroupsAfterCoreEvent() {
+    if (!shouldRefreshGroupsAfterCoreEvent(
+      lastGroupsRefreshAt: _updateGroupsScheduler.lastCompletedAt,
+      eventAt: DateTime.now(),
+    )) {
+      return;
+    }
+    updateGroupsDebounce();
   }
 
   Future<void> _updateGroupsNow() async {
