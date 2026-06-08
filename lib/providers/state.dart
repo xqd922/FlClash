@@ -19,14 +19,7 @@ GroupsState currentGroupsState(Ref ref) {
     patchClashConfigProvider.select((state) => state.mode),
   );
   final groups = ref.watch(
-    groupsProvider.select(
-      (state) => state.map((item) {
-        return item.copyWith(
-          now: '',
-          all: item.all.map((proxy) => proxy.copyWith(now: '')).toList(),
-        );
-      }),
-    ),
+    groupsProvider.select((state) => state.map(_withoutRuntimeSelection)),
   );
   return GroupsState(
     value: switch (mode) {
@@ -39,6 +32,24 @@ GroupsState currentGroupsState(Ref ref) {
             .toList(),
     },
   );
+}
+
+Group _withoutRuntimeSelection(Group group) {
+  final hasGroupSelection = group.now != null && group.now!.isNotEmpty;
+  List<Proxy>? proxies;
+  for (var index = 0; index < group.all.length; index++) {
+    final proxy = group.all[index];
+    if (proxy.now == null || proxy.now == '') {
+      proxies?.add(proxy);
+      continue;
+    }
+    proxies ??= group.all.take(index).toList(growable: true);
+    proxies.add(proxy.copyWith(now: ''));
+  }
+  if (!hasGroupSelection && proxies == null) {
+    return group;
+  }
+  return group.copyWith(now: '', all: proxies ?? group.all);
 }
 
 @riverpod
@@ -507,10 +518,7 @@ VM2<bool, int> checkIp(Ref ref) {
 }
 
 @riverpod
-ColorScheme genColorScheme(
-  Ref ref,
-  Brightness brightness,
-) {
+ColorScheme genColorScheme(Ref ref, Brightness brightness) {
   ref.watch(themeSettingProvider);
   return ColorScheme.fromSeed(
     seedColor:

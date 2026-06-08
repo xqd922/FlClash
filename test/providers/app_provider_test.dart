@@ -1,3 +1,4 @@
+import 'package:fl_clash/enum/enum.dart';
 import 'package:fl_clash/models/models.dart';
 import 'package:fl_clash/providers/providers.dart';
 import 'package:flutter_test/flutter_test.dart';
@@ -46,5 +47,56 @@ void main() {
     addTearDown(container.dispose);
 
     expect(container.read(networkDetectionProvider).isLoading, isFalse);
+  });
+
+  test('CurrentGroupsState reuses groups that have no runtime selection', () {
+    final proxy = Proxy(name: 'Proxy A', type: 'ss');
+    final group = Group(
+      name: 'Group A',
+      type: GroupType.Selector,
+      hidden: false,
+      all: [proxy],
+    );
+    final container = ProviderContainer(
+      overrides: [
+        groupsProvider.overrideWithValue([group]),
+        patchClashConfigProvider.overrideWithValue(ClashConfig()),
+      ],
+    );
+    addTearDown(container.dispose);
+
+    final groups = container.read(currentGroupsStateProvider).value;
+
+    expect(groups, hasLength(1));
+    expect(identical(groups.first, group), isTrue);
+    expect(identical(groups.first.all.first, proxy), isTrue);
+  });
+
+  test('CurrentGroupsState only copies groups with runtime selection', () {
+    final cleanProxy = Proxy(name: 'Proxy A', type: 'ss');
+    final selectedProxy = Proxy(name: 'Proxy B', type: 'ss', now: 'fast');
+    final group = Group(
+      name: 'Group A',
+      type: GroupType.Selector,
+      now: 'Proxy B',
+      hidden: false,
+      all: [cleanProxy, selectedProxy],
+    );
+    final container = ProviderContainer(
+      overrides: [
+        groupsProvider.overrideWithValue([group]),
+        patchClashConfigProvider.overrideWithValue(ClashConfig()),
+      ],
+    );
+    addTearDown(container.dispose);
+
+    final sanitizedGroup = container.read(currentGroupsStateProvider).value;
+
+    expect(sanitizedGroup, hasLength(1));
+    expect(identical(sanitizedGroup.first, group), isFalse);
+    expect(sanitizedGroup.first.now, '');
+    expect(identical(sanitizedGroup.first.all.first, cleanProxy), isTrue);
+    expect(identical(sanitizedGroup.first.all.last, selectedProxy), isFalse);
+    expect(sanitizedGroup.first.all.last.now, '');
   });
 }
