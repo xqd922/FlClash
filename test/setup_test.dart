@@ -56,6 +56,32 @@ void main() {
       ]);
     });
 
+    test('uses generated dart define file for distributor package builds', () {
+      expect(
+        Build.distributorPackageArgs(
+          target: Target.linux,
+          targets: 'deb,appimage,rpm',
+          description: 'amd64',
+          buildTargetPlatform: 'linux-x64',
+        ),
+        [
+          'flutter_distributor',
+          'package',
+          '--skip-clean',
+          '--platform',
+          'linux',
+          '--targets',
+          'deb,appimage,rpm',
+          '--flutter-build-args',
+          'verbose,dart-define-from-file=${Build.envFilePath}',
+          '--description',
+          'amd64',
+          '--build-target-platform',
+          'linux-x64',
+        ],
+      );
+    });
+
     test('writes dart define env file with parent directories', () async {
       final tempDir = await Directory.systemTemp.createTemp('flclash-env-');
       addTearDown(() async {

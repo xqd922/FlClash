@@ -395,6 +395,30 @@ class Build {
     );
   }
 
+  static List<String> distributorPackageArgs({
+    required Target target,
+    required String targets,
+    String? description,
+    String? buildTargetPlatform,
+  }) {
+    return [
+      'flutter_distributor',
+      'package',
+      '--skip-clean',
+      '--platform',
+      target.name,
+      '--targets',
+      targets,
+      '--flutter-build-args',
+      'verbose,dart-define-from-file=$envFilePath',
+      if (description != null) ...['--description', description],
+      if (buildTargetPlatform != null) ...[
+        '--build-target-platform',
+        buildTargetPlatform,
+      ],
+    ];
+  }
+
   static Future<void> buildAndroidApk({required Arch? arch}) async {
     await exec(androidBuildApkArgs(arch), name: 'android apk');
     await copyAndroidApksToDist(
@@ -598,7 +622,8 @@ class BuildCommand extends Command {
   Future<void> _buildDistributor({
     required Target target,
     required String targets,
-    String args = '',
+    String? description,
+    String? buildTargetPlatform,
   }) async {
     await Build.getDistributor();
     final pubCacheBin = Build.pubCacheBinPath;
@@ -611,8 +636,11 @@ class BuildCommand extends Command {
           );
     await Build.exec(
       name: name,
-      Build.getExecutable(
-        'flutter_distributor package --skip-clean --platform ${target.name} --targets $targets --flutter-build-args=verbose,dart-define-from-file=env.json$args',
+      Build.distributorPackageArgs(
+        target: target,
+        targets: targets,
+        description: description,
+        buildTargetPlatform: buildTargetPlatform,
       ),
       environment: environment,
     );
@@ -662,10 +690,10 @@ class BuildCommand extends Command {
 
     switch (target) {
       case Target.windows:
-        _buildDistributor(
+        await _buildDistributor(
           target: target,
           targets: 'exe,zip',
-          args: ' --description $archName',
+          description: archName,
         );
         return;
       case Target.linux:
@@ -677,11 +705,11 @@ class BuildCommand extends Command {
         ].join(',');
         final defaultTarget = targetMap[arch];
         await _getLinuxDependencies(arch!);
-        _buildDistributor(
+        await _buildDistributor(
           target: target,
           targets: targets,
-          args:
-              ' --description $archName --build-target-platform $defaultTarget',
+          description: archName,
+          buildTargetPlatform: defaultTarget,
         );
         return;
       case Target.android:
@@ -689,10 +717,10 @@ class BuildCommand extends Command {
         return;
       case Target.macos:
         await _getMacosDependencies();
-        _buildDistributor(
+        await _buildDistributor(
           target: target,
           targets: 'dmg',
-          args: ' --description $archName',
+          description: archName,
         );
         return;
     }
