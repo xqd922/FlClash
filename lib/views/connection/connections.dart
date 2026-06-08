@@ -2,12 +2,15 @@ import 'dart:async';
 
 import 'package:fl_clash/common/common.dart';
 import 'package:fl_clash/core/controller.dart';
+import 'package:fl_clash/enum/enum.dart';
 import 'package:fl_clash/models/models.dart';
+import 'package:fl_clash/providers/providers.dart';
 import 'package:fl_clash/widgets/widgets.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:super_sliver_list/super_sliver_list.dart';
 
+import 'connections_polling.dart';
 import 'item.dart';
 
 class ConnectionsView extends ConsumerStatefulWidget {
@@ -23,7 +26,13 @@ class _ConnectionsViewState extends ConsumerState<ConnectionsView> {
   );
   final ScrollController _scrollController = ScrollController();
 
-  Timer? timer;
+  Timer? _timer;
+
+  bool get _shouldPoll => shouldPollConnections(
+    isConnectionsCurrent: ref.read(
+      isCurrentPageProvider(PageLabel.connections),
+    ),
+  );
 
   List<Widget> _buildActions() {
     return [
@@ -49,21 +58,49 @@ class _ConnectionsViewState extends ConsumerState<ConnectionsView> {
     );
   }
 
-  Future<void> _updateConnectionsTask() async {
+  void _cancelTimer() {
+    _timer?.cancel();
+    _timer = null;
+  }
+
+  void _scheduleNextUpdate() {
+    _cancelTimer();
+    if (!_shouldPoll) {
+      return;
+    }
+    _timer = Timer(connectionsPollingInterval, _updateConnectionsTask);
+  }
+
+  void _updateConnectionsTask() {
+    if (!_shouldPoll) {
+      _cancelTimer();
+      return;
+    }
     WidgetsBinding.instance.addPostFrameCallback((_) async {
-      if (mounted) {
-        await _updateConnections();
-        timer = Timer(Duration(seconds: 1), () async {
-          _updateConnectionsTask();
-        });
+      if (!mounted) {
+        return;
       }
+      await _updateConnections();
+      if (!mounted) {
+        return;
+      }
+      _scheduleNextUpdate();
     });
   }
 
   @override
   void initState() {
     super.initState();
-    _updateConnectionsTask();
+    ref.listenManual(isCurrentPageProvider(PageLabel.connections), (
+      previous,
+      next,
+    ) {
+      if (next) {
+        _updateConnectionsTask();
+      } else {
+        _cancelTimer();
+      }
+    }, fireImmediately: true);
   }
 
   Future<void> _updateConnections() async {
@@ -79,10 +116,9 @@ class _ConnectionsViewState extends ConsumerState<ConnectionsView> {
 
   @override
   void dispose() {
-    timer?.cancel();
+    _cancelTimer();
     _connectionsStateNotifier.dispose();
     _scrollController.dispose();
-    timer = null;
     super.dispose();
   }
 
