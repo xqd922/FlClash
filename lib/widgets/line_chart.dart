@@ -1,5 +1,3 @@
-import 'dart:ui';
-
 import 'package:fl_clash/common/color.dart';
 import 'package:flutter/material.dart';
 
@@ -8,6 +6,40 @@ class Point {
   final double y;
 
   const Point(this.x, this.y);
+}
+
+double interpolateLineChartValue(double oldValue, double newValue, double t) {
+  if (t <= 0) return oldValue;
+  if (t >= 1) return newValue;
+  return oldValue + (newValue - oldValue) * t;
+}
+
+double _normalizeLineChartValue(double value, double min, double max) {
+  final range = max - min;
+  if (range == 0) return 0;
+  return (value - min) / range;
+}
+
+List<Point> normalizeLineChartPoints(List<Point> points) {
+  if (points.isEmpty) return [];
+  double maxX = points[0].x;
+  double minX = points[0].x;
+  double maxY = points[0].y;
+  double minY = points[0].y;
+
+  for (final point in points) {
+    if (point.x > maxX) maxX = point.x;
+    if (point.x < minX) minX = point.x;
+    if (point.y > maxY) maxY = point.y;
+    if (point.y < minY) minY = point.y;
+  }
+
+  return points.map((point) {
+    return Point(
+      _normalizeLineChartValue(point.x, minX, maxX),
+      _normalizeLineChartValue(point.y, minY, maxY),
+    );
+  }).toList();
 }
 
 class LineChart extends StatefulWidget {
@@ -63,26 +95,7 @@ class _LineChartState extends State<LineChart>
   }
 
   List<Point> _getRenderPoints(List<Point> points) {
-    if (points.isEmpty) return [];
-    double maxX = points[0].x;
-    double minX = points[0].x;
-    double maxY = points[0].y;
-    double minY = points[0].y;
-
-    for (final point in points) {
-      if (point.x > maxX) maxX = point.x;
-      if (point.x < minX) minX = point.x;
-      if (point.y > maxY) maxY = point.y;
-      if (point.y < minY) minY = point.y;
-    }
-
-    return points.map((e) {
-      var x = (e.x - minX) / (maxX - minX);
-      if (x.isNaN) x = 0;
-      var y = (e.y - minY) / (maxY - minY);
-      if (y.isNaN) y = 0;
-      return Point(x, y);
-    }).toList();
+    return normalizeLineChartPoints(points);
   }
 
   @override
@@ -141,60 +154,52 @@ class LineChartPainter extends CustomPainter {
     _fillPaint = Paint()..style = PaintingStyle.fill;
   }
 
-  List<Point> _getInterpolatePoints(double t) {
-    if (currentRenderPoints.isEmpty) return [];
-
-    final length = currentRenderPoints.length;
-    final result = <Point>[];
-
-    for (var i = 0; i < length; i++) {
-      if (i > prevRenderPoints.length - 1) {
-        result.add(currentRenderPoints[i]);
-      } else {
-        final x = lerpDouble(
-          prevRenderPoints[i].x,
-          currentRenderPoints[i].x,
-          t,
-        )!;
-        final y = lerpDouble(
-          prevRenderPoints[i].y,
-          currentRenderPoints[i].y,
-          t,
-        )!;
-        result.add(Point(x, y));
-      }
+  double _getX(int index) {
+    if (index > prevRenderPoints.length - 1) {
+      return currentRenderPoints[index].x;
     }
-
-    return result;
+    final prev = prevRenderPoints[index];
+    final current = currentRenderPoints[index];
+    return interpolateLineChartValue(prev.x, current.x, progress);
   }
 
-  Path _getPath(List<Point> points, Size size) {
-    if (points.isEmpty) return Path();
+  double _getY(int index) {
+    if (index > prevRenderPoints.length - 1) {
+      return currentRenderPoints[index].y;
+    }
+    final prev = prevRenderPoints[index];
+    final current = currentRenderPoints[index];
+    return interpolateLineChartValue(prev.y, current.y, progress);
+  }
 
+  Path _getAnimatedPath(Size size) {
+    if (currentRenderPoints.isEmpty) return Path();
+
+    final firstX = _getX(0);
+    final firstY = _getY(0);
     final path = Path()
-      ..moveTo(points[0].x * size.width, (1 - points[0].y) * size.height);
+      ..moveTo(firstX * size.width, (1 - firstY) * size.height);
 
-    for (var i = 1; i < points.length - 1; i++) {
-      final nextPoint = points[i + 1];
-      final currentPoint = points[i];
-      final midX = (currentPoint.x + nextPoint.x) / 2;
-      final midY = (currentPoint.y + nextPoint.y) / 2;
+    for (var i = 1; i < currentRenderPoints.length - 1; i++) {
+      final currentX = _getX(i);
+      final currentY = _getY(i);
+      final nextX = _getX(i + 1);
+      final nextY = _getY(i + 1);
+      final midX = (currentX + nextX) / 2;
+      final midY = (currentY + nextY) / 2;
 
       path.quadraticBezierTo(
-        currentPoint.x * size.width,
-        (1 - currentPoint.y) * size.height,
+        currentX * size.width,
+        (1 - currentY) * size.height,
         midX * size.width,
         (1 - midY) * size.height,
       );
     }
 
-    path.lineTo(points.last.x * size.width, (1 - points.last.y) * size.height);
+    final lastX = _getX(currentRenderPoints.length - 1);
+    final lastY = _getY(currentRenderPoints.length - 1);
+    path.lineTo(lastX * size.width, (1 - lastY) * size.height);
     return path;
-  }
-
-  Path _getAnimatedPath(Size size) {
-    final interpolatedPoints = _getInterpolatePoints(progress);
-    return _getPath(interpolatedPoints, size);
   }
 
   Shader _getShader(Size size) {
