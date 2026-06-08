@@ -28,6 +28,19 @@ void main() {
       expect(startButtonExpandedIconRightPadding(2), 8);
     });
 
+    test('computes compact visual width from text and animation progress', () {
+      expect(startButtonWidthForText('00:00:00', 0), startButtonIconHeight);
+      expect(startButtonWidthForText('00:00:00', 1), 136);
+    });
+
+    test('clamps visual width progress and maximum width', () {
+      expect(startButtonWidthForText('00:00:00', -1), startButtonIconHeight);
+      expect(
+        startButtonWidthForText('00:00:00-very-long-runtime', 2),
+        startButtonMaxWidth,
+      );
+    });
+
     test('keeps floating action button height bounded', () {
       const constraints = startButtonSizeConstraints;
 

@@ -76,12 +76,25 @@ void main() {
     expectStartButtonSize(tester, maxWidth: 200, maxHeight: 72);
   });
 
-  testWidgets('Dashboard keeps start button root compact', (tester) async {
+  testWidgets('Dashboard start button shell shrinks when stopped', (
+    tester,
+  ) async {
+    await pumpDashboard(tester, runTime: null);
+
+    final rootSize = tester.getSize(find.byType(DashboardStartButton));
+
+    expect(rootSize.width, lessThanOrEqualTo(72));
+    expect(rootSize.height, 56);
+  });
+
+  testWidgets('Dashboard start button shell follows running width', (
+    tester,
+  ) async {
     await pumpDashboard(tester, runTime: _oneHourRuntime);
 
     final rootSize = tester.getSize(find.byType(DashboardStartButton));
 
-    expect(rootSize.width, lessThanOrEqualTo(200));
+    expect(rootSize.width, lessThanOrEqualTo(160));
     expect(rootSize.height, 56);
   });
 

@@ -90,37 +90,44 @@ class _StartButtonState extends ConsumerState<StartButton>
           child: AnimatedBuilder(
             animation: _controller!.view,
             builder: (_, child) {
-              return FloatingActionButton(
-                clipBehavior: Clip.antiAlias,
-                materialTapTargetSize: MaterialTapTargetSize.padded,
-                heroTag: null,
-                onPressed: () {
-                  handleSwitchStart();
-                },
-                child: SizedBox(
-                  height: startButtonIconHeight,
-                  child: Row(
-                    mainAxisSize: MainAxisSize.min,
-                    children: [
-                      Container(
-                        height: startButtonIconHeight,
-                        padding: EdgeInsets.only(
-                          left: startButtonIconLeftPadding,
-                          right: startButtonExpandedIconRightPadding(
-                            _animation.value,
+              final runTime = ref.read(runTimeProvider);
+              final text = utils.getTimeText(runTime);
+              final width = startButtonWidthForText(text, _animation.value);
+              return SizedBox(
+                width: width,
+                height: startButtonIconHeight,
+                child: FloatingActionButton(
+                  clipBehavior: Clip.antiAlias,
+                  materialTapTargetSize: MaterialTapTargetSize.padded,
+                  heroTag: null,
+                  onPressed: () {
+                    handleSwitchStart();
+                  },
+                  child: SizedBox(
+                    height: startButtonIconHeight,
+                    child: Row(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        Container(
+                          height: startButtonIconHeight,
+                          padding: EdgeInsets.only(
+                            left: startButtonIconLeftPadding,
+                            right: startButtonExpandedIconRightPadding(
+                              _animation.value,
+                            ),
+                          ),
+                          alignment: Alignment.centerLeft,
+                          child: AnimatedIcon(
+                            icon: AnimatedIcons.play_pause,
+                            progress: _animation,
                           ),
                         ),
-                        alignment: Alignment.centerLeft,
-                        child: AnimatedIcon(
-                          icon: AnimatedIcons.play_pause,
-                          progress: _animation,
+                        _ExpandableStartButtonLabel(
+                          progress: _animation.value,
+                          child: child!,
                         ),
-                      ),
-                      _ExpandableStartButtonLabel(
-                        progress: _animation.value,
-                        child: child!,
-                      ),
-                    ],
+                      ],
+                    ),
                   ),
                 ),
               );
