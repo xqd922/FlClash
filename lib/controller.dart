@@ -2,6 +2,7 @@ import 'dart:async';
 import 'dart:io';
 
 import 'package:fl_clash/core/core.dart';
+import 'package:fl_clash/deferred_value_updater.dart';
 import 'package:fl_clash/enum/enum.dart';
 import 'package:fl_clash/local_ip_refresh.dart';
 import 'package:fl_clash/plugins/app.dart';
@@ -27,6 +28,8 @@ class AppController {
   int _lastCheckIpAt = 0;
   final _updateGroupsScheduler = UpdateGroupsScheduler();
   LocalIpRefreshController? _localIpRefreshController;
+  DeferredValueUpdater<Brightness>? _brightnessUpdater;
+  DeferredValueUpdater<Size>? _viewSizeUpdater;
 
   static AppController? _instance;
 
@@ -946,16 +949,35 @@ extension SystemControllerExt on AppController {
   }
 
   void updateBrightness() {
-    WidgetsBinding.instance.addPostFrameCallback((_) {
-      _ref.read(systemBrightnessProvider.notifier).value =
-          WidgetsBinding.instance.platformDispatcher.platformBrightness;
-    });
+    final updater = _brightnessUpdater ??= DeferredValueUpdater<Brightness>(
+      read: () => _ref.read(systemBrightnessProvider),
+      write: (value) {
+        _ref.read(systemBrightnessProvider.notifier).value = value;
+      },
+      schedule: (callback) {
+        WidgetsBinding.instance.addPostFrameCallback((_) {
+          callback();
+        });
+      },
+    );
+    updater.update(
+      WidgetsBinding.instance.platformDispatcher.platformBrightness,
+    );
   }
 
   void updateViewSize(Size size) {
-    WidgetsBinding.instance.addPostFrameCallback((_) {
-      _ref.read(viewSizeProvider.notifier).value = size;
-    });
+    final updater = _viewSizeUpdater ??= DeferredValueUpdater<Size>(
+      read: () => _ref.read(viewSizeProvider),
+      write: (value) {
+        _ref.read(viewSizeProvider.notifier).value = value;
+      },
+      schedule: (callback) {
+        WidgetsBinding.instance.addPostFrameCallback((_) {
+          callback();
+        });
+      },
+    );
+    updater.update(size);
   }
 
   void initLink() {
