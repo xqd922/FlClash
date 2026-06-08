@@ -10,6 +10,7 @@ import 'package:fl_clash/widgets/widgets.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
+import 'dashboard_widget_layout.dart';
 import 'widgets/start_button.dart';
 
 typedef _IsEditWidgetBuilder = Widget Function(bool isEdit);
@@ -224,27 +225,28 @@ class _DashboardViewState extends ConsumerState<DashboardView> {
     }
   }
 
+  void _syncAddedWidgets(List<GridItem> children) {
+    final addableWidgets = addableDashboardWidgets(
+      children,
+      platform: SupportPlatform.currentPlatform,
+    );
+    if (isSameGridItemList(_addedWidgetsNotifier.value, addableWidgets)) {
+      return;
+    }
+    _addedWidgetsNotifier.value = addableWidgets;
+  }
+
   @override
   Widget build(BuildContext context) {
     final dashboardState = ref.watch(dashboardStateProvider);
     final columns = max(4 * ((dashboardState.contentWidth / 280).ceil()), 8);
     final spacing = 14.mAp;
-    final children = [
-      ...dashboardState.dashboardWidgets
-          .where(
-            (item) => item.platforms.contains(SupportPlatform.currentPlatform),
-          )
-          .map((item) => item.widget),
-    ];
+    final children = dashboardWidgetsForPlatform(
+      dashboardState.dashboardWidgets,
+      platform: SupportPlatform.currentPlatform,
+    );
     WidgetsBinding.instance.addPostFrameCallback((_) {
-      _addedWidgetsNotifier.value = DashboardWidget.values
-          .where(
-            (item) =>
-                !children.contains(item.widget) &&
-                item.platforms.contains(SupportPlatform.currentPlatform),
-          )
-          .map((item) => item.widget)
-          .toList();
+      _syncAddedWidgets(children);
     });
     return _buildIsEdit(
       (isEdit) => CommonScaffold(
@@ -263,15 +265,7 @@ class _DashboardViewState extends ConsumerState<DashboardView> {
                         crossAxisCount: columns,
                         crossAxisSpacing: spacing,
                         mainAxisSpacing: spacing,
-                        children: [
-                          ...dashboardState.dashboardWidgets
-                              .where(
-                                (item) => item.platforms.contains(
-                                  SupportPlatform.currentPlatform,
-                                ),
-                              )
-                              .map((item) => item.widget),
-                        ],
+                        children: children,
                         onUpdate: () {
                           _handleSave();
                         },
