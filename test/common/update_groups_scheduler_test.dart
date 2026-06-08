@@ -72,5 +72,21 @@ void main() {
         DateTime.fromMillisecondsSinceEpoch(1500),
       );
     });
+
+    test('normalizes synchronous task failures into failed futures', () async {
+      var now = DateTime.fromMillisecondsSinceEpoch(1000);
+      final scheduler = UpdateGroupsScheduler(now: () => now);
+
+      final update = scheduler.run(() {
+        now = DateTime.fromMillisecondsSinceEpoch(1500);
+        throw StateError('boom');
+      });
+
+      await expectLater(update, throwsA(isA<StateError>()));
+      expect(
+        scheduler.lastCompletedAt,
+        DateTime.fromMillisecondsSinceEpoch(1500),
+      );
+    });
   });
 }

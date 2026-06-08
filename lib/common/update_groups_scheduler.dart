@@ -22,14 +22,14 @@ class UpdateGroupsScheduler {
         currentTime.difference(lastCompletedAt) < minInterval) {
       return Future.value();
     }
-    final future = task();
-    _inFlight = future;
-    future.whenComplete(() {
+    late final Future<void> future;
+    future = Future.sync(task).whenComplete(() {
       if (identical(_inFlight, future)) {
         _inFlight = null;
       }
       _lastCompletedAt = now();
     });
+    _inFlight = future;
     return future;
   }
 }
