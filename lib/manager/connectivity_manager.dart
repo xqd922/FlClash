@@ -1,6 +1,7 @@
 import 'dart:async';
 
 import 'package:connectivity_plus/connectivity_plus.dart';
+import 'package:fl_clash/connectivity_policy.dart';
 import 'package:flutter/material.dart';
 
 class ConnectivityManager extends StatefulWidget {
@@ -19,13 +20,21 @@ class ConnectivityManager extends StatefulWidget {
 
 class _ConnectivityManagerState extends State<ConnectivityManager> {
   late StreamSubscription subscription;
+  final _connectivityChangeGate = ConnectivityChangeGate();
 
   @override
   void initState() {
     super.initState();
     subscription = Connectivity().onConnectivityChanged.listen((results) async {
+      final nextResults = _connectivityChangeGate.handle(
+        results,
+        lifecycleState: WidgetsBinding.instance.lifecycleState,
+      );
+      if (nextResults == null) {
+        return;
+      }
       if (widget.onConnectivityChanged != null) {
-        widget.onConnectivityChanged!(results);
+        widget.onConnectivityChanged!(nextResults);
       }
     });
   }

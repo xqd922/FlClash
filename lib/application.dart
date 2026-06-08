@@ -4,6 +4,7 @@ import 'dart:io';
 import 'package:connectivity_plus/connectivity_plus.dart';
 import 'package:fl_clash/application_auto_update.dart';
 import 'package:fl_clash/common/common.dart';
+import 'package:fl_clash/connectivity_policy.dart';
 import 'package:fl_clash/core/core.dart';
 import 'package:fl_clash/l10n/l10n.dart';
 import 'package:fl_clash/manager/hotkey_manager.dart';
@@ -29,7 +30,7 @@ class Application extends ConsumerStatefulWidget {
 class ApplicationState extends ConsumerState<Application>
     with WidgetsBindingObserver {
   Timer? _autoUpdateProfilesTaskTimer;
-  bool _preHasVpn = false;
+  List<ConnectivityResult>? _lastConnectivityResults;
 
   final _pageTransitionsTheme = const PageTransitionsTheme(
     builders: <TargetPlatform, PageTransitionsBuilder>{
@@ -120,13 +121,16 @@ class ApplicationState extends ConsumerState<Application>
       child: CoreManager(
         child: ConnectivityManager(
           onConnectivityChanged: (results) async {
+            final previousResults = _lastConnectivityResults;
+            _lastConnectivityResults = results;
             commonPrint.log('connectivityChanged ${results.toString()}');
             appController.updateLocalIp();
-            final hasVpn = results.contains(ConnectivityResult.vpn);
-            if (_preHasVpn != hasVpn) {
+            if (shouldCheckIpAfterConnectivityChange(
+              previousResults: previousResults,
+              nextResults: results,
+            )) {
               appController.tryCheckIp();
             }
-            _preHasVpn = hasVpn;
           },
           child: child,
         ),
