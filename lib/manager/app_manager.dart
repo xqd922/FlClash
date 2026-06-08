@@ -3,6 +3,7 @@ import 'dart:async';
 import 'package:fl_clash/common/common.dart';
 import 'package:fl_clash/controller.dart';
 import 'package:fl_clash/enum/enum.dart';
+import 'package:fl_clash/manager/sidebar_width_policy.dart';
 import 'package:fl_clash/manager/window_manager.dart';
 import 'package:fl_clash/network_detection_policy.dart';
 import 'package:fl_clash/providers/providers.dart';
@@ -169,9 +170,21 @@ class AppSidebarContainer extends ConsumerWidget {
 
   void _updateSideBarWidth(WidgetRef ref, double contentWidth) {
     WidgetsBinding.instance.addPostFrameCallback((_) {
-      ref.read(sideWidthProvider.notifier).value =
-          ref.read(viewSizeProvider.select((state) => state.width)) -
-          contentWidth;
+      final viewWidth = ref.read(
+        viewSizeProvider.select((state) => state.width),
+      );
+      final currentSideWidth = ref.read(sideWidthProvider);
+      if (!shouldUpdateSideWidth(
+        currentSideWidth: currentSideWidth,
+        viewWidth: viewWidth,
+        contentWidth: contentWidth,
+      )) {
+        return;
+      }
+      ref.read(sideWidthProvider.notifier).value = computeSideWidth(
+        viewWidth: viewWidth,
+        contentWidth: contentWidth,
+      );
     });
   }
 
