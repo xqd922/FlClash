@@ -75,60 +75,89 @@ class _StartButtonState extends ConsumerState<StartButton>
     if (!hasProfile) {
       return Container();
     }
-    return Theme(
-      data: Theme.of(context).copyWith(
-        floatingActionButtonTheme: Theme.of(context).floatingActionButtonTheme
-            .copyWith(
-              sizeConstraints: BoxConstraints(minWidth: 56, maxWidth: 200),
-            ),
-      ),
-      child: AnimatedBuilder(
-        animation: _controller!.view,
-        builder: (_, child) {
-          return FloatingActionButton(
-            clipBehavior: Clip.antiAlias,
-            materialTapTargetSize: MaterialTapTargetSize.padded,
-            heroTag: null,
-            onPressed: () {
-              handleSwitchStart();
-            },
-            child: Row(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                Container(
-                  height: 56,
-                  width: 56,
-                  alignment: Alignment.center,
-                  child: AnimatedIcon(
-                    icon: AnimatedIcons.play_pause,
-                    progress: _animation,
+    final theme = Theme.of(context);
+    return RepaintBoundary(
+      child: Theme(
+        data: theme.copyWith(
+          floatingActionButtonTheme: theme.floatingActionButtonTheme.copyWith(
+            sizeConstraints: const BoxConstraints(minWidth: 56, maxWidth: 200),
+          ),
+        ),
+        child: AnimatedBuilder(
+          animation: _controller!.view,
+          builder: (_, child) {
+            return FloatingActionButton(
+              clipBehavior: Clip.antiAlias,
+              materialTapTargetSize: MaterialTapTargetSize.padded,
+              heroTag: null,
+              onPressed: () {
+                handleSwitchStart();
+              },
+              child: Row(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Container(
+                    height: startButtonIconHeight,
+                    padding: EdgeInsets.only(
+                      left: startButtonIconLeftPadding,
+                      right: startButtonExpandedIconRightPadding(
+                        _animation.value,
+                      ),
+                    ),
+                    alignment: Alignment.centerLeft,
+                    child: AnimatedIcon(
+                      icon: AnimatedIcons.play_pause,
+                      progress: _animation,
+                    ),
                   ),
-                ),
-                ClipRect(
-                  child: Align(widthFactor: _animation.value, child: child!),
-                ),
-              ],
-            ),
-          );
-        },
-        child: Consumer(
-          builder: (_, ref, _) {
-            final runTime = ref.watch(runTimeProvider);
-            final text = utils.getTimeText(runTime);
-            final style = Theme.of(context).textTheme.titleMedium?.toSoftBold
-                .copyWith(color: context.colorScheme.onPrimaryContainer);
-            final textWidth = estimatedStartButtonTextWidth(text);
-            return SizedBox(
-              width: textWidth,
-              child: Text(
-                text,
-                maxLines: 1,
-                overflow: TextOverflow.visible,
-                style: style,
+                  ClipRect(
+                    child: Align(widthFactor: _animation.value, child: child!),
+                  ),
+                ],
               ),
             );
           },
+          child: Consumer(
+            builder: (_, ref, _) {
+              final runTime = ref.watch(runTimeProvider);
+              final text = utils.getTimeText(runTime);
+              final style = theme.textTheme.titleMedium?.toSoftBold.copyWith(
+                color: context.colorScheme.onPrimaryContainer,
+              );
+              final textWidth = estimatedStartButtonTextWidth(text);
+              return _StartButtonLabel(
+                text: text,
+                width: textWidth,
+                style: style,
+              );
+            },
+          ),
         ),
+      ),
+    );
+  }
+}
+
+class _StartButtonLabel extends StatelessWidget {
+  const _StartButtonLabel({
+    required this.text,
+    required this.width,
+    required this.style,
+  });
+
+  final String text;
+  final double width;
+  final TextStyle? style;
+
+  @override
+  Widget build(BuildContext context) {
+    return SizedBox(
+      width: width,
+      child: Text(
+        text,
+        maxLines: 1,
+        overflow: TextOverflow.visible,
+        style: style,
       ),
     );
   }

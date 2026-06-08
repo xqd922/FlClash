@@ -15,5 +15,16 @@ void main() {
       expect(estimatedStartButtonTextWidth('00:00'), 61);
       expect(estimatedStartButtonTextWidth('100:00:00'), 97);
     });
+
+    test('shrinks icon right padding as the button expands', () {
+      expect(startButtonExpandedIconRightPadding(0), 16);
+      expect(startButtonExpandedIconRightPadding(0.5), 12);
+      expect(startButtonExpandedIconRightPadding(1), 8);
+    });
+
+    test('clamps icon right padding progress', () {
+      expect(startButtonExpandedIconRightPadding(-1), 16);
+      expect(startButtonExpandedIconRightPadding(2), 8);
+    });
   });
 }

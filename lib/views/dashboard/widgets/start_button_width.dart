@@ -1,9 +1,31 @@
 const startButtonRuntimeCharacterWidth = 9.0;
+const startButtonRuntimeHorizontalPadding = 16.0;
+const startButtonIconHeight = 56.0;
+const startButtonIconLeftPadding = 16.0;
+const startButtonIconRightPadding = 16.0;
+const startButtonIconExpandedRightPadding = 8.0;
 
 double startButtonTextWidth(double measuredTextWidth) {
-  return (measuredTextWidth < 0 ? 0 : measuredTextWidth) + 16;
+  return _paddedWidth(measuredTextWidth, startButtonRuntimeHorizontalPadding);
 }
 
 double estimatedStartButtonTextWidth(String text) {
-  return startButtonTextWidth(text.length * startButtonRuntimeCharacterWidth);
+  return startButtonTextWidth(
+    _estimatedTextWidth(text, startButtonRuntimeCharacterWidth),
+  );
+}
+
+double startButtonExpandedIconRightPadding(double progress) {
+  final clampedProgress = progress.clamp(0.0, 1.0);
+  return startButtonIconRightPadding -
+      (startButtonIconRightPadding - startButtonIconExpandedRightPadding) *
+          clampedProgress;
+}
+
+double _paddedWidth(double measuredTextWidth, double padding) {
+  return (measuredTextWidth < 0 ? 0 : measuredTextWidth) + padding;
+}
+
+double _estimatedTextWidth(String text, double characterWidth) {
+  return text.length * characterWidth;
 }
