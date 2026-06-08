@@ -43,6 +43,7 @@ export 'system.dart';
 export 'task.dart';
 export 'text.dart';
 export 'tray.dart';
+export 'update_groups_scheduler.dart';
 export 'update_task_scheduler.dart';
 export 'utils.dart';
 export 'window.dart';

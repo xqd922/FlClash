@@ -22,6 +22,7 @@ class AppController {
   late final WidgetRef _ref;
   bool isAttach = false;
   int _lastCheckIpAt = 0;
+  final _updateGroupsScheduler = UpdateGroupsScheduler();
 
   static AppController? _instance;
 
@@ -416,6 +417,10 @@ extension ProxiesControllerExt on AppController {
   }
 
   Future<void> updateGroups() async {
+    await _updateGroupsScheduler.run(_updateGroupsNow);
+  }
+
+  Future<void> _updateGroupsNow() async {
     try {
       commonPrint.log('updateGroups');
       _ref.read(groupsProvider.notifier).value = await retry(
