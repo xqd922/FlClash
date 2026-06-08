@@ -11,6 +11,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:url_launcher/url_launcher.dart';
 
+import 'auto_check_update_policy.dart';
 import 'common/common.dart';
 import 'database/database.dart';
 import 'models/models.dart';
@@ -123,7 +124,21 @@ extension InitControllerExt on AppController {
   }
 
   Future<void> autoCheckUpdate() async {
-    if (!_ref.read(appSettingProvider).autoCheckUpdate) return;
+    scheduleAutoCheckUpdate(
+      isEnabled: () => _ref.read(appSettingProvider).autoCheckUpdate,
+      lifecycleState: () => WidgetsBinding.instance.lifecycleState,
+      schedule: (delay, task) => Timer(delay, task),
+      checkForUpdate: _autoCheckUpdateNow,
+      onError: (error, stackTrace) {
+        commonPrint.log(
+          'autoCheckUpdate failed: $error stack: $stackTrace',
+          logLevel: LogLevel.warning,
+        );
+      },
+    );
+  }
+
+  Future<void> _autoCheckUpdateNow() async {
     final res = await request.checkForUpdate();
     checkUpdateResultHandle(data: res);
   }
