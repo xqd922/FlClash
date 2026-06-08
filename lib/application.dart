@@ -2,12 +2,14 @@ import 'dart:async';
 import 'dart:io';
 
 import 'package:connectivity_plus/connectivity_plus.dart';
+import 'package:fl_clash/application_auto_update.dart';
 import 'package:fl_clash/common/common.dart';
 import 'package:fl_clash/core/core.dart';
 import 'package:fl_clash/l10n/l10n.dart';
 import 'package:fl_clash/manager/hotkey_manager.dart';
 import 'package:fl_clash/manager/manager.dart';
 import 'package:fl_clash/plugins/app.dart';
+import 'package:fl_clash/providers/database.dart';
 import 'package:fl_clash/providers/providers.dart';
 import 'package:fl_clash/state.dart';
 import 'package:flutter/material.dart';
@@ -24,7 +26,8 @@ class Application extends ConsumerStatefulWidget {
   ConsumerState<Application> createState() => ApplicationState();
 }
 
-class ApplicationState extends ConsumerState<Application> {
+class ApplicationState extends ConsumerState<Application>
+    with WidgetsBindingObserver {
   Timer? _autoUpdateProfilesTaskTimer;
   bool _preHasVpn = false;
 
@@ -37,15 +40,17 @@ class ApplicationState extends ConsumerState<Application> {
     },
   );
 
-  ColorScheme _getAppColorScheme({
-    required Brightness brightness,
-  }) {
+  ColorScheme _getAppColorScheme({required Brightness brightness}) {
     return ref.read(genColorSchemeProvider(brightness));
   }
 
   @override
   void initState() {
     super.initState();
+    WidgetsBinding.instance.addObserver(this);
+    ref.listenManual(profilesProvider, (previous, next) {
+      _syncProfileAutoUpdateTimer();
+    }, fireImmediately: true);
     WidgetsBinding.instance.addPostFrameCallback((timeStamp) async {
       final currentContext = globalState.navigatorKey.currentContext;
       if (currentContext != null) {
@@ -53,17 +58,50 @@ class ApplicationState extends ConsumerState<Application> {
       } else {
         exit(0);
       }
-      _autoUpdateProfilesTask();
+      _syncProfileAutoUpdateTimer();
       appController.initLink();
       app?.initShortcuts();
     });
   }
 
-  void _autoUpdateProfilesTask() {
-    _autoUpdateProfilesTaskTimer = Timer(const Duration(minutes: 20), () async {
-      await appController.autoUpdateProfiles();
-      _autoUpdateProfilesTask();
-    });
+  @override
+  void didChangeAppLifecycleState(AppLifecycleState state) {
+    _syncProfileAutoUpdateTimer();
+  }
+
+  void _cancelProfileAutoUpdateTimer() {
+    _autoUpdateProfilesTaskTimer?.cancel();
+    _autoUpdateProfilesTaskTimer = null;
+  }
+
+  bool get _shouldScheduleProfileAutoUpdate {
+    return shouldScheduleProfileAutoUpdate(
+      profiles: ref.read(profilesProvider),
+      lifecycleState: WidgetsBinding.instance.lifecycleState,
+    );
+  }
+
+  void _syncProfileAutoUpdateTimer() {
+    if (!_shouldScheduleProfileAutoUpdate) {
+      _cancelProfileAutoUpdateTimer();
+      return;
+    }
+    if (_autoUpdateProfilesTaskTimer?.isActive == true) {
+      return;
+    }
+    _autoUpdateProfilesTaskTimer = Timer(
+      profileAutoUpdateCheckInterval,
+      () async {
+        _autoUpdateProfilesTaskTimer = null;
+        if (!_shouldScheduleProfileAutoUpdate) {
+          return;
+        }
+        await appController.autoUpdateProfiles();
+        if (mounted) {
+          _syncProfileAutoUpdateTimer();
+        }
+      },
+    );
   }
 
   Widget _buildPlatformState({required Widget child}) {
@@ -143,16 +181,12 @@ class ApplicationState extends ConsumerState<Application> {
           theme: ThemeData(
             useMaterial3: true,
             pageTransitionsTheme: _pageTransitionsTheme,
-            colorScheme: _getAppColorScheme(
-              brightness: Brightness.light,
-            ),
+            colorScheme: _getAppColorScheme(brightness: Brightness.light),
           ),
           darkTheme: ThemeData(
             useMaterial3: true,
             pageTransitionsTheme: _pageTransitionsTheme,
-            colorScheme: _getAppColorScheme(
-              brightness: Brightness.dark,
-            ),
+            colorScheme: _getAppColorScheme(brightness: Brightness.dark),
           ),
           home: child!,
         );
@@ -163,8 +197,9 @@ class ApplicationState extends ConsumerState<Application> {
 
   @override
   Future<void> dispose() async {
+    WidgetsBinding.instance.removeObserver(this);
     linkManager.destroy();
-    _autoUpdateProfilesTaskTimer?.cancel();
+    _cancelProfileAutoUpdateTimer();
     await coreController.destroy();
     await appController.handleExit();
     super.dispose();
