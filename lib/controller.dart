@@ -3,6 +3,7 @@ import 'dart:io';
 
 import 'package:fl_clash/core/core.dart';
 import 'package:fl_clash/enum/enum.dart';
+import 'package:fl_clash/local_ip_refresh.dart';
 import 'package:fl_clash/plugins/app.dart';
 import 'package:fl_clash/providers/providers.dart';
 import 'package:fl_clash/state.dart';
@@ -25,6 +26,7 @@ class AppController {
   bool isAttach = false;
   int _lastCheckIpAt = 0;
   final _updateGroupsScheduler = UpdateGroupsScheduler();
+  LocalIpRefreshController? _localIpRefreshController;
 
   static AppController? _instance;
 
@@ -1013,9 +1015,13 @@ extension SystemControllerExt on AppController {
   }
 
   Future<void> updateLocalIp() async {
-    _ref.read(localIpProvider.notifier).value = null;
-    await Future.delayed(commonDuration);
-    _ref.read(localIpProvider.notifier).value = await utils.getLocalIpAddress();
+    final controller = _localIpRefreshController ??= LocalIpRefreshController(
+      lookup: utils.getLocalIpAddress,
+      update: (value) {
+        _ref.read(localIpProvider.notifier).value = value;
+      },
+    );
+    await controller.refresh();
   }
 }
 
