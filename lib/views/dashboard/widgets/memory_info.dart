@@ -21,16 +21,25 @@ class MemoryInfo extends ConsumerStatefulWidget {
   ConsumerState<MemoryInfo> createState() => _MemoryInfoState();
 }
 
-class _MemoryInfoState extends ConsumerState<MemoryInfo> {
+class _MemoryInfoState extends ConsumerState<MemoryInfo>
+    with WidgetsBindingObserver {
   Timer? _timer;
 
   bool get _shouldPoll => shouldPollMemoryInfo(
     isDashboardCurrent: ref.read(isCurrentPageProvider(PageLabel.dashboard)),
+    isAppResumed: _isAppResumed,
   );
+
+  bool get _isAppResumed {
+    final lifecycleState = WidgetsBinding.instance.lifecycleState;
+    return lifecycleState == null ||
+        lifecycleState == AppLifecycleState.resumed;
+  }
 
   @override
   void initState() {
     super.initState();
+    WidgetsBinding.instance.addObserver(this);
     ref.listenManual(isCurrentPageProvider(PageLabel.dashboard), (
       previous,
       next,
@@ -41,6 +50,17 @@ class _MemoryInfoState extends ConsumerState<MemoryInfo> {
         _cancelTimer();
       }
     }, fireImmediately: true);
+  }
+
+  @override
+  void didChangeAppLifecycleState(AppLifecycleState state) {
+    if (state == AppLifecycleState.resumed) {
+      if (_shouldPoll) {
+        _updateMemory();
+      }
+      return;
+    }
+    _cancelTimer();
   }
 
   void _cancelTimer() {
@@ -88,6 +108,7 @@ class _MemoryInfoState extends ConsumerState<MemoryInfo> {
   @override
   void dispose() {
     _cancelTimer();
+    WidgetsBinding.instance.removeObserver(this);
     super.dispose();
   }
 

@@ -4,8 +4,21 @@ import 'package:flutter_test/flutter_test.dart';
 void main() {
   group('Connections polling', () {
     test('polls only while connections is the current page', () {
-      expect(shouldPollConnections(isConnectionsCurrent: true), isTrue);
-      expect(shouldPollConnections(isConnectionsCurrent: false), isFalse);
+      expect(
+        shouldPollConnections(isConnectionsCurrent: true, isAppResumed: true),
+        isTrue,
+      );
+      expect(
+        shouldPollConnections(isConnectionsCurrent: false, isAppResumed: true),
+        isFalse,
+      );
+    });
+
+    test('skips polling while the app is not resumed', () {
+      expect(
+        shouldPollConnections(isConnectionsCurrent: true, isAppResumed: false),
+        isFalse,
+      );
     });
 
     test(

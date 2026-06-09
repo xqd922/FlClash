@@ -21,7 +21,8 @@ class ConnectionsView extends ConsumerStatefulWidget {
   ConsumerState<ConnectionsView> createState() => _ConnectionsViewState();
 }
 
-class _ConnectionsViewState extends ConsumerState<ConnectionsView> {
+class _ConnectionsViewState extends ConsumerState<ConnectionsView>
+    with WidgetsBindingObserver {
   final _connectionsStateNotifier = ValueNotifier<TrackerInfosState>(
     const TrackerInfosState(),
   );
@@ -33,7 +34,14 @@ class _ConnectionsViewState extends ConsumerState<ConnectionsView> {
     isConnectionsCurrent: ref.read(
       isCurrentPageProvider(PageLabel.connections),
     ),
+    isAppResumed: _isAppResumed,
   );
+
+  bool get _isAppResumed {
+    final lifecycleState = WidgetsBinding.instance.lifecycleState;
+    return lifecycleState == null ||
+        lifecycleState == AppLifecycleState.resumed;
+  }
 
   List<Widget> _buildActions() {
     return [
@@ -92,6 +100,7 @@ class _ConnectionsViewState extends ConsumerState<ConnectionsView> {
   @override
   void initState() {
     super.initState();
+    WidgetsBinding.instance.addObserver(this);
     ref.listenManual(isCurrentPageProvider(PageLabel.connections), (
       previous,
       next,
@@ -102,6 +111,17 @@ class _ConnectionsViewState extends ConsumerState<ConnectionsView> {
         _cancelTimer();
       }
     }, fireImmediately: true);
+  }
+
+  @override
+  void didChangeAppLifecycleState(AppLifecycleState state) {
+    if (state == AppLifecycleState.resumed) {
+      if (_shouldPoll) {
+        _updateConnectionsTask();
+      }
+      return;
+    }
+    _cancelTimer();
   }
 
   Future<void> _updateConnections() async {
@@ -125,6 +145,7 @@ class _ConnectionsViewState extends ConsumerState<ConnectionsView> {
   @override
   void dispose() {
     _cancelTimer();
+    WidgetsBinding.instance.removeObserver(this);
     _connectionsStateNotifier.dispose();
     _scrollController.dispose();
     super.dispose();
