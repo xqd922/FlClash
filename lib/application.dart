@@ -1,6 +1,6 @@
 import 'dart:async';
-import 'dart:io';
 
+import 'package:fl_clash/application_startup.dart';
 import 'package:connectivity_plus/connectivity_plus.dart';
 import 'package:fl_clash/application_auto_update.dart';
 import 'package:fl_clash/common/common.dart';
@@ -31,6 +31,7 @@ class ApplicationState extends ConsumerState<Application>
     with WidgetsBindingObserver {
   Timer? _autoUpdateProfilesTaskTimer;
   List<ConnectivityResult>? _lastConnectivityResults;
+  bool _isAttaching = false;
 
   final _pageTransitionsTheme = const PageTransitionsTheme(
     builders: <TargetPlatform, PageTransitionsBuilder>{
@@ -52,17 +53,45 @@ class ApplicationState extends ConsumerState<Application>
     ref.listenManual(profilesProvider, (previous, next) {
       _syncProfileAutoUpdateTimer();
     }, fireImmediately: true);
-    WidgetsBinding.instance.addPostFrameCallback((timeStamp) async {
+    _scheduleAttachAfterFrame();
+  }
+
+  void _scheduleAttachAfterFrame() {
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (!mounted || appController.isAttach || _isAttaching) {
+        return;
+      }
       final currentContext = globalState.navigatorKey.currentContext;
-      if (currentContext != null) {
-        await appController.attach(currentContext, ref);
-      } else {
-        exit(0);
+      if (startupAttachStatus(currentContext) ==
+          StartupAttachStatus.waitForNavigator) {
+        Future<void>.delayed(startupAttachRetryDelay, () {
+          if (!mounted || appController.isAttach || _isAttaching) {
+            return;
+          }
+          _scheduleAttachAfterFrame();
+        });
+        return;
+      }
+      unawaited(_attach(currentContext!));
+    });
+    WidgetsBinding.instance.ensureVisualUpdate();
+  }
+
+  Future<void> _attach(BuildContext currentContext) async {
+    _isAttaching = true;
+    try {
+      await appController.attach(currentContext, ref);
+      if (!mounted) {
+        return;
       }
       _syncProfileAutoUpdateTimer();
       appController.initLink();
       app?.initShortcuts();
-    });
+    } finally {
+      if (mounted) {
+        _isAttaching = false;
+      }
+    }
   }
 
   @override

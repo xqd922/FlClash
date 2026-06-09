@@ -1,5 +1,5 @@
 import 'package:fl_clash/common/common.dart';
-import 'package:fl_clash/controller.dart';
+import 'package:fl_clash/deferred_value_updater.dart';
 import 'package:fl_clash/providers/app.dart';
 import 'package:fl_clash/state.dart';
 import 'package:fl_clash/system_ui_overlay_style_updater.dart';
@@ -20,6 +20,7 @@ class ThemeManager extends ConsumerStatefulWidget {
 
 class _ThemeManagerState extends ConsumerState<ThemeManager> {
   SystemUiOverlayStyleUpdater? _systemUiOverlayStyleUpdater;
+  DeferredValueUpdater<Size>? _viewSizeUpdater;
 
   Widget _buildSystemUi(Widget child) {
     if (!system.isAndroid) {
@@ -68,9 +69,7 @@ class _ThemeManagerState extends ConsumerState<ThemeManager> {
         ),
         child: LayoutBuilder(
           builder: (_, container) {
-            appController.updateViewSize(
-              Size(container.maxWidth, container.maxHeight),
-            );
+            _updateViewSize(Size(container.maxWidth, container.maxHeight));
             return _buildSystemUi(widget.child);
           },
         ),
@@ -94,5 +93,22 @@ class _ThemeManagerState extends ConsumerState<ThemeManager> {
           },
         );
     updater.update(style);
+  }
+
+  void _updateViewSize(Size size) {
+    final updater = _viewSizeUpdater ??= DeferredValueUpdater<Size>(
+      read: () => ref.read(viewSizeProvider),
+      write: (value) {
+        ref.read(viewSizeProvider.notifier).value = value;
+      },
+      schedule: (callback) {
+        WidgetsBinding.instance.addPostFrameCallback((_) {
+          if (mounted) {
+            callback();
+          }
+        });
+      },
+    );
+    updater.update(size);
   }
 }
