@@ -11,6 +11,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:super_sliver_list/super_sliver_list.dart';
 
 import 'connections_polling.dart';
+import 'connections_updates.dart';
 import 'item.dart';
 
 class ConnectionsView extends ConsumerStatefulWidget {
@@ -104,8 +105,15 @@ class _ConnectionsViewState extends ConsumerState<ConnectionsView> {
   }
 
   Future<void> _updateConnections() async {
+    final nextConnections = await coreController.getConnections();
+    if (!shouldUpdateConnectionsList(
+      _connectionsStateNotifier.value.trackerInfos,
+      nextConnections,
+    )) {
+      return;
+    }
     _connectionsStateNotifier.value = _connectionsStateNotifier.value.copyWith(
-      trackerInfos: await coreController.getConnections(),
+      trackerInfos: nextConnections,
     );
   }
 
