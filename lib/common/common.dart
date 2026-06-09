@@ -18,6 +18,7 @@ export 'iterable.dart';
 export 'keyboard.dart';
 export 'launch.dart';
 export 'lazy_separated_list.dart';
+export 'lifecycle.dart';
 export 'link.dart';
 export 'lock.dart';
 export 'measure.dart';

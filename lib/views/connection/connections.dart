@@ -34,14 +34,8 @@ class _ConnectionsViewState extends ConsumerState<ConnectionsView>
     isConnectionsCurrent: ref.read(
       isCurrentPageProvider(PageLabel.connections),
     ),
-    isAppResumed: _isAppResumed,
+    isAppResumed: isAppLifecycleResumed(WidgetsBinding.instance.lifecycleState),
   );
-
-  bool get _isAppResumed {
-    final lifecycleState = WidgetsBinding.instance.lifecycleState;
-    return lifecycleState == null ||
-        lifecycleState == AppLifecycleState.resumed;
-  }
 
   List<Widget> _buildActions() {
     return [

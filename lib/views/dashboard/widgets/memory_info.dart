@@ -27,14 +27,8 @@ class _MemoryInfoState extends ConsumerState<MemoryInfo>
 
   bool get _shouldPoll => shouldPollMemoryInfo(
     isDashboardCurrent: ref.read(isCurrentPageProvider(PageLabel.dashboard)),
-    isAppResumed: _isAppResumed,
+    isAppResumed: isAppLifecycleResumed(WidgetsBinding.instance.lifecycleState),
   );
-
-  bool get _isAppResumed {
-    final lifecycleState = WidgetsBinding.instance.lifecycleState;
-    return lifecycleState == null ||
-        lifecycleState == AppLifecycleState.resumed;
-  }
 
   @override
   void initState() {

@@ -17,7 +17,8 @@ class RequestsView extends ConsumerStatefulWidget {
   ConsumerState<RequestsView> createState() => _RequestsViewState();
 }
 
-class _RequestsViewState extends ConsumerState<RequestsView> {
+class _RequestsViewState extends ConsumerState<RequestsView>
+    with WidgetsBindingObserver {
   final _requestsStateNotifier = ValueNotifier<TrackerInfosState>(
     const TrackerInfosState(),
   );
@@ -26,6 +27,7 @@ class _RequestsViewState extends ConsumerState<RequestsView> {
 
   bool get _shouldUpdateView => shouldUpdateRequestsView(
     isRequestsCurrent: ref.read(isCurrentPageProvider(PageLabel.requests)),
+    isAppResumed: isAppLifecycleResumed(WidgetsBinding.instance.lifecycleState),
   );
 
   void _onSearch(String value) {
@@ -43,6 +45,7 @@ class _RequestsViewState extends ConsumerState<RequestsView> {
   @override
   void initState() {
     super.initState();
+    WidgetsBinding.instance.addObserver(this);
     _requests = ref.read(requestsProvider).list;
     _scrollController = ScrollController(initialScrollOffset: double.maxFinite);
     _requestsStateNotifier.value = _requestsStateNotifier.value.copyWith(
@@ -69,7 +72,17 @@ class _RequestsViewState extends ConsumerState<RequestsView> {
   }
 
   @override
+  void didChangeAppLifecycleState(AppLifecycleState state) {
+    if (state == AppLifecycleState.resumed) {
+      updateRequestsThrottler();
+      return;
+    }
+    throttler.cancel(FunctionTag.requests);
+  }
+
+  @override
   void dispose() {
+    WidgetsBinding.instance.removeObserver(this);
     _requestsStateNotifier.dispose();
     _scrollController.dispose();
     super.dispose();

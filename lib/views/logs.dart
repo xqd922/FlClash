@@ -18,7 +18,8 @@ class LogsView extends ConsumerStatefulWidget {
   ConsumerState<LogsView> createState() => _LogsViewState();
 }
 
-class _LogsViewState extends ConsumerState<LogsView> {
+class _LogsViewState extends ConsumerState<LogsView>
+    with WidgetsBindingObserver {
   final _logsStateNotifier = ValueNotifier<LogsState>(LogsState());
   late ScrollController _scrollController;
 
@@ -26,11 +27,13 @@ class _LogsViewState extends ConsumerState<LogsView> {
 
   bool get _shouldUpdateView => shouldUpdateLogsView(
     isLogsCurrent: ref.read(isCurrentPageProvider(PageLabel.logs)),
+    isAppResumed: isAppLifecycleResumed(WidgetsBinding.instance.lifecycleState),
   );
 
   @override
   void initState() {
     super.initState();
+    WidgetsBinding.instance.addObserver(this);
     _logs = ref.read(logsProvider).list;
     _scrollController = ScrollController(initialScrollOffset: double.maxFinite);
     _logsStateNotifier.value = _logsStateNotifier.value.copyWith(logs: _logs);
@@ -51,6 +54,15 @@ class _LogsViewState extends ConsumerState<LogsView> {
         updateLogsThrottler();
       }
     });
+  }
+
+  @override
+  void didChangeAppLifecycleState(AppLifecycleState state) {
+    if (state == AppLifecycleState.resumed) {
+      updateLogsThrottler();
+      return;
+    }
+    throttler.cancel(FunctionTag.logs);
   }
 
   List<Widget> _buildActions() {
@@ -76,6 +88,7 @@ class _LogsViewState extends ConsumerState<LogsView> {
 
   @override
   void dispose() {
+    WidgetsBinding.instance.removeObserver(this);
     _logsStateNotifier.dispose();
     _scrollController.dispose();
     super.dispose();

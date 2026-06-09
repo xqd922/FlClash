@@ -1,3 +1,6 @@
-bool shouldUpdateLogsView({required bool isLogsCurrent}) {
-  return isLogsCurrent;
+bool shouldUpdateLogsView({
+  required bool isLogsCurrent,
+  required bool isAppResumed,
+}) {
+  return isLogsCurrent && isAppResumed;
 }
