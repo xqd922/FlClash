@@ -16,17 +16,38 @@ const startButtonSizeConstraints = BoxConstraints(
 );
 
 double startButtonWidthForText(String text, double progress) {
+  return startButtonWidthForMeasuredText(
+    estimatedStartButtonTextWidth(text),
+    progress,
+  );
+}
+
+double startButtonWidthForMeasuredText(double textWidth, double progress) {
   final clampedProgress = progress.clamp(0.0, 1.0).toDouble();
   final width =
       startButtonIconLeftPadding +
       startButtonIconSize +
       startButtonExpandedIconRightPadding(clampedProgress) +
-      estimatedStartButtonTextWidth(text) * clampedProgress;
+      textWidth * clampedProgress;
   return width.clamp(startButtonIconHeight, startButtonMaxWidth).toDouble();
 }
 
 double startButtonTextWidth(double measuredTextWidth) {
   return _paddedWidth(measuredTextWidth, startButtonRuntimeHorizontalPadding);
+}
+
+double measuredStartButtonTextWidth(
+  String text, {
+  required TextStyle? style,
+  required TextScaler textScaler,
+}) {
+  final textPainter = TextPainter(
+    text: TextSpan(text: text, style: style),
+    maxLines: 1,
+    textDirection: TextDirection.ltr,
+    textScaler: textScaler,
+  )..layout();
+  return startButtonTextWidth(textPainter.size.width);
 }
 
 double estimatedStartButtonTextWidth(String text) {

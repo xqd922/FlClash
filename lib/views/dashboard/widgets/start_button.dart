@@ -75,7 +75,17 @@ class _StartButtonState extends ConsumerState<StartButton>
     if (!hasProfile) {
       return const SizedBox.shrink();
     }
+    final runTime = ref.watch(runTimeProvider);
+    final text = utils.getTimeText(runTime);
     final theme = Theme.of(context);
+    final style = theme.textTheme.titleMedium?.toSoftBold.copyWith(
+      color: context.colorScheme.onPrimaryContainer,
+    );
+    final textWidth = measuredStartButtonTextWidth(
+      text,
+      style: style,
+      textScaler: MediaQuery.of(context).textScaler,
+    );
     return Align(
       widthFactor: 1,
       heightFactor: 1,
@@ -90,9 +100,18 @@ class _StartButtonState extends ConsumerState<StartButton>
           child: AnimatedBuilder(
             animation: _controller!.view,
             builder: (_, child) {
-              final runTime = ref.read(runTimeProvider);
-              final text = utils.getTimeText(runTime);
-              final width = startButtonWidthForText(text, _animation.value);
+              final iconRightPadding = startButtonExpandedIconRightPadding(
+                _animation.value,
+              );
+              final iconWidth =
+                  startButtonIconLeftPadding +
+                  startButtonIconSize +
+                  iconRightPadding;
+              final width = startButtonWidthForMeasuredText(
+                textWidth,
+                _animation.value,
+              );
+              final labelWidth = width - iconWidth;
               return SizedBox(
                 width: width,
                 height: startButtonIconHeight,
@@ -108,23 +127,28 @@ class _StartButtonState extends ConsumerState<StartButton>
                     child: Row(
                       mainAxisSize: MainAxisSize.min,
                       children: [
-                        Container(
+                        SizedBox(
+                          width: iconWidth,
                           height: startButtonIconHeight,
-                          padding: EdgeInsets.only(
-                            left: startButtonIconLeftPadding,
-                            right: startButtonExpandedIconRightPadding(
-                              _animation.value,
+                          child: Padding(
+                            padding: EdgeInsets.only(
+                              left: startButtonIconLeftPadding,
+                              right: iconRightPadding,
+                            ),
+                            child: AnimatedIcon(
+                              icon: AnimatedIcons.play_pause,
+                              progress: _animation,
                             ),
                           ),
-                          alignment: Alignment.centerLeft,
-                          child: AnimatedIcon(
-                            icon: AnimatedIcons.play_pause,
-                            progress: _animation,
-                          ),
                         ),
-                        _ExpandableStartButtonLabel(
-                          progress: _animation.value,
-                          child: child!,
+                        SizedBox(
+                          width: labelWidth < 0 ? 0 : labelWidth,
+                          child: ClipRect(
+                            child: Align(
+                              alignment: Alignment.centerLeft,
+                              child: child!,
+                            ),
+                          ),
                         ),
                       ],
                     ),
@@ -132,21 +156,7 @@ class _StartButtonState extends ConsumerState<StartButton>
                 ),
               );
             },
-            child: Consumer(
-              builder: (_, ref, _) {
-                final runTime = ref.watch(runTimeProvider);
-                final text = utils.getTimeText(runTime);
-                final style = theme.textTheme.titleMedium?.toSoftBold.copyWith(
-                  color: context.colorScheme.onPrimaryContainer,
-                );
-                final textWidth = estimatedStartButtonTextWidth(text);
-                return _StartButtonLabel(
-                  text: text,
-                  width: textWidth,
-                  style: style,
-                );
-              },
-            ),
+            child: _StartButtonLabel(text: text, style: style),
           ),
         ),
       ),
@@ -154,49 +164,18 @@ class _StartButtonState extends ConsumerState<StartButton>
   }
 }
 
-class _ExpandableStartButtonLabel extends StatelessWidget {
-  const _ExpandableStartButtonLabel({
-    required this.progress,
-    required this.child,
-  });
-
-  final double progress;
-  final Widget child;
-
-  @override
-  Widget build(BuildContext context) {
-    return ClipRect(
-      child: Align(
-        widthFactor: progress,
-        heightFactor: 1,
-        alignment: Alignment.centerLeft,
-        child: child,
-      ),
-    );
-  }
-}
-
 class _StartButtonLabel extends StatelessWidget {
-  const _StartButtonLabel({
-    required this.text,
-    required this.width,
-    required this.style,
-  });
+  const _StartButtonLabel({required this.text, required this.style});
 
   final String text;
-  final double width;
   final TextStyle? style;
 
   @override
   Widget build(BuildContext context) {
-    return SizedBox(
-      width: width,
-      child: Text(
-        text,
-        maxLines: 1,
-        overflow: TextOverflow.visible,
-        style: style,
-      ),
+    return FittedBox(
+      fit: BoxFit.scaleDown,
+      alignment: Alignment.centerLeft,
+      child: Text(text, maxLines: 1, style: style),
     );
   }
 }

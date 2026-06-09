@@ -24,7 +24,44 @@ void main() {
   testWidgets('Start button stays compact when running', (tester) async {
     await pumpStartButton(tester, runTime: _oneHourRuntime);
 
-    expectStartButtonSize(tester, maxWidth: 160, maxHeight: 72);
+    expectStartButtonSize(tester, maxWidth: 200, maxHeight: 72);
+  });
+
+  testWidgets('Start button does not overflow when runtime text changes', (
+    tester,
+  ) async {
+    final container = ProviderContainer(
+      overrides: [
+        profilesProvider.overrideWithValue([
+          const Profile(
+            id: 1,
+            label: 'test',
+            autoUpdateDuration: Duration.zero,
+          ),
+        ]),
+      ],
+    );
+    addTearDown(container.dispose);
+
+    await pumpMutableStartButton(tester, container);
+
+    container.read(runTimeProvider.notifier).value = 1000;
+    await tester.pumpAndSettle();
+    expect(tester.takeException(), isNull);
+    final initialWidth = tester
+        .getSize(find.byType(FloatingActionButton))
+        .width;
+
+    container.read(runTimeProvider.notifier).value = _oneHourRuntime;
+    await tester.pump();
+    await tester.pump();
+
+    final updatedWidth = tester
+        .getSize(find.byType(FloatingActionButton))
+        .width;
+    expect(tester.takeException(), isNull);
+    expect(updatedWidth, greaterThanOrEqualTo(initialWidth));
+    expect(updatedWidth, lessThanOrEqualTo(200));
   });
 
   testWidgets('Start button root stays compact in the scaffold FAB slot', (
@@ -103,7 +140,7 @@ void main() {
 
     final rootSize = tester.getSize(find.byType(StartButton));
 
-    expect(rootSize.width, lessThanOrEqualTo(160));
+    expect(rootSize.width, lessThanOrEqualTo(200));
     expect(rootSize.height, 56);
   });
 
@@ -177,6 +214,29 @@ Future<void> pumpStartButton(
                   height: constrainFabHeight,
                   child: const StartButton(),
                 ),
+        ),
+      ),
+    ),
+  );
+  await tester.pump();
+}
+
+Future<void> pumpMutableStartButton(
+  WidgetTester tester,
+  ProviderContainer container,
+) async {
+  tester.view.physicalSize = const Size(390, 844);
+  tester.view.devicePixelRatio = 1;
+  addTearDown(tester.view.resetPhysicalSize);
+  addTearDown(tester.view.resetDevicePixelRatio);
+
+  await tester.pumpWidget(
+    UncontrolledProviderScope(
+      container: container,
+      child: const MaterialApp(
+        home: Scaffold(
+          body: SizedBox.expand(),
+          floatingActionButton: StartButton(),
         ),
       ),
     ),
