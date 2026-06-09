@@ -111,6 +111,17 @@ void main() {
       );
     });
 
+    test('keeps android build number above released stable installs', () {
+      final versionLine = File('pubspec.yaml')
+          .readAsLinesSync()
+          .map((line) => line.trim())
+          .firstWhere((line) => line.startsWith('version:'));
+      final version = versionLine.substring('version:'.length).trim();
+      final buildNumber = int.parse(version.split('+').last);
+
+      expect(buildNumber, greaterThan(2026062302));
+    });
+
     test('prepends a path entry without dropping existing environment', () {
       final environment = Build.prependPathEntry(
         {'Path': r'C:\tools', 'FOO': 'bar'},
