@@ -1,3 +1,7 @@
+bool shouldUpdateRuntime({required bool isDashboardCurrent}) {
+  return isDashboardCurrent;
+}
+
 bool shouldSampleSpeedTraffic({
   required bool isDashboardCurrent,
   required bool showTrayTitle,

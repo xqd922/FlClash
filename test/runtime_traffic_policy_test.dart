@@ -2,6 +2,16 @@ import 'package:fl_clash/runtime_traffic_policy.dart';
 import 'package:flutter_test/flutter_test.dart';
 
 void main() {
+  group('Runtime display update policy', () {
+    test('updates while dashboard is visible', () {
+      expect(shouldUpdateRuntime(isDashboardCurrent: true), isTrue);
+    });
+
+    test('skips while dashboard is not visible', () {
+      expect(shouldUpdateRuntime(isDashboardCurrent: false), isFalse);
+    });
+  });
+
   group('Speed traffic sampling policy', () {
     test('samples while dashboard is visible', () {
       expect(

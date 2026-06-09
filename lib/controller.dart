@@ -1211,7 +1211,7 @@ extension CommonControllerExt on AppController {
 
   Future<void> startRuntimeUpdates() async {
     await globalState.handleStart([
-      ScheduledUpdateTask(updateRunTime),
+      ScheduledUpdateTask(updateRunTime, shouldRun: _shouldUpdateRunTime),
       ScheduledUpdateTask(updateSpeedTraffic, shouldRun: _shouldSampleSpeed),
       ScheduledUpdateTask(
         updateTotalTraffic,
@@ -1219,6 +1219,12 @@ extension CommonControllerExt on AppController {
         shouldRun: _shouldSampleTotalTraffic,
       ),
     ]);
+  }
+
+  bool _shouldUpdateRunTime() {
+    return shouldUpdateRuntime(
+      isDashboardCurrent: _ref.read(isCurrentPageProvider(PageLabel.dashboard)),
+    );
   }
 
   Future<void> updateTraffic() async {
