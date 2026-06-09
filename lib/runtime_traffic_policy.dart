@@ -4,3 +4,7 @@ bool shouldSampleSpeedTraffic({
 }) {
   return isDashboardCurrent || showTrayTitle;
 }
+
+bool shouldSampleTotalTraffic({required bool isDashboardCurrent}) {
+  return isDashboardCurrent;
+}

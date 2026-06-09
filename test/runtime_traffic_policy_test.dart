@@ -1,4 +1,4 @@
-import 'package:fl_clash/speed_traffic_policy.dart';
+import 'package:fl_clash/runtime_traffic_policy.dart';
 import 'package:flutter_test/flutter_test.dart';
 
 void main() {
@@ -31,6 +31,16 @@ void main() {
         ),
         isFalse,
       );
+    });
+  });
+
+  group('Total traffic sampling policy', () {
+    test('samples while dashboard is visible', () {
+      expect(shouldSampleTotalTraffic(isDashboardCurrent: true), isTrue);
+    });
+
+    test('skips while dashboard is not visible', () {
+      expect(shouldSampleTotalTraffic(isDashboardCurrent: false), isFalse);
     });
   });
 }

@@ -1,18 +1,24 @@
 import 'dart:async';
 
 typedef UpdateTaskCallback = FutureOr<void> Function();
+typedef UpdateTaskPredicate = bool Function();
 
 class ScheduledUpdateTask {
   ScheduledUpdateTask(
     this.callback, {
     this.interval = const Duration(seconds: 1),
+    this.shouldRun,
   });
 
   final UpdateTaskCallback callback;
   final Duration interval;
+  final UpdateTaskPredicate? shouldRun;
   DateTime? _lastRunAt;
 
   bool isDue(DateTime now) {
+    if (shouldRun?.call() == false) {
+      return false;
+    }
     final lastRunAt = _lastRunAt;
     return lastRunAt == null || now.difference(lastRunAt) >= interval;
   }

@@ -55,5 +55,24 @@ void main() {
 
       expect(runs, 2);
     });
+
+    test('skipped tasks stay eligible for the next runnable tick', () async {
+      var runs = 0;
+      var canRun = false;
+      final scheduler = UpdateTaskScheduler([
+        ScheduledUpdateTask(
+          () => runs++,
+          interval: const Duration(seconds: 5),
+          shouldRun: () => canRun,
+        ),
+      ]);
+      final start = DateTime.fromMillisecondsSinceEpoch(1000);
+
+      await scheduler.runDueTasks(start);
+      canRun = true;
+      await scheduler.runDueTasks(start.add(const Duration(seconds: 1)));
+
+      expect(runs, 1);
+    });
   });
 }

@@ -7,7 +7,7 @@ import 'package:fl_clash/enum/enum.dart';
 import 'package:fl_clash/local_ip_refresh.dart';
 import 'package:fl_clash/plugins/app.dart';
 import 'package:fl_clash/providers/providers.dart';
-import 'package:fl_clash/speed_traffic_policy.dart';
+import 'package:fl_clash/runtime_traffic_policy.dart';
 import 'package:fl_clash/state.dart';
 import 'package:fl_clash/widgets/dialog.dart';
 import 'package:flutter/material.dart';
@@ -1212,10 +1212,11 @@ extension CommonControllerExt on AppController {
   Future<void> startRuntimeUpdates() async {
     await globalState.handleStart([
       ScheduledUpdateTask(updateRunTime),
-      ScheduledUpdateTask(updateSpeedTraffic),
+      ScheduledUpdateTask(updateSpeedTraffic, shouldRun: _shouldSampleSpeed),
       ScheduledUpdateTask(
         updateTotalTraffic,
         interval: const Duration(seconds: 5),
+        shouldRun: _shouldSampleTotalTraffic,
       ),
     ]);
   }
@@ -1226,20 +1227,26 @@ extension CommonControllerExt on AppController {
   }
 
   Future<void> updateSpeedTraffic() async {
-    final shouldSample = shouldSampleSpeedTraffic(
-      isDashboardCurrent: _ref.read(isCurrentPageProvider(PageLabel.dashboard)),
-      showTrayTitle: _ref.read(
-        appSettingProvider.select((state) => state.showTrayTitle),
-      ),
-    );
-    if (!shouldSample) {
-      return;
-    }
     final onlyStatisticsProxy = _ref.read(
       appSettingProvider.select((state) => state.onlyStatisticsProxy),
     );
     final traffic = await coreController.getTraffic(onlyStatisticsProxy);
     _ref.read(trafficsProvider.notifier).addTraffic(traffic);
+  }
+
+  bool _shouldSampleSpeed() {
+    return shouldSampleSpeedTraffic(
+      isDashboardCurrent: _ref.read(isCurrentPageProvider(PageLabel.dashboard)),
+      showTrayTitle: _ref.read(
+        appSettingProvider.select((state) => state.showTrayTitle),
+      ),
+    );
+  }
+
+  bool _shouldSampleTotalTraffic() {
+    return shouldSampleTotalTraffic(
+      isDashboardCurrent: _ref.read(isCurrentPageProvider(PageLabel.dashboard)),
+    );
   }
 
   Future<void> updateTotalTraffic() async {
