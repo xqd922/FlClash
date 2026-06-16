@@ -1,3 +1,15 @@
+## v(7.0.21)
+
+### 🔄 重构
+
+- 统一所有平台的应用名称为 XClash
+  - Android: XClash (Release), XClash Debug (Debug)
+  - Windows: XClash.exe, XClashCore.exe, XClashHelperService.exe
+  - macOS: XClash.app, XClashCore
+  - Linux: XClash, XClashCore（AppImage、DEB、RPM 包）
+- 更新核心二进制路径和锁文件命名
+- 更新所有打包配置中的应用显示名称和关键词
+
 ## v(7.0.20)
 
 ### 🐛 修复
