@@ -186,7 +186,10 @@ class AppSidebarContainer extends ConsumerWidget {
               children: [
                 if (system.isMacOS) SizedBox(height: 22),
                 SizedBox(height: 10),
-                if (!system.isMacOS) ...[
+                // Show app icon only on Windows and Linux desktop platforms
+                // macOS: uses system title bar and Dock
+                // Android (tablets): follows Material Design NavigationRail guidelines
+                if (system.isWindows || system.isLinux) ...[
                   ClipRect(child: AppIcon()),
                   SizedBox(height: 12),
                 ],
