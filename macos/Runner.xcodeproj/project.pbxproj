@@ -30,7 +30,7 @@
 		36318A03D19527AAA8B8DCFC /* Pods_Runner.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 34DDDF4BE376B6283E8CF3FB /* Pods_Runner.framework */; };
 		EDFB0F7BFE44CA6EE10BC97E /* Pods_RunnerTests.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 318645D7A7E65945F20006A1 /* Pods_RunnerTests.framework */; };
 		F5131FDD2EF0F1A500A1748D /* LaunchAtLogin in Frameworks */ = {isa = PBXBuildFile; productRef = F5131FDC2EF0F1A500A1748D /* LaunchAtLogin */; };
-		F51BB7CB2EF0267400E05D67 /* FlClashCore in Copy Core */ = {isa = PBXBuildFile; fileRef = F51BB7CA2EF0267400E05D67 /* FlClashCore */; settings = {ATTRIBUTES = (CodeSignOnCopy, ); }; };
+		F51BB7CB2EF0267400E05D67 /* XClashCore in Copy Core */ = {isa = PBXBuildFile; fileRef = F51BB7CA2EF0267400E05D67 /* XClashCore */; settings = {ATTRIBUTES = (CodeSignOnCopy, ); }; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -67,7 +67,7 @@
 			dstPath = "";
 			dstSubfolderSpec = 6;
 			files = (
-				F51BB7CB2EF0267400E05D67 /* FlClashCore in Copy Core */,
+				F51BB7CB2EF0267400E05D67 /* XClashCore in Copy Core */,
 			);
 			name = "Copy Core";
 			runOnlyForDeploymentPostprocessing = 0;
@@ -101,7 +101,7 @@
 		9740EEB21CF90195004384FC /* Debug.xcconfig */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.xcconfig; path = Debug.xcconfig; sourceTree = "<group>"; };
 		9C9D4EF99A207AF51C53E0A3 /* Pods-RunnerTests.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-RunnerTests.release.xcconfig"; path = "Target Support Files/Pods-RunnerTests/Pods-RunnerTests.release.xcconfig"; sourceTree = "<group>"; };
 		CE90D6AE6AF7FF51A5D7A5BB /* Pods-Runner.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-Runner.release.xcconfig"; path = "Target Support Files/Pods-Runner/Pods-Runner.release.xcconfig"; sourceTree = "<group>"; };
-		F51BB7CA2EF0267400E05D67 /* FlClashCore */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.executable"; name = FlClashCore; path = ../libclash/macos/FlClashCore; sourceTree = "<group>"; };
+		F51BB7CA2EF0267400E05D67 /* XClashCore */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.executable"; name = XClashCore; path = ../libclash/macos/XClashCore; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -147,7 +147,7 @@
 		33CC10E42044A3C60003C045 = {
 			isa = PBXGroup;
 			children = (
-				F51BB7CA2EF0267400E05D67 /* FlClashCore */,
+				F51BB7CA2EF0267400E05D67 /* XClashCore */,
 				33FAB671232836740065AC1E /* Runner */,
 				33CEB47122A05771004F2AC0 /* Flutter */,
 				331C80D6294CF71000263BE5 /* RunnerTests */,
