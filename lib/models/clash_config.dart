@@ -447,7 +447,7 @@ abstract class ClashConfig with _$ClashConfig {
     @Default(0) @JsonKey(name: 'redir-port') int redirPort,
     @Default(0) @JsonKey(name: 'tproxy-port') int tproxyPort,
     @Default(Mode.rule) Mode mode,
-    @Default(false) @JsonKey(name: 'allow-lan') bool allowLan,
+    @Default(true) @JsonKey(name: 'allow-lan') bool allowLan,
     @Default(LogLevel.error) @JsonKey(name: 'log-level') LogLevel logLevel,
     @Default(true) bool ipv6,
     @Default(FindProcessMode.always)
