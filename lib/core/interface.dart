@@ -6,6 +6,10 @@ import 'package:fl_clash/enum/enum.dart';
 import 'package:fl_clash/models/models.dart';
 import 'package:flutter/foundation.dart';
 
+Map<String, dynamic> updateConfigPayload(UpdateParams updateParams) {
+  return updateParams.toJson()..remove(externalControllerKey);
+}
+
 mixin CoreInterface {
   Future<bool> init(InitParams params);
 
@@ -24,6 +28,8 @@ mixin CoreInterface {
   Future<String> asyncTestDelay(String url, String proxyName);
 
   Future<String> updateConfig(UpdateParams updateParams);
+
+  Future<String> updateExternalController(String externalController);
 
   Future<String> setupConfig(SetupParams setupParams);
 
@@ -156,7 +162,16 @@ abstract class CoreHandlerInterface with CoreInterface {
   Future<String> updateConfig(UpdateParams updateParams) async {
     return await _invoke<String>(
           method: ActionMethod.updateConfig,
-          data: json.encode(updateParams),
+          data: json.encode(updateConfigPayload(updateParams)),
+        ) ??
+        '';
+  }
+
+  @override
+  Future<String> updateExternalController(String externalController) async {
+    return await _invoke<String>(
+          method: ActionMethod.updateConfig,
+          data: json.encode({externalControllerKey: externalController}),
         ) ??
         '';
   }

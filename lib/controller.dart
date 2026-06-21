@@ -572,17 +572,26 @@ extension SetupControllerExt on AppController {
           return;
         }
         await globalState.handleStart([updateRunTime, updateTraffic]);
-        applyProfileDebounce(force: true, silence: true);
+        applyProfileDebounce(
+          force: true,
+          silence: true,
+          enableExternalController: true,
+        );
       } else {
         globalState.needInitStatus = false;
         await applyProfile(
           force: true,
+          enableExternalController: true,
           preloadInvoke: () async {
             await globalState.handleStart([updateRunTime, updateTraffic]);
           },
         );
       }
     } else {
+      final shouldCloseExternalController = _ref.read(isStartProvider);
+      if (shouldCloseExternalController) {
+        await closeExternalController(syncConfigFile: true);
+      }
       await globalState.handleStop();
       coreController.resetTraffic();
       _ref.read(trafficsProvider.notifier).clear();
@@ -651,10 +660,22 @@ extension SetupControllerExt on AppController {
     tryCheckIp(force: true);
   }
 
-  void applyProfileDebounce({bool silence = false, bool force = false}) {
-    debouncer.call(FunctionTag.applyProfile, (silence, force) {
-      applyProfile(silence: silence, force: force);
-    }, args: [silence, force]);
+  void applyProfileDebounce({
+    bool silence = false,
+    bool force = false,
+    bool? enableExternalController,
+  }) {
+    debouncer.call(FunctionTag.applyProfile, (
+      silence,
+      force,
+      enableExternalController,
+    ) {
+      applyProfile(
+        silence: silence,
+        force: force,
+        enableExternalController: enableExternalController,
+      );
+    }, args: [silence, force, enableExternalController]);
   }
 
   void changeMode(Mode mode) {
@@ -676,6 +697,7 @@ extension SetupControllerExt on AppController {
   Future<void> applyProfile({
     bool silence = false,
     bool force = false,
+    bool? enableExternalController,
     VoidCallback? preloadInvoke,
   }) async {
     if (!force && !await needSetup()) {
@@ -683,7 +705,11 @@ extension SetupControllerExt on AppController {
     }
     await loadingRun(
       () async {
-        await _setupConfig(preloadInvoke);
+        await _setupConfig(
+          preloadInvoke,
+          enableExternalController:
+              enableExternalController ?? _ref.read(isStartProvider),
+        );
         await updateGroups();
         await updateProviders();
       },
@@ -698,6 +724,7 @@ extension SetupControllerExt on AppController {
   Future<Map<String, dynamic>> getProfile({
     required SetupState setupState,
     required ClashConfig patchConfig,
+    required bool enableExternalController,
   }) async {
     final profileId = setupState.profileId;
     if (profileId == null) {
@@ -721,6 +748,9 @@ extension SetupControllerExt on AppController {
       addedRules.addAll(setupState.addedRules);
     }
     final realPatchConfig = patchConfig.copyWith(
+      externalController: enableExternalController
+          ? ExternalControllerStatus.open
+          : ExternalControllerStatus.close,
       tun: patchConfig.tun.getRealTun(routeMode),
     );
     Map<String, dynamic> rawConfig = configMap;
@@ -751,6 +781,7 @@ extension SetupControllerExt on AppController {
       res = await getProfile(
         setupState: setupState,
         patchConfig: patchClashConfig,
+        enableExternalController: _ref.read(isStartProvider),
       );
     } catch (e) {
       globalState.showNotifier(e.toString());
@@ -758,7 +789,10 @@ extension SetupControllerExt on AppController {
     return res;
   }
 
-  Future<void> _setupConfig([VoidCallback? preloadInvoke]) async {
+  Future<void> _setupConfig(
+    VoidCallback? preloadInvoke, {
+    bool? enableExternalController,
+  }) async {
     commonPrint.log('setup ===>');
     var profile = _ref.read(currentProfileProvider);
     final nextProfile = await profile?.checkAndUpdateAndCopy();
@@ -779,13 +813,12 @@ extension SetupControllerExt on AppController {
       globalState.lastVpnState = _ref.read(vpnStateProvider);
       preferences.saveShareState(this.sharedState);
     }
-    final config = await getProfile(
+    await writeProfileConfig(
       setupState: setupState,
       patchConfig: realPatchConfig,
+      enableExternalController:
+          enableExternalController ?? _ref.read(isStartProvider),
     );
-    final configFilePath = await appPath.configFilePath;
-    final yamlString = await encodeYamlTask(config);
-    await File(configFilePath).safeWriteAsString(yamlString);
     final message = await coreController.setupConfig(
       setupState: setupState,
       params: setupParams,
@@ -795,6 +828,44 @@ extension SetupControllerExt on AppController {
       throw message;
     }
     addCheckIp();
+  }
+
+  Future<void> writeProfileConfig({
+    required SetupState setupState,
+    required ClashConfig patchConfig,
+    required bool enableExternalController,
+  }) async {
+    final config = await getProfile(
+      setupState: setupState,
+      patchConfig: patchConfig,
+      enableExternalController: enableExternalController,
+    );
+    final configFilePath = await appPath.configFilePath;
+    final yamlString = await encodeYamlTask(config);
+    await File(configFilePath).safeWriteAsString(yamlString);
+  }
+
+  Future<void> closeExternalController({bool syncConfigFile = false}) async {
+    if (syncConfigFile) {
+      try {
+        final profileId = _ref.read(currentProfileIdProvider);
+        if (profileId != null) {
+          final setupState = await _ref.read(
+            setupStateProvider(profileId).future,
+          );
+          final patchConfig = _ref.read(patchClashConfigProvider);
+          final realTunEnable = _ref.read(realTunEnableProvider);
+          await writeProfileConfig(
+            setupState: setupState,
+            patchConfig: patchConfig.copyWith.tun(enable: realTunEnable),
+            enableExternalController: false,
+          );
+        }
+      } catch (e) {
+        commonPrint.log(e.toString(), logLevel: LogLevel.warning);
+      }
+    }
+    await coreController.updateExternalController('');
   }
 }
 

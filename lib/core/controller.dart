@@ -89,6 +89,10 @@ class CoreController {
     return await _interface.updateConfig(updateParams);
   }
 
+  Future<String> updateExternalController(String externalController) async {
+    return await _interface.updateExternalController(externalController);
+  }
+
   Future<String> setupConfig({
     required SetupParams params,
     required SetupState setupState,
