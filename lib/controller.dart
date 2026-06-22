@@ -590,7 +590,7 @@ extension SetupControllerExt on AppController {
     } else {
       final shouldCloseExternalController = _ref.read(isStartProvider);
       if (shouldCloseExternalController) {
-        await closeExternalController(syncConfigFile: true);
+        await closeExternalController();
       }
       await globalState.handleStop();
       coreController.resetTraffic();
@@ -845,26 +845,7 @@ extension SetupControllerExt on AppController {
     await File(configFilePath).safeWriteAsString(yamlString);
   }
 
-  Future<void> closeExternalController({bool syncConfigFile = false}) async {
-    if (syncConfigFile) {
-      try {
-        final profileId = _ref.read(currentProfileIdProvider);
-        if (profileId != null) {
-          final setupState = await _ref.read(
-            setupStateProvider(profileId).future,
-          );
-          final patchConfig = _ref.read(patchClashConfigProvider);
-          final realTunEnable = _ref.read(realTunEnableProvider);
-          await writeProfileConfig(
-            setupState: setupState,
-            patchConfig: patchConfig.copyWith.tun(enable: realTunEnable),
-            enableExternalController: false,
-          );
-        }
-      } catch (e) {
-        commonPrint.log(e.toString(), logLevel: LogLevel.warning);
-      }
-    }
+  Future<void> closeExternalController() async {
     await coreController.updateExternalController('');
   }
 }

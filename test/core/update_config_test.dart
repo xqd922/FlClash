@@ -1,13 +1,12 @@
 import 'dart:convert';
 
 import 'package:fl_clash/common/common.dart';
-import 'package:fl_clash/core/interface.dart';
 import 'package:fl_clash/enum/enum.dart';
 import 'package:fl_clash/models/models.dart';
 import 'package:flutter_test/flutter_test.dart';
 
 void main() {
-  test('regular update config payload omits external-controller', () {
+  test('update config payload does not contain external-controller', () {
     final updateParams = UpdateParams(
       tun: defaultTun,
       mixedPort: defaultMixedPort,
@@ -17,12 +16,10 @@ void main() {
       logLevel: LogLevel.error,
       ipv6: true,
       tcpConcurrent: true,
-      externalController: ExternalControllerStatus.close,
       unifiedDelay: false,
     );
 
-    final payload = updateConfigPayload(updateParams);
-    final jsonPayload = json.encode(payload);
+    final jsonPayload = json.encode(updateParams);
 
     expect(jsonPayload.contains(externalControllerKey), isFalse);
   });

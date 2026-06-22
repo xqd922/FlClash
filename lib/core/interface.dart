@@ -6,10 +6,6 @@ import 'package:fl_clash/enum/enum.dart';
 import 'package:fl_clash/models/models.dart';
 import 'package:flutter/foundation.dart';
 
-Map<String, dynamic> updateConfigPayload(UpdateParams updateParams) {
-  return updateParams.toJson()..remove(externalControllerKey);
-}
-
 mixin CoreInterface {
   Future<bool> init(InitParams params);
 
@@ -162,7 +158,7 @@ abstract class CoreHandlerInterface with CoreInterface {
   Future<String> updateConfig(UpdateParams updateParams) async {
     return await _invoke<String>(
           method: ActionMethod.updateConfig,
-          data: json.encode(updateConfigPayload(updateParams)),
+          data: json.encode(updateParams),
         ) ??
         '';
   }
