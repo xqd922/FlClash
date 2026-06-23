@@ -1,3 +1,25 @@
+## v(7.0.22)
+
+### ✨ 新功能
+
+- 默认启用 `allow-lan`
+
+### 🐛 修复
+
+- `external-controller` 改为跟随 profile 配置文件
+  - 移除设置页面的 External Controller 开关
+  - 启动代理时读取 profile 中的 `external-controller` 地址
+  - 停止代理时仅运行时关闭，不修改配置文件
+  - 保留用户配置的 `external-ui` 和 `external-ui-url`
+- 从 `UpdateParams` 移除 `externalController`，`updateConfig` 不再干预
+  - 删除 `updateConfigPayload` workaround
+  - external controller 完全由配置文件 + `setupConfig` 管理
+
+### 🧪 测试
+
+- 新增 `external_controller` 单元测试
+- 新增 `update_config` payload 测试
+
 ## v(7.0.21)
 
 ### 🔄 重构

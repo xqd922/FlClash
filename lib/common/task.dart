@@ -109,9 +109,7 @@ Future<Map<String, dynamic>> _makeRealProfileTask(
     enableExternalController:
         realPatchConfig.externalController == ExternalControllerStatus.open,
   );
-  rawConfig['external-ui'] = '';
   rawConfig['interface-name'] = '';
-  rawConfig['external-ui-url'] = '';
   rawConfig['tcp-concurrent'] = realPatchConfig.tcpConcurrent;
   rawConfig['unified-delay'] = realPatchConfig.unifiedDelay;
   rawConfig['ipv6'] = realPatchConfig.ipv6;
