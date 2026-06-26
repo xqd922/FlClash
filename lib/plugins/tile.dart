@@ -26,17 +26,19 @@ class Tile {
 
   Future<void> _methodCallHandler(MethodCall call) async {
     for (final TileListener listener in _listeners) {
-      switch (call.method) {
-        case 'start':
-          listener.onStart();
-          break;
-        case 'stop':
-          listener.onStop();
-          break;
-        case 'detached':
-          listener.onDetached();
-          break;
-      }
+      try {
+        switch (call.method) {
+          case 'start':
+            listener.onStart();
+            break;
+          case 'stop':
+            listener.onStop();
+            break;
+          case 'detached':
+            listener.onDetached();
+            break;
+        }
+      } catch (_) {}
     }
   }
 

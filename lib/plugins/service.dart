@@ -34,13 +34,17 @@ class Service {
           final data = call.arguments as String? ?? '';
           final result = ActionResult.fromJson(json.decode(data));
           for (final listener in _listeners) {
-            listener.onServiceEvent(CoreEvent.fromJson(result.data));
+            try {
+              listener.onServiceEvent(CoreEvent.fromJson(result.data));
+            } catch (_) {}
           }
           break;
         case 'crash':
           final message = call.arguments as String? ?? '';
           for (final listener in _listeners) {
-            listener.onServiceCrash(message);
+            try {
+              listener.onServiceCrash(message);
+            } catch (_) {}
           }
           break;
         default:
