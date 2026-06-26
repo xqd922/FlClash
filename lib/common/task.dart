@@ -82,33 +82,10 @@ Future<Map<String, dynamic>> makeRealProfileTask(
   );
 }
 
-Future<Map<String, dynamic>> _makeRealProfileTask(
-  MakeRealProfileState data,
-) async {
-  final rawConfig = Map.from(data.rawConfig);
-  final realPatchConfig = data.realPatchConfig;
-  final profilesPath = data.profilesPath;
-  final profileId = data.profileId;
-  final overrideDns = data.overrideDns;
-  final addedRules = data.addedRules;
-  final appendSystemDns = data.appendSystemDns;
-  final defaultUA = data.defaultUA;
-  String getProvidersFilePathInner(String type, String url) {
-    return join(
-      profilesPath,
-      'providers',
-      profileId.toString(),
-      type,
-      url.toMd5(),
-    );
-  }
-
-  final configExternalController = rawConfig[externalControllerKey];
-  rawConfig[externalControllerKey] = resolveExternalController(
-    configExternalController,
-    enableExternalController:
-        realPatchConfig.externalController == ExternalControllerStatus.open,
-  );
+void _applyCoreSettings(
+  Map<String, dynamic> rawConfig,
+  ClashConfig realPatchConfig,
+) {
   rawConfig['interface-name'] = '';
   rawConfig['tcp-concurrent'] ??= realPatchConfig.tcpConcurrent;
   rawConfig['unified-delay'] ??= realPatchConfig.unifiedDelay;
@@ -133,6 +110,9 @@ Future<Map<String, dynamic>> _makeRealProfileTask(
   rawConfig['tun']['route-address'] ??= realPatchConfig.tun.routeAddress;
   rawConfig['tun']['auto-route'] ??= realPatchConfig.tun.autoRoute;
   rawConfig['geodata-loader'] ??= realPatchConfig.geodataLoader.name;
+}
+
+void _normalizeSniffer(Map<String, dynamic> rawConfig) {
   if (rawConfig['sniffer']?['sniff'] != null) {
     for (final value in (rawConfig['sniffer']?['sniff'] as Map).values) {
       if (value['ports'] != null && value['ports'] is List) {
@@ -141,18 +121,19 @@ Future<Map<String, dynamic>> _makeRealProfileTask(
       }
     }
   }
-  if (rawConfig['profile'] == null) {
-    rawConfig['profile'] = {};
-  }
+}
+
+void _rewriteProviderPaths(
+  Map<String, dynamic> rawConfig,
+  String Function(String type, String url) getProvidersFilePath,
+) {
   if (rawConfig['proxy-providers'] != null) {
     final proxyProviders = rawConfig['proxy-providers'] as Map;
     for (final key in proxyProviders.keys) {
       final proxyProvider = proxyProviders[key];
-      if (proxyProvider['type'] != 'http') {
-        continue;
-      }
+      if (proxyProvider['type'] != 'http') continue;
       if (proxyProvider['url'] != null) {
-        proxyProvider['path'] = getProvidersFilePathInner(
+        proxyProvider['path'] = getProvidersFilePath(
           'proxies',
           proxyProvider['url'],
         );
@@ -163,30 +144,27 @@ Future<Map<String, dynamic>> _makeRealProfileTask(
     final ruleProviders = rawConfig['rule-providers'] as Map;
     for (final key in ruleProviders.keys) {
       final ruleProvider = ruleProviders[key];
-      if (ruleProvider['type'] != 'http') {
-        continue;
-      }
+      if (ruleProvider['type'] != 'http') continue;
       if (ruleProvider['url'] != null) {
-        ruleProvider['path'] = getProvidersFilePathInner(
+        ruleProvider['path'] = getProvidersFilePath(
           'rules',
           ruleProvider['url'],
         );
       }
     }
   }
-  rawConfig['profile']['store-selected'] = false;
-  rawConfig['geox-url'] ??= realPatchConfig.geoXUrl.toJson();
-  rawConfig['global-ua'] ??= realPatchConfig.globalUa ?? defaultUA;
-  if (rawConfig['hosts'] == null) {
-    rawConfig['hosts'] = {};
-  }
-  for (final host in realPatchConfig.hosts.entries) {
-    rawConfig['hosts'][host.key] = host.value.splitByMultipleSeparators;
-  }
+}
+
+void _applyDns(
+  Map<String, dynamic> rawConfig,
+  ClashConfig realPatchConfig, {
+  required bool overrideDns,
+  required bool appendSystemDns,
+}) {
   if (rawConfig['dns'] == null) {
     rawConfig['dns'] = {};
   }
-  final systemDns = 'system://';
+  const systemDns = 'system://';
   if (overrideDns) {
     final dns = realPatchConfig.dns;
     rawConfig['dns'] = dns.toJson();
@@ -196,8 +174,7 @@ Future<Map<String, dynamic>> _makeRealProfileTask(
           entry.value.splitByMultipleSeparators;
     }
   } else {
-    if (rawConfig['dns']['enable'] != true &&
-        rawConfig['dns'].isNotEmpty) {
+    if (rawConfig['dns']['enable'] != true && rawConfig['dns'].isNotEmpty) {
       rawConfig['dns']['enable'] = true;
     }
   }
@@ -209,52 +186,107 @@ Future<Map<String, dynamic>> _makeRealProfileTask(
       rawConfig['dns']['nameserver'] = [...nameserver, systemDns];
     }
   }
+}
+
+List<String> _mergeRules(
+  Map<String, dynamic> rawConfig,
+  List<Rule> addedRules,
+) {
   List<String> rules = [];
   if (rawConfig['rules'] != null) {
     rules = List<String>.from(rawConfig['rules']);
   }
   rawConfig.remove('rules');
-  if (addedRules.isNotEmpty) {
-    final parsedNewRules = addedRules
-        .map((item) => ParsedRule.parseString(item.value))
-        .toList();
-    final hasMatchPlaceholder = parsedNewRules.any(
-      (item) => item.ruleTarget?.toUpperCase() == 'MATCH',
-    );
-    String? replacementTarget;
+  if (addedRules.isEmpty) return rules;
 
-    if (hasMatchPlaceholder) {
-      for (int i = rules.length - 1; i >= 0; i--) {
-        final parsed = ParsedRule.parseString(rules[i]);
-        if (parsed.ruleAction == RuleAction.MATCH) {
-          final target = parsed.ruleTarget;
-          if (target != null && target.isNotEmpty) {
-            replacementTarget = target;
-            break;
-          }
+  final parsedNewRules = addedRules
+      .map((item) => ParsedRule.parseString(item.value))
+      .toList();
+  final hasMatchPlaceholder = parsedNewRules.any(
+    (item) => item.ruleTarget?.toUpperCase() == 'MATCH',
+  );
+  String? replacementTarget;
+
+  if (hasMatchPlaceholder) {
+    for (int i = rules.length - 1; i >= 0; i--) {
+      final parsed = ParsedRule.parseString(rules[i]);
+      if (parsed.ruleAction == RuleAction.MATCH) {
+        final target = parsed.ruleTarget;
+        if (target != null && target.isNotEmpty) {
+          replacementTarget = target;
+          break;
         }
       }
     }
-    final List<String> finalAddedRules;
-
-    if (replacementTarget?.isNotEmpty == true) {
-      finalAddedRules = [];
-      for (int i = 0; i < parsedNewRules.length; i++) {
-        final parsed = parsedNewRules[i];
-        if (parsed.ruleTarget?.toUpperCase() == 'MATCH') {
-          finalAddedRules.add(
-            parsed.copyWith(ruleTarget: replacementTarget).value,
-          );
-        } else {
-          finalAddedRules.add(addedRules[i].value);
-        }
-      }
-    } else {
-      finalAddedRules = addedRules.map((e) => e.value).toList();
-    }
-    rules = [...finalAddedRules, ...rules];
   }
-  rawConfig['rules'] = rules;
+  final List<String> finalAddedRules;
+
+  if (replacementTarget?.isNotEmpty == true) {
+    finalAddedRules = [];
+    for (int i = 0; i < parsedNewRules.length; i++) {
+      final parsed = parsedNewRules[i];
+      if (parsed.ruleTarget?.toUpperCase() == 'MATCH') {
+        finalAddedRules.add(
+          parsed.copyWith(ruleTarget: replacementTarget).value,
+        );
+      } else {
+        finalAddedRules.add(addedRules[i].value);
+      }
+    }
+  } else {
+    finalAddedRules = addedRules.map((e) => e.value).toList();
+  }
+  return [...finalAddedRules, ...rules];
+}
+
+Future<Map<String, dynamic>> _makeRealProfileTask(
+  MakeRealProfileState data,
+) async {
+  final rawConfig = Map.from(data.rawConfig);
+  final realPatchConfig = data.realPatchConfig;
+
+  final configExternalController = rawConfig[externalControllerKey];
+  rawConfig[externalControllerKey] = resolveExternalController(
+    configExternalController,
+    enableExternalController:
+        realPatchConfig.externalController == ExternalControllerStatus.open,
+  );
+
+  _applyCoreSettings(rawConfig, realPatchConfig);
+  _normalizeSniffer(rawConfig);
+
+  if (rawConfig['profile'] == null) {
+    rawConfig['profile'] = {};
+  }
+
+  _rewriteProviderPaths(rawConfig, (type, url) {
+    return join(
+      data.profilesPath,
+      'providers',
+      data.profileId.toString(),
+      type,
+      url.toMd5(),
+    );
+  });
+
+  rawConfig['profile']['store-selected'] = false;
+  rawConfig['geox-url'] ??= realPatchConfig.geoXUrl.toJson();
+  rawConfig['global-ua'] ??= realPatchConfig.globalUa ?? data.defaultUA;
+  if (rawConfig['hosts'] == null) {
+    rawConfig['hosts'] = {};
+  }
+  for (final host in realPatchConfig.hosts.entries) {
+    rawConfig['hosts'][host.key] = host.value.splitByMultipleSeparators;
+  }
+
+  _applyDns(
+    rawConfig,
+    realPatchConfig,
+    overrideDns: data.overrideDns,
+    appendSystemDns: data.appendSystemDns,
+  );
+
+  rawConfig['rules'] = _mergeRules(rawConfig, data.addedRules);
   return Map<String, dynamic>.from(rawConfig);
 }
 
