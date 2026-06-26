@@ -25,12 +25,13 @@ import (
 	"os"
 	"runtime"
 	"runtime/debug"
+	"sync/atomic"
 	"strconv"
 	"time"
 )
 
 var (
-	isInit            = false
+	isInit            atomic.Bool
 	externalProviders = map[string]cp.Provider{}
 	logSubscriber     observable.Subscription[log.Event]
 )
@@ -45,14 +46,14 @@ func handleInitClash(paramsString string) bool {
 	}
 	version = params.Version
 	constant.SetHomeDir(params.HomeDir)
-	isInit = true
-	return isInit
+	isInit.Store(true)
+	return isInit.Load()
 }
 
 func handleStartListener() bool {
 	runLock.Lock()
 	defer runLock.Unlock()
-	isRunning = true
+	isRunning.Store(true)
 	updateListeners()
 	resolver.ResetConnection()
 	return true
@@ -61,14 +62,14 @@ func handleStartListener() bool {
 func handleStopListener() bool {
 	runLock.Lock()
 	defer runLock.Unlock()
-	isRunning = false
+	isRunning.Store(false)
 	listener.StopListener()
 	resolver.ResetConnection()
 	return true
 }
 
 func handleGetIsInit() bool {
-	return isInit
+	return isInit.Load()
 }
 
 func handleForceGC() {
@@ -83,7 +84,7 @@ func handleShutdown() bool {
 	stopListeners()
 	executor.Shutdown()
 	handleForceGC()
-	isInit = false
+	isInit.Store(false)
 	return true
 }
 
@@ -145,8 +146,8 @@ func handleGetProxies() ProxiesData {
 }
 
 func handleChangeProxy(data string, fn func(string string)) {
-	runLock.Lock()
 	go func() {
+		runLock.Lock()
 		defer runLock.Unlock()
 		var params = &ChangeProxyParams{}
 		err := json.Unmarshal([]byte(data), params)
@@ -391,7 +392,9 @@ func handleUpdateGeoData(geoType string, geoName string, fn func(value string)) 
 
 func handleUpdateExternalProvider(providerName string, fn func(value string)) {
 	go func() {
+		runLock.Lock()
 		externalProvider, exist := externalProviders[providerName]
+		runLock.Unlock()
 		if !exist {
 			fn("external provider is not exist")
 			return
@@ -510,6 +513,7 @@ func handleDelFile(path string, result ActionResult) {
 		if err != nil {
 			if !os.IsNotExist(err) {
 				result.success(err.Error())
+				return
 			}
 			result.success("")
 			return
@@ -532,7 +536,7 @@ func handleDelFile(path string, result ActionResult) {
 }
 
 func handleSetupConfig(bytes []byte) string {
-	if !isInit {
+	if !isInit.Load() {
 		return "not initialized"
 	}
 	var params = defaultSetupParams()

@@ -27,12 +27,13 @@ import (
 	"path/filepath"
 	"runtime"
 	"sync"
+	"sync/atomic"
 )
 
 var (
 	currentConfig *config.Config
 	version       = 0
-	isRunning     = false
+	isRunning     atomic.Bool
 	runLock       sync.Mutex
 	mBatch, _     = batch.New[bool](context.Background(), batch.WithConcurrencyNum[bool](50))
 )
@@ -102,7 +103,7 @@ func sideUpdateExternalProvider(p cp.Provider, bytes []byte) error {
 }
 
 func updateListeners() {
-	if !isRunning {
+	if !isRunning.Load() {
 		return
 	}
 	if currentConfig == nil {
