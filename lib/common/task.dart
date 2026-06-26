@@ -186,20 +186,19 @@ Future<Map<String, dynamic>> _makeRealProfileTask(
   if (rawConfig['dns'] == null) {
     rawConfig['dns'] = {};
   }
-  final isEnableDns = rawConfig['dns']['enable'] == true;
   final systemDns = 'system://';
-  if (overrideDns || !isEnableDns) {
-    final dns = switch (!isEnableDns) {
-      true => realPatchConfig.dns.copyWith(
-        nameserver: [...realPatchConfig.dns.nameserver, systemDns],
-      ),
-      false => realPatchConfig.dns,
-    };
+  if (overrideDns) {
+    final dns = realPatchConfig.dns;
     rawConfig['dns'] = dns.toJson();
     rawConfig['dns']['nameserver-policy'] = {};
     for (final entry in dns.nameserverPolicy.entries) {
       rawConfig['dns']['nameserver-policy'][entry.key] =
           entry.value.splitByMultipleSeparators;
+    }
+  } else {
+    if (rawConfig['dns']['enable'] != true &&
+        rawConfig['dns'].isNotEmpty) {
+      rawConfig['dns']['enable'] = true;
     }
   }
   if (appendSystemDns) {
