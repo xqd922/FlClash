@@ -53,7 +53,11 @@ class CoreController {
         await geoFile.writeAsBytes(bytes, flush: true);
       }
     } catch (e) {
-      exit(0);
+      // NOTE: 原来直接 exit(0)，用户看到闪退没有任何信息。
+      // geo 文件只在首次启动需要从 assets 复制，失败通常是包损坏或磁盘问题。
+      // 打印错误日志帮助排查，但仍退出（代理客户端依赖这些文件）。
+      print('Failed to initialize geo data: $e');
+      exit(1);
     }
   }
 

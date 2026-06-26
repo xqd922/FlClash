@@ -27,7 +27,13 @@ import (
 	"unsafe"
 )
 
-var eventListener unsafe.Pointer
+// NOTE: eventListener 被多个 goroutine 读写（sendMessage 在 log/delay/request 的
+// goroutine 中调用，setEventListener 从 JNI 主线程调用）。
+// 使用 RWMutex 保护并发访问，避免竞态条件和 ARM 上的撕裂读。
+var (
+	eventListener     unsafe.Pointer
+	eventListenerLock sync.RWMutex
+)
 
 type TunHandler struct {
 	listener *sing_tun.Listener
@@ -152,6 +158,7 @@ func handleStartTun(callback unsafe.Pointer, fd int, stack, address, dns string)
 }
 
 func handleUpdateDns(value string) {
+	// NOTE: fire-and-forget，UpdateSystemDNS 无返回值无法捕获错误。
 	go func() {
 		log.Infoln("[DNS] updateDns %s", value)
 		dns.UpdateSystemDNS(strings.Split(value, ","))
@@ -173,7 +180,12 @@ func (result ActionResult) send() {
 func nextHandle(action *Action, result ActionResult) bool {
 	switch action.Method {
 	case updateDnsMethod:
-		data := action.Data.(string)
+		// NOTE: 使用 comma-ok 断言，防止类型错误时 panic。
+		data, ok := action.Data.(string)
+		if !ok {
+			result.error("invalid data type for updateDns")
+			return true
+		}
 		handleUpdateDns(data)
 		result.success(true)
 		return true
@@ -226,6 +238,8 @@ func quickSetup(callback unsafe.Pointer, initParamsChar *C.char, setupParamsChar
 
 //export setEventListener
 func setEventListener(listener unsafe.Pointer) {
+	eventListenerLock.Lock()
+	defer eventListenerLock.Unlock()
 	if eventListener != nil || listener == nil {
 		releaseObject(eventListener)
 	}
@@ -234,25 +248,28 @@ func setEventListener(listener unsafe.Pointer) {
 
 //export getTotalTraffic
 func getTotalTraffic(onlyStatisticsProxy bool) *C.char {
-	data := C.CString(handleGetTotalTraffic(onlyStatisticsProxy))
-	defer C.free(unsafe.Pointer(data))
-	return data
+	// NOTE: 不用 defer C.free —— Go 的 defer 在函数返回时执行，
+	// 会导致 JNI 侧拿到已释放的内存（use-after-free）。
+	// 由调用方（Kotlin/JNI）复制字符串后释放。
+	return C.CString(handleGetTotalTraffic(onlyStatisticsProxy))
 }
 
 //export getTraffic
 func getTraffic(onlyStatisticsProxy bool) *C.char {
-	data := C.CString(handleGetTraffic(onlyStatisticsProxy))
-	defer C.free(unsafe.Pointer(data))
-	return data
+	// NOTE: 同 getTotalTraffic，调用方负责释放。
+	return C.CString(handleGetTraffic(onlyStatisticsProxy))
 }
 
 func sendMessage(message Message) {
-	if eventListener == nil {
+	eventListenerLock.RLock()
+	listener := eventListener
+	eventListenerLock.RUnlock()
+	if listener == nil {
 		return
 	}
 	result := ActionResult{
 		Method:   messageMethod,
-		callback: eventListener,
+		callback: listener,
 		Data:     message,
 	}
 	result.send()

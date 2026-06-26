@@ -36,10 +36,27 @@ func (result ActionResult) error(data interface{}) {
 	result.send()
 }
 
+// NOTE: 使用 comma-ok 类型断言，避免外部传入错误类型时 Go panic 崩溃。
+// 虽然是本地 IPC，但防御性编程能防止意外 crash。
+
+func asString(data interface{}) (string, bool) {
+	s, ok := data.(string)
+	return s, ok
+}
+
+func asBool(data interface{}) (bool, bool) {
+	b, ok := data.(bool)
+	return b, ok
+}
+
 func handleAction(action *Action, result ActionResult) {
 	switch action.Method {
 	case initClashMethod:
-		paramsString := action.Data.(string)
+		paramsString, ok := asString(action.Data)
+		if !ok {
+			result.error("invalid data type for initClash")
+			return
+		}
 		result.success(handleInitClash(paramsString))
 		return
 	case getIsInitMethod:
@@ -53,32 +70,56 @@ func handleAction(action *Action, result ActionResult) {
 		result.success(handleShutdown())
 		return
 	case validateConfigMethod:
-		path := action.Data.(string)
+		path, ok := asString(action.Data)
+		if !ok {
+			result.error("invalid data type for validateConfig")
+			return
+		}
 		result.success(handleValidateConfig(path))
 		return
 	case updateConfigMethod:
-		data := []byte(action.Data.(string))
-		result.success(handleUpdateConfig(data))
+		data, ok := asString(action.Data)
+		if !ok {
+			result.error("invalid data type for updateConfig")
+			return
+		}
+		result.success(handleUpdateConfig([]byte(data)))
 		return
 	case setupConfigMethod:
-		data := []byte(action.Data.(string))
-		result.success(handleSetupConfig(data))
+		data, ok := asString(action.Data)
+		if !ok {
+			result.error("invalid data type for setupConfig")
+			return
+		}
+		result.success(handleSetupConfig([]byte(data)))
 		return
 	case getProxiesMethod:
 		result.success(handleGetProxies())
 		return
 	case changeProxyMethod:
-		data := action.Data.(string)
+		data, ok := asString(action.Data)
+		if !ok {
+			result.error("invalid data type for changeProxy")
+			return
+		}
 		handleChangeProxy(data, func(value string) {
 			result.success(value)
 		})
 		return
 	case getTrafficMethod:
-		data := action.Data.(bool)
+		data, ok := asBool(action.Data)
+		if !ok {
+			result.error("invalid data type for getTraffic")
+			return
+		}
 		result.success(handleGetTraffic(data))
 		return
 	case getTotalTrafficMethod:
-		data := action.Data.(bool)
+		data, ok := asBool(action.Data)
+		if !ok {
+			result.error("invalid data type for getTotalTraffic")
+			return
+		}
 		result.success(handleGetTotalTraffic(data))
 		return
 	case resetTrafficMethod:
@@ -86,7 +127,11 @@ func handleAction(action *Action, result ActionResult) {
 		result.success(true)
 		return
 	case asyncTestDelayMethod:
-		data := action.Data.(string)
+		data, ok := asString(action.Data)
+		if !ok {
+			result.error("invalid data type for asyncTestDelay")
+			return
+		}
 		handleAsyncTestDelay(data, func(value string) {
 			result.success(value)
 		})
@@ -101,7 +146,11 @@ func handleAction(action *Action, result ActionResult) {
 		result.success(handleResetConnections())
 		return
 	case getConfigMethod:
-		path := action.Data.(string)
+		path, ok := asString(action.Data)
+		if !ok {
+			result.error("invalid data type for getConfig")
+			return
+		}
 		config, err := handleGetConfig(path)
 		if err != nil {
 			result.error(err)
@@ -110,17 +159,29 @@ func handleAction(action *Action, result ActionResult) {
 		result.success(config)
 		return
 	case closeConnectionMethod:
-		id := action.Data.(string)
+		id, ok := asString(action.Data)
+		if !ok {
+			result.error("invalid data type for closeConnection")
+			return
+		}
 		result.success(handleCloseConnection(id))
 		return
 	case getExternalProvidersMethod:
 		result.success(handleGetExternalProviders())
 		return
 	case getExternalProviderMethod:
-		externalProviderName := action.Data.(string)
+		externalProviderName, ok := asString(action.Data)
+		if !ok {
+			result.error("invalid data type for getExternalProvider")
+			return
+		}
 		result.success(handleGetExternalProvider(externalProviderName))
 	case updateGeoDataMethod:
-		paramsString := action.Data.(string)
+		paramsString, ok := asString(action.Data)
+		if !ok {
+			result.error("invalid data type for updateGeoData")
+			return
+		}
 		var params = map[string]string{}
 		err := json.Unmarshal([]byte(paramsString), &params)
 		if err != nil {
@@ -134,13 +195,21 @@ func handleAction(action *Action, result ActionResult) {
 		})
 		return
 	case updateExternalProviderMethod:
-		providerName := action.Data.(string)
+		providerName, ok := asString(action.Data)
+		if !ok {
+			result.error("invalid data type for updateExternalProvider")
+			return
+		}
 		handleUpdateExternalProvider(providerName, func(value string) {
 			result.success(value)
 		})
 		return
 	case sideLoadExternalProviderMethod:
-		paramsString := action.Data.(string)
+		paramsString, ok := asString(action.Data)
+		if !ok {
+			result.error("invalid data type for sideLoadExternalProvider")
+			return
+		}
 		var params = map[string]string{}
 		err := json.Unmarshal([]byte(paramsString), &params)
 		if err != nil {
@@ -168,7 +237,11 @@ func handleAction(action *Action, result ActionResult) {
 		result.success(handleStopListener())
 		return
 	case getCountryCodeMethod:
-		ip := action.Data.(string)
+		ip, ok := asString(action.Data)
+		if !ok {
+			result.error("invalid data type for getCountryCode")
+			return
+		}
 		handleGetCountryCode(ip, func(value string) {
 			result.success(value)
 		})
@@ -182,7 +255,11 @@ func handleAction(action *Action, result ActionResult) {
 		result.success(true)
 		handleCrash()
 	case deleteFile:
-		path := action.Data.(string)
+		path, ok := asString(action.Data)
+		if !ok {
+			result.error("invalid data type for deleteFile")
+			return
+		}
 		handleDelFile(path, result)
 		return
 	default:

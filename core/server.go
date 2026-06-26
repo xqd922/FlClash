@@ -6,6 +6,7 @@ import (
 	"bufio"
 	"encoding/json"
 	"fmt"
+	"log"
 	"net"
 	"strconv"
 )
@@ -44,8 +45,10 @@ func startServer(arg string) {
 	} else {
 		conn, err = net.Dial("tcp", fmt.Sprintf("127.0.0.1:%s", arg))
 	}
+	// NOTE: 原来用 panic，连接失败时没有有用的错误信息。
+	// 改用 log.Fatal 输出明确的错误后退出。
 	if err != nil {
-		panic(err.Error())
+		log.Fatalf("failed to connect to IPC server: %v", err)
 	}
 
 	defer func(conn net.Conn) {

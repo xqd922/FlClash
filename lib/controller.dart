@@ -387,7 +387,8 @@ extension ProfilesControllerExt on AppController {
 
 extension LogsControllerExt on AppController {
   void addLog(Log log) {
-    _ref.read(logsProvider).add(log);
+    // NOTE: 必须走 notifier，直接 .add() 是原地修改，Riverpod 检测不到变化，日志页面不刷新。
+    _ref.read(logsProvider.notifier).addLog(log);
   }
 
   Future<bool> exportLogs() async {
