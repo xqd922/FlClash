@@ -85,14 +85,14 @@ func sideUpdateExternalProvider(p cp.Provider, bytes []byte) error {
 	case *provider.ProxySetProvider:
 		psp := p.(*provider.ProxySetProvider)
 		_, _, err := psp.SideUpdate(bytes)
-		if err == nil {
+		if err != nil {
 			return err
 		}
 		return nil
-	case rp.RuleSetProvider:
+	case *rp.RuleSetProvider:
 		rsp := p.(*rp.RuleSetProvider)
 		_, _, err := rsp.SideUpdate(bytes)
-		if err == nil {
+		if err != nil {
 			return err
 		}
 		return nil

@@ -175,7 +175,7 @@ class SortNum extends _$SortNum with AutoDisposeNotifierMixin {
     return 0;
   }
 
-  int add() => state++;
+  int add() => state += 1;
 }
 
 @Riverpod(keepAlive: true)
@@ -185,7 +185,7 @@ class CheckIpNum extends _$CheckIpNum with AutoDisposeNotifierMixin {
     return 0;
   }
 
-  int add() => state++;
+  int add() => state += 1;
 }
 
 @Riverpod(keepAlive: true)

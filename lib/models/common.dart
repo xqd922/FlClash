@@ -558,7 +558,7 @@ extension ScriptExt on Script {
     if (!await file.exists()) {
       await file.create(recursive: true);
     }
-    await File(copyPath).copy(copyPath);
+    await File(copyPath).copy(file.path);
     return copyWith(lastUpdateTime: DateTime.now());
   }
 }
@@ -583,8 +583,8 @@ extension DelayStateExt on DelayState {
     if (delay != other.delay) {
       return delay.compareTo(other.delay);
     }
-    if (group && !group) return -1;
-    if (!group && group) return 1;
+    if (group && !other.group) return -1;
+    if (!group && other.group) return 1;
     return 0;
   }
 }
