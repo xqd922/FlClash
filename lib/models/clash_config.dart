@@ -179,7 +179,7 @@ abstract class Tun with _$Tun {
 
   factory Tun.fromJson(Map<String, Object?> json) => _$TunFromJson(json);
 
-  factory Tun.safeFormJson(Map<String, Object?>? json) {
+  factory Tun.safeFromJson(Map<String, Object?>? json) {
     if (json == null) {
       return defaultTun;
     }
@@ -296,7 +296,7 @@ abstract class GeoXUrl with _$GeoXUrl {
   factory GeoXUrl.fromJson(Map<String, Object?> json) =>
       _$GeoXUrlFromJson(json);
 
-  factory GeoXUrl.safeFormJson(Map<String, Object?>? json) {
+  factory GeoXUrl.safeFromJson(Map<String, Object?>? json) {
     if (json == null) {
       return defaultGeoXUrl;
     }
@@ -461,10 +461,10 @@ abstract class ClashConfig with _$ClashConfig {
     int keepAliveInterval,
     @Default(false) @JsonKey(name: 'unified-delay') bool unifiedDelay,
     @Default(true) @JsonKey(name: 'tcp-concurrent') bool tcpConcurrent,
-    @Default(defaultTun) @JsonKey(fromJson: Tun.safeFormJson) Tun tun,
+    @Default(defaultTun) @JsonKey(fromJson: Tun.safeFromJson) Tun tun,
     @Default(defaultDns) @JsonKey(fromJson: Dns.safeDnsFromJson) Dns dns,
     @Default(defaultGeoXUrl)
-    @JsonKey(name: 'geox-url', fromJson: GeoXUrl.safeFormJson)
+    @JsonKey(name: 'geox-url', fromJson: GeoXUrl.safeFromJson)
     GeoXUrl geoXUrl,
     @Default(GeodataLoader.memconservative)
     @JsonKey(name: 'geodata-loader')
@@ -481,7 +481,7 @@ abstract class ClashConfig with _$ClashConfig {
   factory ClashConfig.fromJson(Map<String, Object?> json) =>
       _$ClashConfigFromJson(json);
 
-  factory ClashConfig.safeFormJson(Map<String, Object?>? json) {
+  factory ClashConfig.safeFromJson(Map<String, Object?>? json) {
     if (json == null) {
       return defaultClashConfig;
     }

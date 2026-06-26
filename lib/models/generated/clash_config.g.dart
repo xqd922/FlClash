@@ -354,13 +354,13 @@ _ClashConfig _$ClashConfigFromJson(Map<String, dynamic> json) => _ClashConfig(
   tcpConcurrent: json['tcp-concurrent'] as bool? ?? true,
   tun: json['tun'] == null
       ? defaultTun
-      : Tun.safeFormJson(json['tun'] as Map<String, Object?>?),
+      : Tun.safeFromJson(json['tun'] as Map<String, Object?>?),
   dns: json['dns'] == null
       ? defaultDns
       : Dns.safeDnsFromJson(json['dns'] as Map<String, Object?>),
   geoXUrl: json['geox-url'] == null
       ? defaultGeoXUrl
-      : GeoXUrl.safeFormJson(json['geox-url'] as Map<String, Object?>?),
+      : GeoXUrl.safeFromJson(json['geox-url'] as Map<String, Object?>?),
   geodataLoader:
       $enumDecodeNullable(_$GeodataLoaderEnumMap, json['geodata-loader']) ??
       GeodataLoader.memconservative,
