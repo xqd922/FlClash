@@ -2,12 +2,19 @@ import 'dart:async';
 
 class Store<T> {
   late T _data;
+  // NOTE: StreamSubscription 保存以便 dispose 时取消，避免泄漏。
+  late final StreamSubscription<T> _subscription;
 
   Store(Stream stream, T defaultValue) {
-    stream.listen((data) {
+    _subscription = stream.listen((data) {
       _add(data);
     });
     _data = defaultValue;
+  }
+
+  void dispose() {
+    _subscription.cancel();
+    _streamController.close();
   }
 
   bool equals(T oldValue, T newValue) {

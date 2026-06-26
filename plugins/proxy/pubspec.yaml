@@ -4,7 +4,8 @@ version: 0.0.1
 homepage:
 
 environment:
-  sdk: '>=3.1.0 <4.0.0'
+  # NOTE: 对齐主 app 的 SDK 约束 (>=3.8.0)，避免声称兼容但未测试的版本。
+  sdk: '>=3.8.0 <4.0.0'
   flutter: '>=3.3.0'
 
 dependencies:

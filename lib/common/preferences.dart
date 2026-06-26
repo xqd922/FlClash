@@ -46,7 +46,9 @@ class Preferences {
       if (configString == null) return null;
       final Map<String, Object?>? configMap = json.decode(configString);
       return configMap;
-    } catch (_) {
+      // NOTE: 捕获异常并打印日志，原来是静默吞掉。
+    } catch (e) {
+      print('getConfigMap failed: $e');
       return null;
     }
   }
@@ -57,7 +59,8 @@ class Preferences {
       final clashConfigString = preferences?.getString(clashConfigKey);
       if (clashConfigString == null) return null;
       return json.decode(clashConfigString);
-    } catch (_) {
+    } catch (e) {
+      print('getClashConfigMap failed: $e');
       return null;
     }
   }

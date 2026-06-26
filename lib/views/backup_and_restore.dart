@@ -163,6 +163,8 @@ class BackupAndRestore extends ConsumerWidget {
   Widget build(BuildContext context, ref) {
     final dav = ref.watch(davSettingProvider);
     final isLoading = ref.watch(loadingProvider(LoadingTag.backup_restore));
+    // NOTE: 每次 build 重建 DAVClient，但此页面访问频率低，开销可忽略。
+    // 如果性能成为问题，转为 StatefulWidget 缓存 client。
     final client = dav != null ? DAVClient(dav) : null;
     return CommonScaffold(
       isLoading: isLoading,

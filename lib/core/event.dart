@@ -17,6 +17,8 @@ abstract mixin class CoreEventListener {
 }
 
 class CoreEventManager {
+  // NOTE: StreamController 在 singleton 生命周期内不关闭。
+  // singleton 与 app 同生命周期，关闭反而可能在关闭后收到事件导致异常。
   final _controller = StreamController<CoreEvent>();
 
   CoreEventManager._() {

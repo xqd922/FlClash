@@ -263,6 +263,10 @@ class Loading extends _$Loading with AutoDisposeNotifierMixin {
 
   @override
   bool build(LoadingTag tag) {
+    ref.onDispose(() {
+      // NOTE: Timer 取消防止在已 dispose 的 notifier 上触发回调。
+      _timer?.cancel();
+    });
     return false;
   }
 
@@ -345,9 +349,10 @@ class NetworkDetection extends _$NetworkDetection
     if (!isStart && _preIsStart == false && state.ipInfo != null) {
       return;
     }
-    final millisecondsEpoch = DateTime.now().millisecondsSinceEpoch;
-    _startMillisecondsEpoch = millisecondsEpoch;
-    final runTime = millisecondsEpoch + 1;
+    // NOTE: 用请求计数器代替时间戳比较。原来的 millisecondsEpoch+1 逻辑
+    // 导致错误检查永远为 true，任何 checkIp 失败都会卡在 loading 状态。
+    final requestId = DateTime.now().millisecondsSinceEpoch;
+    _startMillisecondsEpoch = requestId;
     _cancelToken?.cancel();
     _cancelToken = CancelToken();
     commonPrint.log('checkIp start');
@@ -355,8 +360,12 @@ class NetworkDetection extends _$NetworkDetection
     _preIsStart = isStart;
     final res = await request.checkIp(cancelToken: _cancelToken);
     commonPrint.log('checkIp res: $res');
-    if (res.isError && runTime > _startMillisecondsEpoch) {
-      state = state.copyWith(isLoading: true, ipInfo: null);
+    // 如果有更新的请求已启动，丢弃本次结果。
+    if (requestId != _startMillisecondsEpoch) {
+      return;
+    }
+    if (res.isError) {
+      state = state.copyWith(isLoading: false, ipInfo: null);
       return;
     }
     final ipInfo = res.data;

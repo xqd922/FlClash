@@ -25,6 +25,15 @@ class SingleInstanceLock {
       return false;
     }
   }
+
+  // NOTE: 释放文件锁，原来进程退出时文件句柄泄漏。
+  Future<void> release() async {
+    try {
+      await _accessFile?.unlock();
+      await _accessFile?.close();
+    } catch (_) {}
+    _accessFile = null;
+  }
 }
 
 final singleInstanceLock = SingleInstanceLock();

@@ -111,7 +111,10 @@ class Build {
     final environment = Platform.environment;
     if (buildItem.target == Target.android) {
       final ndk = environment['ANDROID_NDK'];
-      assert(ndk != null);
+      // NOTE: assert 在 release 模式下被移除，改为显式检查。
+      if (ndk == null) {
+        throw Exception('ANDROID_NDK environment variable not set');
+      }
       final prebuiltDir = Directory(
         join(ndk!, 'toolchains', 'llvm', 'prebuilt'),
       );
@@ -163,13 +166,13 @@ class Build {
       print(utf8.decode(data));
     });
     final exitCode = await process.exitCode;
-    if (exitCode != 0 && name != null) throw '$name error';
+    if (exitCode != 0 && name != null) throw Exception('$name error');
   }
 
   static Future<String> calcSha256(String filePath) async {
     final file = File(filePath);
     if (!await file.exists()) {
-      throw 'File not exists';
+      throw Exception('File not exists: $filePath');
     }
     final stream = file.openRead();
     return sha256.convert(await stream.reduce((a, b) => a + b)).toString();
@@ -294,6 +297,8 @@ class Build {
   }
 
   static List<String> getExecutable(String command) {
+    // NOTE: 简单空格分割，含空格路径会出错。
+    // 依赖 runInShell=true 由 shell 解析，仅 Process.start 的 args 列表不正确。
     return command.split(' ');
   }
 
@@ -325,7 +330,7 @@ class Build {
   static void copyFile(String sourceFilePath, String destinationFilePath) {
     final sourceFile = File(sourceFilePath);
     if (!sourceFile.existsSync()) {
-      throw 'SourceFilePath not exists';
+      throw Exception('SourceFilePath not exists: $sourceFilePath');
     }
     final destinationFile = File(destinationFilePath);
     final destinationDirectory = destinationFile.parent;
@@ -456,7 +461,7 @@ class BuildCommand extends Command {
     final arch = currentArches.isEmpty ? null : currentArches.first;
 
     if (arch == null && target != Target.android) {
-      throw 'Invalid arch parameter';
+      throw Exception('Invalid arch parameter: $arch');
     }
 
     final corePaths = await Build.buildCore(

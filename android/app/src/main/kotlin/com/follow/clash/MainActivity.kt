@@ -12,6 +12,7 @@ import io.flutter.embedding.engine.FlutterEngineCache
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.SupervisorJob
+import kotlinx.coroutines.cancel
 import kotlinx.coroutines.launch
 
 class MainActivity : FlutterActivity(),
@@ -48,6 +49,7 @@ class MainActivity : FlutterActivity(),
     override fun shouldDestroyEngineWithHost(): Boolean = false
 
     override fun onDestroy() {
+        cancel()
         GlobalState.launch {
             Service.setEventListener(null)
         }

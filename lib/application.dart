@@ -165,7 +165,7 @@ class ApplicationState extends ConsumerState<Application> {
   Future<void> dispose() async {
     linkManager.destroy();
     _autoUpdateProfilesTaskTimer?.cancel();
-    await coreController.destroy();
+    // NOTE: handleExit 内部已调用 coreController.destroy()，不需要重复调用。
     await appController.handleExit();
     super.dispose();
   }

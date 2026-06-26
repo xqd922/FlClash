@@ -70,21 +70,30 @@ class CoreService extends CoreHandlerInterface {
 
   Future<void> _attachSocket(Socket socket) async {
     await _destroySocket();
+    // NOTE: 旧 socket 关闭后，挂起的请求 completer 永远不会完成。
+    // 清理它们防止内存泄漏和无限等待。
+    _clearCompleter();
     _socketCompleter.complete(socket);
     socket
         .transform(uint8ListToListIntConverter)
         .transform(utf8.decoder)
         .transform(LineSplitter())
-        .listen((data) async {
-          final dataJson = await data.trim().commonToJSON<dynamic>();
-          handleResult(ActionResult.fromJson(dataJson));
-        })
-        .onDone(() {
-          _handleInvokeCrashEvent();
-          if (!_shutdownCompleter.isCompleted) {
-            _shutdownCompleter.complete(true);
-          }
-        });
+        .listen(
+          (data) async {
+            final dataJson = await data.trim().commonToJSON<dynamic>();
+            handleResult(ActionResult.fromJson(dataJson));
+          },
+          // NOTE: 添加 onError 回调，原来 socket 错误会导致未处理异常。
+          onError: (error) {
+            _handleInvokeCrashEvent();
+          },
+          onDone: () {
+            _handleInvokeCrashEvent();
+            if (!_shutdownCompleter.isCompleted) {
+              _shutdownCompleter.complete(true);
+            }
+          },
+        );
   }
 
   void _handleInvokeCrashEvent() {
@@ -188,7 +197,14 @@ class CoreService extends CoreHandlerInterface {
   }) async {
     final id = '${method.name}#${utils.id}';
     _callbackCompleterMap[id] = Completer<T?>();
-    sendMessage(json.encode(Action(id: id, method: method, data: data)));
+    // NOTE: sendMessage 可能抛异常（socket 已关闭），需清理 completer 防止泄漏。
+    try {
+      sendMessage(json.encode(Action(id: id, method: method, data: data)));
+    } catch (e) {
+      final completer = _callbackCompleterMap.remove(id);
+      completer?.safeCompleter(null);
+      return null;
+    }
     return (_callbackCompleterMap[id] as Completer<T?>).future.withTimeout(
       timeout: timeout,
       onLast: () {

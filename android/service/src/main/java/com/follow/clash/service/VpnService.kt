@@ -24,11 +24,14 @@ import com.follow.clash.service.modules.VpnResidualCleaner
 import com.follow.clash.service.modules.moduleLoader
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.SupervisorJob
+import kotlinx.coroutines.cancel
 import java.net.InetSocketAddress
 import android.net.VpnService as SystemVpnService
 
+// NOTE: 加 SupervisorJob 防止子协程失败取消整个 scope。
 class VpnService : SystemVpnService(), IBaseService,
-    CoroutineScope by CoroutineScope(Dispatchers.Default) {
+    CoroutineScope by CoroutineScope(SupervisorJob() + Dispatchers.Default) {
 
     private val self: VpnService
         get() = this
@@ -45,6 +48,7 @@ class VpnService : SystemVpnService(), IBaseService,
     }
 
     override fun onDestroy() {
+        cancel()
         handleDestroy()
         super.onDestroy()
     }
@@ -246,7 +250,9 @@ class VpnService : SystemVpnService(), IBaseService,
             State.options?.let {
                 handleStart(it)
             }
-        } catch (_: Exception) {
+        // NOTE: 记录异常信息，原来是静默吞掉，VPN 启动失败无法排查。
+        } catch (e: Exception) {
+            GlobalState.log("VpnService start failed: ${e.message}")
             stop()
         }
     }

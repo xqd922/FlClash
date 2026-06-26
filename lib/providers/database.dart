@@ -228,11 +228,9 @@ class ProfileDisabledRuleIds extends _$ProfileDisabledRuleIds
   void _put(int ruleId) {
     var newList = List<int>.from(value);
     final index = newList.indexWhere((item) => item == ruleId);
-    if (index != -1) {
-      newList[index] = ruleId;
-    } else {
-      newList.insert(0, ruleId);
-    }
+    // NOTE: 已存在则跳过，原代码重复赋值同一值是 no-op。
+    if (index != -1) return;
+    newList.insert(0, ruleId);
     value = newList;
   }
 

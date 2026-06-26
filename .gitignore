@@ -68,3 +68,10 @@ devtools_options.yaml
 # FVM Version Cache
 .fvm/
 .fvmrc
+
+# Security - prevent accidental commit of secrets and keys
+env.json
+*.jks
+*.keystore
+*.pem
+*.key

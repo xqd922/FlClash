@@ -1,4 +1,5 @@
-use once_cell::sync::Lazy;
+// NOTE: 用 std::sync::LazyLock 替代 once_cell（Rust 2021 edition + 1.80+ 支持）。
+use std::sync::LazyLock;
 use serde::{Deserialize, Serialize};
 use sha2::{Digest, Sha256};
 use std::collections::VecDeque;
@@ -33,13 +34,17 @@ fn sha256_file(path: &str) -> Result<String, Error> {
     Ok(format!("{:x}", hasher.finalize()))
 }
 
-static LOGS: Lazy<Arc<Mutex<VecDeque<String>>>> =
-    Lazy::new(|| Arc::new(Mutex::new(VecDeque::with_capacity(100))));
-static PROCESS: Lazy<Arc<Mutex<Option<std::process::Child>>>> =
-    Lazy::new(|| Arc::new(Mutex::new(None)));
+static LOGS: LazyLock<Arc<Mutex<VecDeque<String>>>> =
+    LazyLock::new(|| Arc::new(Mutex::new(VecDeque::with_capacity(100))));
+static PROCESS: LazyLock<Arc<Mutex<Option<std::process::Child>>>> =
+    LazyLock::new(|| Arc::new(Mutex::new(None)));
 
 fn start(start_params: StartParams) -> impl Reply {
-    let sha256 = sha256_file(start_params.path.as_str()).unwrap_or("".to_string());
+    // NOTE: 区分文件读取失败和哈希不匹配，方便排查。
+    let sha256 = match sha256_file(start_params.path.as_str()) {
+        Ok(hash) => hash,
+        Err(e) => return format!("Failed to read core binary: {}", e),
+    };
     if sha256 != env!("TOKEN") {
         return format!("The SHA256 hash of the program requesting execution is: {}. The helper program only allows execution of applications with the SHA256 hash: {}.", sha256,  env!("TOKEN"),);
     }
@@ -108,8 +113,10 @@ fn get_logs() -> impl Reply {
 pub async fn run_service() -> anyhow::Result<()> {
     let api_ping = warp::get().and(warp::path("ping")).map(|| env!("TOKEN"));
 
+    // NOTE: 添加 16KB 请求体大小限制，防止恶意超大 JSON 耗尽内存。
     let api_start = warp::post()
         .and(warp::path("start"))
+        .and(warp::body::content_length_limit(1024 * 16))
         .and(warp::body::json())
         .map(|start_params: StartParams| start(start_params));
 

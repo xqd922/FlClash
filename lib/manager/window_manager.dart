@@ -61,14 +61,8 @@ class _WindowContainerState extends ConsumerState<WindowManager>
     super.onShouldTerminate();
   }
 
-  @override
-  void onWindowMoved() {
-    super.onWindowMoved();
-    windowManager.getPosition().then((offset) {
-      ref.read(windowSettingProvider.notifier);
-      // .update((state) => state.copyWith(top: offset.dy, left: offset.dx));
-    });
-  }
+  // NOTE: 窗口位置持久化已注释掉，移除死代码。
+  // 如需恢复窗口位置功能，取消注释 original onWindowMoved 逻辑。
 
   @override
   Future<void> onWindowResized() async {

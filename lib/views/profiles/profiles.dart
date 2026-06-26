@@ -193,7 +193,6 @@ class ProfileItem extends StatelessWidget {
 
   Future updateProfile() async {
     if (profile.type == ProfileType.file) return;
-    try {} finally {}
     await appController.loadingRun(() async {
       await appController.updateProfile(profile, showLoading: true);
     }, tag: LoadingTag.profiles);
