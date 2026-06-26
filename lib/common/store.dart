@@ -6,7 +6,8 @@ class Store<T> {
   late final StreamSubscription<T> _subscription;
 
   Store(Stream stream, T defaultValue) {
-    _subscription = stream.listen((data) {
+    // NOTE: stream 参数是无类型的 Stream，需要 cast 为 Stream<T> 以匹配 StreamSubscription<T>。
+    _subscription = (stream as Stream<T>).listen((data) {
       _add(data);
     });
     _data = defaultValue;

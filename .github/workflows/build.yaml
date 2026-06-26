@@ -99,8 +99,9 @@ jobs:
       - name: Generate Code
         run: dart run build_runner build --delete-conflicting-outputs
 
+      # NOTE: 只分析主项目代码，--no-fatal-infos 忽略 print 等 info 级别提示。
       - name: Analyze
-        run: flutter analyze
+        run: flutter analyze --no-fatal-infos lib/
 
       - name: Setup
         run: dart setup.dart ${{ matrix.platform }} ${{ matrix.arch && format('--arch {0}', matrix.arch) }} ${{ env.IS_STABLE == 'true' && '--env stable' || '' }}

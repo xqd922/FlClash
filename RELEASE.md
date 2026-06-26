@@ -1,3 +1,43 @@
+## v(7.0.25)
+
+### 🐛 修复
+
+- CGO use-after-free：移除 `getTotalTraffic`/`getTraffic` 中的 `defer C.free`，修复 JNI 拿到已释放内存的问题
+- 竞态条件：`eventListener` 加 `RWMutex` 保护多 goroutine 并发读写
+- Go panic 防护：`handleAction` 全部类型断言改为 comma-ok 模式，并在 goroutine 中加 recover
+- 错误逻辑反转：`sideUpdateExternalProvider` 修复为正确返回错误
+- 日志 UI 不刷新：`addLog` 改走 Riverpod notifier，修复 app 日志不显示的问题
+- 首次启动闪退：`initGeo` 失败时打印错误信息而非静默退出
+- `handleValidateConfig` 修复 `readFile` 错误被覆盖的问题
+- `UpdateGeoIp`/`UpdateGeoSite` 修复 `GetGeoDataLoader` 错误被覆盖的问题
+- `checkIp` 竞态条件：修复时间戳比较逻辑，错误时不再卡在 loading 状态
+- `Application.dispose` 移除重复的 `coreController.destroy()` 调用
+- CoreService socket 添加 `onError` 回调，invoke 添加 try-catch 防止 completer 泄漏
+- `startServer` panic 改为 `log.Fatalf`，输出明确错误信息
+
+### ✨ 优化
+
+- Kotlin 协程泄漏修复：TempActivity、MainActivity、ServicePlugin、VpnService、CommonService 的 CoroutineScope 在生命周期结束时正确取消
+- JS 运行时泄漏：`handleEvaluate` 中 finally 块 dispose JS runtime
+- `uidPageNameMap` 改为 LRU 缓存（256 上限），防止长时间运行 VPN 时内存增长
+- Gson 实例复用：7 处分散的 `Gson()` 改为共享 `GlobalState.gson`
+- Module 防重复安装/卸载，ModuleLoader.cancel 同步等待清理完成
+- `updateViewSize`/`_updateSideBarWidth` 添加变化检查，避免不必要的 provider 写入触发重建循环
+- Proguard 规则补充 core JNI 类保护
+
+### 🧹 清理
+
+- 移除死代码：`hello()` 空方法、`DoNothingIntent`、空 try-finally、注释掉的 `onWindowMoved`
+- 移除未使用的 `fractional_indexing` 依赖
+- `intl` 版本约束从 `any` 改为 `^0.20.0`
+- 插件 SDK 约束对齐主 app `>=3.8.0`
+- 移除 proxy/window_ext 插件的模板注释
+- 移除 `once_cell` 依赖，改用 `std::sync::LazyLock`
+- tokio features 从 `full` 精简为 `rt-multi-thread` + `macros`
+- `.gitignore` 补充 `env.json`、`*.jks`、`*.keystore`、`*.pem`、`*.key`
+- CI 添加 `flutter analyze` 步骤和 Rust 依赖缓存
+- `setup.dart` throw 字符串改为 `throw Exception()`，assert 改为显式检查
+
 ## v(7.0.24)
 
 ### ✨ 新功能

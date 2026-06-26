@@ -103,22 +103,6 @@ extension InitControllerExt on AppController {
         false;
   }
 
-  Future<void> _handlerDisclaimer() async {
-    if (_ref.read(
-      appSettingProvider.select((state) => state.disclaimerAccepted),
-    )) {
-      return;
-    }
-    final isDisclaimerAccepted = await showDisclaimer();
-    if (!isDisclaimerAccepted) {
-      await handleExit();
-    }
-    _ref
-        .read(appSettingProvider.notifier)
-        .update((state) => state.copyWith(disclaimerAccepted: true));
-    return;
-  }
-
   Future<void> _initStatus() async {
     if (!globalState.needInitStatus) {
       commonPrint.log('init status cancel');
@@ -520,7 +504,7 @@ extension ProxiesControllerExt on AppController {
       await Future.delayed(commonDuration);
     }
     if (error != null && providers.isEmpty) {
-      throw error!;
+      throw error;
     }
     _ref.read(providersProvider.notifier).value = providers;
   }
