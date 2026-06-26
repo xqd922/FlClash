@@ -5,6 +5,7 @@ import android.app.Activity
 import android.app.ActivityManager
 import android.content.Intent
 import android.content.pm.ApplicationInfo
+import android.content.pm.ComponentInfo
 import android.content.pm.PackageManager
 import android.net.VpnService
 import android.os.Build
@@ -14,6 +15,7 @@ import androidx.core.content.ContextCompat.getSystemService
 import androidx.core.content.pm.ShortcutInfoCompat
 import androidx.core.content.pm.ShortcutManagerCompat
 import androidx.core.graphics.drawable.IconCompat
+import com.android.tools.smali.dexlib2.dexbacked.DexBackedDexFile
 import com.follow.clash.R
 import com.follow.clash.common.Components
 import com.follow.clash.common.GlobalState
@@ -35,7 +37,9 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.cancel
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
+import java.io.File
 import java.lang.ref.WeakReference
+import java.util.zip.ZipFile
 
 class AppPlugin : FlutterPlugin, MethodChannel.MethodCallHandler, ActivityAware {
 
@@ -214,45 +218,18 @@ class AppPlugin : FlutterPlugin, MethodChannel.MethodCallHandler, ActivityAware 
     private fun getPackages(): List<Package> {
         val packageManager = GlobalState.application.packageManager
         if (packages.isNotEmpty()) return packages
-        val launcherIntent = Intent(Intent.ACTION_MAIN).apply {
-            addCategory(Intent.CATEGORY_LAUNCHER)
-        }
-        val launcherPackages = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
-            packageManager.queryIntentActivities(
-                launcherIntent,
-                PackageManager.ResolveInfoFlags.of(0)
-            )
-        } else {
-            @Suppress("DEPRECATION")
-            packageManager.queryIntentActivities(launcherIntent, 0)
-        }
-        launcherPackages
-            .mapNotNull { it.activityInfo?.applicationInfo }
-            .distinctBy { it.packageName }
-            .filter {
+        packageManager?.getInstalledPackages(PackageManager.GET_META_DATA or PackageManager.GET_PERMISSIONS)
+            ?.filter {
                 it.packageName != GlobalState.application.packageName && it.packageName != "android"
-            }.mapNotNull {
-                val packageInfo = try {
-                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
-                        packageManager.getPackageInfo(
-                            it.packageName,
-                            PackageManager.PackageInfoFlags.of(0)
-                        )
-                    } else {
-                        @Suppress("DEPRECATION")
-                        packageManager.getPackageInfo(it.packageName, 0)
-                    }
-                } catch (_: Exception) {
-                    return@mapNotNull null
-                }
+            }?.map {
                 Package(
                     packageName = it.packageName,
-                    label = it.loadLabel(packageManager).toString(),
-                    system = (it.flags and ApplicationInfo.FLAG_SYSTEM) != 0,
-                    lastUpdateTime = packageInfo.lastUpdateTime,
-                    internet = true
+                    label = it.applicationInfo?.loadLabel(packageManager).toString(),
+                    system = (it.applicationInfo?.flags?.and(ApplicationInfo.FLAG_SYSTEM)) != 0,
+                    lastUpdateTime = it.lastUpdateTime,
+                    internet = it.requestedPermissions?.contains(Manifest.permission.INTERNET) == true
                 )
-            }.let { packages.addAll(it) }
+            }?.let { packages.addAll(it) }
         return packages
     }
 
@@ -321,11 +298,69 @@ class AppPlugin : FlutterPlugin, MethodChannel.MethodCallHandler, ActivityAware 
     }
 
 
+    @Suppress("DEPRECATION")
     private fun isChinaPackage(packageName: String): Boolean {
+        val packageManager = GlobalState.application.packageManager ?: return false
         skipPrefixList.forEach {
             if (packageName == it || packageName.startsWith("$it.")) return false
         }
-        return packageName.matches(chinaAppRegex)
+        val packageManagerFlags = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
+            PackageManager.MATCH_UNINSTALLED_PACKAGES or PackageManager.GET_ACTIVITIES or PackageManager.GET_SERVICES or PackageManager.GET_RECEIVERS or PackageManager.GET_PROVIDERS
+        } else {
+            PackageManager.GET_UNINSTALLED_PACKAGES or PackageManager.GET_ACTIVITIES or PackageManager.GET_SERVICES or PackageManager.GET_RECEIVERS or PackageManager.GET_PROVIDERS
+        }
+        if (packageName.matches(chinaAppRegex)) {
+            return true
+        }
+        try {
+            val packageInfo = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+                packageManager.getPackageInfo(
+                    packageName, PackageManager.PackageInfoFlags.of(packageManagerFlags.toLong())
+                )
+            } else {
+                packageManager.getPackageInfo(
+                    packageName, packageManagerFlags
+                )
+            }
+            mutableListOf<ComponentInfo>().apply {
+                packageInfo.services?.let { addAll(it) }
+                packageInfo.activities?.let { addAll(it) }
+                packageInfo.receivers?.let { addAll(it) }
+                packageInfo.providers?.let { addAll(it) }
+            }.forEach {
+                if (it.name.matches(chinaAppRegex)) return true
+            }
+            packageInfo.applicationInfo?.publicSourceDir?.let {
+                ZipFile(File(it)).use {
+                    for (packageEntry in it.entries()) {
+                        if (!(packageEntry.name.startsWith("classes") && packageEntry.name.endsWith(
+                                ".dex"
+                            ))
+                        ) {
+                            continue
+                        }
+                        if (packageEntry.size > 15000000) {
+                            return true
+                        }
+                        val input = it.getInputStream(packageEntry).buffered()
+                        val dexFile = try {
+                            DexBackedDexFile.fromInputStream(null, input)
+                        } catch (e: Exception) {
+                            return false
+                        }
+                        for (clazz in dexFile.classes) {
+                            val clazzName =
+                                clazz.type.substring(1, clazz.type.length - 1).replace("/", ".")
+                                    .replace("$", ".")
+                            if (clazzName.matches(chinaAppRegex)) return true
+                        }
+                    }
+                }
+            }
+        } catch (_: Exception) {
+            return false
+        }
+        return false
     }
 
     override fun onAttachedToEngine(flutterPluginBinding: FlutterPlugin.FlutterPluginBinding) {
