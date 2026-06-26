@@ -1,19 +1,3 @@
-## v7.0.26
-
-- Optimize FixedList to avoid full list copy on every log/request/traffic add
-
-- Fix computeSort O(n²logn) to O(nlogn) by pre-computing delay states
-
-- Remove unnecessary deep copy in currentGroupsState
-
-- Fix AutoDisposeNotifierMixin equals logic bug
-
-- Optimize filterGroupsState with cached lowercase proxy names
-
-- Fix Debouncer and Throttler map leak in cancel()
-
-- Simplify DelayDataSource.setDelay map update
-
 ## v0.8.92
 
 - Add sqlite store

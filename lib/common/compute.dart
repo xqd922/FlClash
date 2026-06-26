@@ -16,20 +16,23 @@ List<Group> computeSort({
     required Map<String, String> selectedMap,
     required String testUrl,
   }) {
-    // ponytail: pre-compute O(n) instead of O(n²logn) lookups in comparator
-    final delayStates = <String, DelayState>{};
-    for (final proxy in proxies) {
-      delayStates[proxy.name] = computeProxyDelayState(
-        proxyName: proxy.name,
+    return List.from(proxies)..sort((a, b) {
+      final aDelayState = computeProxyDelayState(
+        proxyName: a.name,
         testUrl: testUrl,
         groups: groups,
         selectedMap: selectedMap,
         delayMap: delayMap,
       );
-    }
-    return List.from(proxies)
-      ..sort((a, b) =>
-          delayStates[a.name]!.compareTo(delayStates[b.name]!));
+      final bDelayState = computeProxyDelayState(
+        proxyName: b.name,
+        testUrl: testUrl,
+        groups: groups,
+        selectedMap: selectedMap,
+        delayMap: delayMap,
+      );
+      return aDelayState.compareTo(bDelayState);
+    });
   }
 
   List<Proxy> sortOfName(List<Proxy> proxies) {

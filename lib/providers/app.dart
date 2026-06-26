@@ -25,8 +25,8 @@ class Logs extends _$Logs with AutoDisposeNotifierMixin {
     return FixedList(0);
   }
 
-  void addLog(Log log) {
-    this.value = state.addAndNotify(log);
+  void addLog(Log value) {
+    this.value = state.copyWith()..add(value);
   }
 }
 
@@ -37,8 +37,8 @@ class Requests extends _$Requests with AutoDisposeNotifierMixin {
     return FixedList(0);
   }
 
-  void addRequest(TrackerInfo info) {
-    this.value = state.addAndNotify(info);
+  void addRequest(TrackerInfo value) {
+    this.value = state.copyWith()..add(value);
   }
 }
 
@@ -82,12 +82,12 @@ class Traffics extends _$Traffics with AutoDisposeNotifierMixin {
     return FixedList(0);
   }
 
-  void addTraffic(Traffic traffic) {
-    this.value = state.addAndNotify(traffic);
+  void addTraffic(Traffic value) {
+    this.value = state.copyWith()..add(value);
   }
 
   void clear() {
-    this.value = state.copyWith()..clear();
+    value = state.copyWith()..clear();
   }
 }
 
@@ -221,12 +221,12 @@ class DelayDataSource extends _$DelayDataSource with AutoDisposeNotifierMixin {
 
   void setDelay(Delay delay) {
     if (state[delay.url]?[delay.name] != delay.value) {
-      value = Map.from(state)
-        ..update(
-          delay.url,
-          (m) => m..[delay.name] = delay.value,
-          ifAbsent: () => {delay.name: delay.value},
-        );
+      final DelayMap newDelayMap = Map.from(state);
+      if (newDelayMap[delay.url] == null) {
+        newDelayMap[delay.url] = {};
+      }
+      newDelayMap[delay.url]![delay.name] = delay.value;
+      value = newDelayMap;
     }
   }
 }
