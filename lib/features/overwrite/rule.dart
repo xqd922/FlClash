@@ -110,6 +110,13 @@ class _AddOrEditRuleDialogState extends State<AddOrEditRuleDialog> {
     super.initState();
   }
 
+  @override
+  void dispose() {
+    _ruleTargetController.dispose();
+    _contentController.dispose();
+    super.dispose();
+  }
+
   void _initState() {
     _targetItems = [
       ...RuleTarget.values.map(

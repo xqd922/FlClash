@@ -49,6 +49,7 @@ class ProxiesTabViewState extends ConsumerState<ProxiesTabView>
 
   @override
   void dispose() {
+    _hasMoreButtonNotifier.dispose();
     _destroyTabController();
     super.dispose();
   }

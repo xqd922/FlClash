@@ -90,6 +90,12 @@ class _HotKeyManagerState extends ConsumerState<HotKeyManager> {
   }
 
   @override
+  void dispose() {
+    hotKeyManager.unregisterAll();
+    super.dispose();
+  }
+
+  @override
   Widget build(BuildContext context) {
     return _buildShortcuts(widget.child);
   }

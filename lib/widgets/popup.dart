@@ -150,6 +150,12 @@ class _CommonPopupBoxState extends State<CommonPopupBox> {
   }
 
   @override
+  void dispose() {
+    _targetOffsetValueNotifier.dispose();
+    super.dispose();
+  }
+
+  @override
   Widget build(BuildContext context) {
     return LayoutBuilder(
       builder: (_, _) {
