@@ -131,7 +131,8 @@ extension ProfilesExt on List<Profile> {
     return index == -1 ? null : this[index];
   }
 
-  String _getLabel(String label, int id) {
+  String _getLabel(String label, int id, [int depth = 0]) {
+    if (depth > 100) return label;
     final realLabel = label.takeFirstValid([id.toString()]);
     final hasDup =
         indexWhere(
@@ -139,9 +140,9 @@ extension ProfilesExt on List<Profile> {
         ) !=
         -1;
     if (hasDup) {
-      return _getLabel(utils.getOverwriteLabel(realLabel), id);
+      return _getLabel(utils.getOverwriteLabel(realLabel), id, depth + 1);
     } else {
-      return label;
+      return realLabel;
     }
   }
 
