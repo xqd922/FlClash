@@ -1,3 +1,11 @@
+## v(7.0.23)
+
+### 🐛 修复
+
+- 恢复访问控制功能，回退应用可见性加固
+  - 恢复 `QUERY_ALL_PACKAGES` 权限
+  - `getPackages()` 改回 `getInstalledPackages()` 获取所有已安装应用
+
 ## v(7.0.22)
 
 ### ✨ 新功能
