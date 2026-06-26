@@ -221,12 +221,12 @@ class DelayDataSource extends _$DelayDataSource with AutoDisposeNotifierMixin {
 
   void setDelay(Delay delay) {
     if (state[delay.url]?[delay.name] != delay.value) {
-      final DelayMap newDelayMap = Map.from(state);
-      if (newDelayMap[delay.url] == null) {
-        newDelayMap[delay.url] = {};
-      }
-      newDelayMap[delay.url]![delay.name] = delay.value;
-      value = newDelayMap;
+      value = Map.from(state)
+        ..update(
+          delay.url,
+          (m) => m..[delay.name] = delay.value,
+          ifAbsent: () => {delay.name: delay.value},
+        );
     }
   }
 }
