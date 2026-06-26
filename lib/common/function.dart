@@ -24,8 +24,7 @@ class Debouncer {
   }
 
   void cancel(dynamic tag) {
-    _operations[tag]?.cancel();
-    _operations[tag] = null;
+    _operations.remove(tag)?.cancel();
   }
 }
 
@@ -60,8 +59,7 @@ class Throttler {
   }
 
   void cancel(dynamic tag) {
-    _operations[tag]?.cancel();
-    _operations[tag] = null;
+    _operations.remove(tag)?.cancel();
   }
 }
 

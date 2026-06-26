@@ -25,8 +25,8 @@ class Logs extends _$Logs with AutoDisposeNotifierMixin {
     return FixedList(0);
   }
 
-  void addLog(Log value) {
-    this.value = state.copyWith()..add(value);
+  void addLog(Log log) {
+    this.value = state.addAndNotify(log);
   }
 }
 
@@ -37,8 +37,8 @@ class Requests extends _$Requests with AutoDisposeNotifierMixin {
     return FixedList(0);
   }
 
-  void addRequest(TrackerInfo value) {
-    this.value = state.copyWith()..add(value);
+  void addRequest(TrackerInfo info) {
+    this.value = state.addAndNotify(info);
   }
 }
 
@@ -82,12 +82,12 @@ class Traffics extends _$Traffics with AutoDisposeNotifierMixin {
     return FixedList(0);
   }
 
-  void addTraffic(Traffic value) {
-    this.value = state.copyWith()..add(value);
+  void addTraffic(Traffic traffic) {
+    this.value = state.addAndNotify(traffic);
   }
 
   void clear() {
-    value = state.copyWith()..clear();
+    this.value = state.copyWith()..clear();
   }
 }
 
