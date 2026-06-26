@@ -18,16 +18,7 @@ GroupsState currentGroupsState(Ref ref) {
   final mode = ref.watch(
     patchClashConfigProvider.select((state) => state.mode),
   );
-  final groups = ref.watch(
-    groupsProvider.select(
-      (state) => state.map((item) {
-        return item.copyWith(
-          now: '',
-          all: item.all.map((proxy) => proxy.copyWith(now: '')).toList(),
-        );
-      }),
-    ),
-  );
+  final groups = ref.watch(groupsProvider);
   return GroupsState(
     value: switch (mode) {
       Mode.direct => [],
