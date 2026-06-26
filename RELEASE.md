@@ -1,3 +1,13 @@
+## v(7.0.24)
+
+### ✨ 新功能
+
+- 所有设置默认使用配置文件的值，app 不再强制覆盖
+  - mode、allow-lan、ipv6、log-level 等基础设置
+  - TUN 全部子字段（enable、stack、device 等）
+  - DNS 配置不再要求 `dns.enable: true` 前提条件
+  - geox-url、global-ua
+
 ## v(7.0.23)
 
 ### 🐛 修复
