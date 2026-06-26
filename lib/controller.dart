@@ -1064,13 +1064,9 @@ extension BackupControllerExt on AppController {
     final pathsToDelete = await shakingProfileTask(VM2(profileIds, scriptIds));
     if (pathsToDelete.isNotEmpty) {
       final deleteFutures = pathsToDelete.map((path) async {
-        try {
-          final res = await coreController.deleteFile(path);
-          if (res.isNotEmpty) {
-            throw res;
-          }
-        } catch (e) {
-          rethrow;
+        final res = await coreController.deleteFile(path);
+        if (res.isNotEmpty) {
+          throw res;
         }
       });
 
