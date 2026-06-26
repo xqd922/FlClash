@@ -110,31 +110,29 @@ Future<Map<String, dynamic>> _makeRealProfileTask(
         realPatchConfig.externalController == ExternalControllerStatus.open,
   );
   rawConfig['interface-name'] = '';
-  rawConfig['tcp-concurrent'] = realPatchConfig.tcpConcurrent;
-  rawConfig['unified-delay'] = realPatchConfig.unifiedDelay;
-  rawConfig['ipv6'] = realPatchConfig.ipv6;
-  rawConfig['log-level'] = realPatchConfig.logLevel.name;
-  rawConfig['port'] = 0;
-  rawConfig['socks-port'] = 0;
-  rawConfig['keep-alive-interval'] = realPatchConfig.keepAliveInterval;
-  rawConfig['mixed-port'] = realPatchConfig.mixedPort;
-  rawConfig['port'] = realPatchConfig.port;
-  rawConfig['socks-port'] = realPatchConfig.socksPort;
-  rawConfig['redir-port'] = realPatchConfig.redirPort;
-  rawConfig['tproxy-port'] = realPatchConfig.tproxyPort;
-  rawConfig['find-process-mode'] = realPatchConfig.findProcessMode.name;
-  rawConfig['allow-lan'] = realPatchConfig.allowLan;
-  rawConfig['mode'] = realPatchConfig.mode.name;
+  rawConfig['tcp-concurrent'] ??= realPatchConfig.tcpConcurrent;
+  rawConfig['unified-delay'] ??= realPatchConfig.unifiedDelay;
+  rawConfig['ipv6'] ??= realPatchConfig.ipv6;
+  rawConfig['log-level'] ??= realPatchConfig.logLevel.name;
+  rawConfig['keep-alive-interval'] ??= realPatchConfig.keepAliveInterval;
+  rawConfig['mixed-port'] ??= realPatchConfig.mixedPort;
+  rawConfig['port'] ??= realPatchConfig.port;
+  rawConfig['socks-port'] ??= realPatchConfig.socksPort;
+  rawConfig['redir-port'] ??= realPatchConfig.redirPort;
+  rawConfig['tproxy-port'] ??= realPatchConfig.tproxyPort;
+  rawConfig['find-process-mode'] ??= realPatchConfig.findProcessMode.name;
+  rawConfig['allow-lan'] ??= realPatchConfig.allowLan;
+  rawConfig['mode'] ??= realPatchConfig.mode.name;
   if (rawConfig['tun'] == null) {
     rawConfig['tun'] = {};
   }
-  rawConfig['tun']['enable'] = realPatchConfig.tun.enable;
-  rawConfig['tun']['device'] = realPatchConfig.tun.device;
-  rawConfig['tun']['dns-hijack'] = realPatchConfig.tun.dnsHijack;
-  rawConfig['tun']['stack'] = realPatchConfig.tun.stack.name;
-  rawConfig['tun']['route-address'] = realPatchConfig.tun.routeAddress;
-  rawConfig['tun']['auto-route'] = realPatchConfig.tun.autoRoute;
-  rawConfig['geodata-loader'] = realPatchConfig.geodataLoader.name;
+  rawConfig['tun']['enable'] ??= realPatchConfig.tun.enable;
+  rawConfig['tun']['device'] ??= realPatchConfig.tun.device;
+  rawConfig['tun']['dns-hijack'] ??= realPatchConfig.tun.dnsHijack;
+  rawConfig['tun']['stack'] ??= realPatchConfig.tun.stack.name;
+  rawConfig['tun']['route-address'] ??= realPatchConfig.tun.routeAddress;
+  rawConfig['tun']['auto-route'] ??= realPatchConfig.tun.autoRoute;
+  rawConfig['geodata-loader'] ??= realPatchConfig.geodataLoader.name;
   if (rawConfig['sniffer']?['sniff'] != null) {
     for (final value in (rawConfig['sniffer']?['sniff'] as Map).values) {
       if (value['ports'] != null && value['ports'] is List) {
@@ -177,8 +175,8 @@ Future<Map<String, dynamic>> _makeRealProfileTask(
     }
   }
   rawConfig['profile']['store-selected'] = false;
-  rawConfig['geox-url'] = realPatchConfig.geoXUrl.toJson();
-  rawConfig['global-ua'] = realPatchConfig.globalUa ?? defaultUA;
+  rawConfig['geox-url'] ??= realPatchConfig.geoXUrl.toJson();
+  rawConfig['global-ua'] ??= realPatchConfig.globalUa ?? defaultUA;
   if (rawConfig['hosts'] == null) {
     rawConfig['hosts'] = {};
   }
