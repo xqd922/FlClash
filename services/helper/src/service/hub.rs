@@ -7,6 +7,7 @@ use std::io::{BufRead, Error, Read};
 use std::process::{Command, Stdio};
 use std::sync::{Arc, Mutex};
 use std::{io, thread};
+use tokio::sync::Notify;
 use warp::{Filter, Reply};
 
 const LISTEN_PORT: u16 = 47890;
@@ -37,6 +38,7 @@ static LOGS: Lazy<Arc<Mutex<VecDeque<String>>>> =
     Lazy::new(|| Arc::new(Mutex::new(VecDeque::with_capacity(100))));
 static PROCESS: Lazy<Arc<Mutex<Option<std::process::Child>>>> =
     Lazy::new(|| Arc::new(Mutex::new(None)));
+static SHUTDOWN: Lazy<Notify> = Lazy::new(Notify::new);
 
 fn start(start_params: StartParams) -> impl Reply {
     let sha256 = sha256_file(start_params.path.as_str()).unwrap_or("".to_string());
@@ -44,7 +46,7 @@ fn start(start_params: StartParams) -> impl Reply {
         return format!("The SHA256 hash of the program requesting execution is: {}. The helper program only allows execution of applications with the SHA256 hash: {}.", sha256,  env!("TOKEN"),);
     }
     stop();
-    let mut process = PROCESS.lock().unwrap();
+    let mut process = PROCESS.lock().unwrap_or_else(|e| e.into_inner());
     match Command::new(&start_params.path)
         .stderr(Stdio::piped())
         .arg(&start_params.arg)
@@ -78,7 +80,7 @@ fn start(start_params: StartParams) -> impl Reply {
 }
 
 fn stop() -> impl Reply {
-    let mut process = PROCESS.lock().unwrap();
+    let mut process = PROCESS.lock().unwrap_or_else(|e| e.into_inner());
     if let Some(mut child) = process.take() {
         let _ = child.kill();
         let _ = child.wait();
@@ -88,7 +90,7 @@ fn stop() -> impl Reply {
 }
 
 fn log_message(message: String) {
-    let mut log_buffer = LOGS.lock().unwrap();
+    let mut log_buffer = LOGS.lock().unwrap_or_else(|e| e.into_inner());
     if log_buffer.len() == 100 {
         log_buffer.pop_front();
     }
@@ -96,13 +98,18 @@ fn log_message(message: String) {
 }
 
 fn get_logs() -> impl Reply {
-    let log_buffer = LOGS.lock().unwrap();
+    let log_buffer = LOGS.lock().unwrap_or_else(|e| e.into_inner());
     let value = log_buffer
         .iter()
         .cloned()
         .collect::<Vec<String>>()
         .join("\n");
     warp::reply::with_header(value, "Content-Type", "text/plain")
+}
+
+pub fn shutdown() {
+    stop();
+    SHUTDOWN.notify_waiters();
 }
 
 pub async fn run_service() -> anyhow::Result<()> {
@@ -117,9 +124,12 @@ pub async fn run_service() -> anyhow::Result<()> {
 
     let api_logs = warp::get().and(warp::path("logs")).map(|| get_logs());
 
-    warp::serve(api_ping.or(api_start).or(api_stop).or(api_logs))
-        .run(([127, 0, 0, 1], LISTEN_PORT))
-        .await;
+    let (_, server_future) = warp::serve(api_ping.or(api_start).or(api_stop).or(api_logs))
+        .bind_with_graceful_shutdown(([127, 0, 0, 1], LISTEN_PORT), async {
+            SHUTDOWN.notified().await;
+        });
+
+    server_future.await;
 
     Ok(())
 }

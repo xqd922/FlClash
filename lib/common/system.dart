@@ -102,11 +102,7 @@ class System {
           value: '',
         ),
       );
-      final arguments = [
-        '-c',
-        'echo "$password" | sudo -S chown root:root "$corePath" && echo "$password" | sudo -S chmod +sx "$corePath"',
-      ];
-      final result = await Process.run(shell, arguments);
+      final result = await _runSudoWithPassword(password, corePath);
       if (result.exitCode != 0) {
         return AuthorizeCode.error;
       }
@@ -126,6 +122,22 @@ class System {
     }
     await window?.close();
   }
+}
+
+Future<ProcessResult> _runSudoWithPassword(
+  String password,
+  String corePath,
+) async {
+  final process = await Process.start('sudo', [
+    '-S',
+    'sh',
+    '-c',
+    'chown root:root "$corePath" && chmod +sx "$corePath"',
+  ]);
+  process.stdin.writeln(password);
+  await process.stdin.close();
+  final exitCode = await process.exitCode;
+  return ProcessResult(process.pid, exitCode, '', '');
 }
 
 final system = System();

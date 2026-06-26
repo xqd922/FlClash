@@ -1,4 +1,4 @@
-use crate::service::hub::run_service;
+use crate::service::hub::{run_service, shutdown};
 
 use std::ffi::OsString;
 
@@ -43,7 +43,10 @@ async fn run_windows_service() -> anyhow::Result<()> {
         move |event| -> ServiceControlHandlerResult {
             match event {
                 ServiceControl::Interrogate => ServiceControlHandlerResult::NoError,
-                ServiceControl::Stop => std::process::exit(0),
+                ServiceControl::Stop => {
+                    shutdown();
+                    ServiceControlHandlerResult::NoError
+                }
                 _ => ServiceControlHandlerResult::NotImplemented,
             }
         },

@@ -237,7 +237,6 @@ func updateConfig(params *UpdateParams) {
 }
 
 func applyConfig(params *SetupParams) error {
-	runtime.GC()
 	runLock.Lock()
 	defer runLock.Unlock()
 	var err error
