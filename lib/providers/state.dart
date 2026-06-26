@@ -236,16 +236,27 @@ GroupsState filterGroupsState(Ref ref, String query) {
     return currentGroups;
   }
   final lowQuery = query.toLowerCase();
-  final groups = currentGroups.value
-      .map((group) {
-        return group.copyWith(
-          all: group.all
-              .where((proxy) => proxy.name.toLowerCase().contains(lowQuery))
-              .toList(),
-        );
-      })
-      .where((group) => group.all.isNotEmpty)
-      .toList();
+  // ponytail: cache lowercase names per-group so repeated searches skip re-computation
+  final lowerCache = <String, List<String>>{};
+  for (final group in currentGroups.value) {
+    lowerCache[group.name] = [
+      for (final p in group.all) p.name.toLowerCase(),
+    ];
+  }
+  final groups = <Group>[];
+  for (int gi = 0; gi < currentGroups.value.length; gi++) {
+    final group = currentGroups.value[gi];
+    final lowers = lowerCache[group.name]!;
+    final filtered = <Proxy>[];
+    for (int pi = 0; pi < group.all.length; pi++) {
+      if (lowers[pi].contains(lowQuery)) {
+        filtered.add(group.all[pi]);
+      }
+    }
+    if (filtered.isNotEmpty) {
+      groups.add(group.copyWith(all: filtered));
+    }
+  }
   return currentGroups.copyWith(value: groups);
 }
 
