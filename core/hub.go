@@ -393,12 +393,15 @@ func handleUpdateGeoData(geoType string, geoName string, fn func(value string)) 
 }
 
 func handleUpdateExternalProvider(providerName string, fn func(value string)) {
+	// NOTE: 在持有锁时获取 provider 引用，防止 handleGetExternalProviders 替换 map 导致竞态。
+	runLock.Lock()
+	externalProvider, exist := externalProviders[providerName]
+	runLock.Unlock()
+	if !exist {
+		fn("external provider is not exist")
+		return
+	}
 	go func() {
-		externalProvider, exist := externalProviders[providerName]
-		if !exist {
-			fn("external provider is not exist")
-			return
-		}
 		err := externalProvider.Update()
 		if err != nil {
 			fn(err.Error())

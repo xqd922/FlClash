@@ -100,7 +100,17 @@ object Service {
     suspend fun setEventListener(
         cb: ((result: String?) -> Unit)?
     ): Result<Unit> {
-        val results = HashMap<String, MutableList<ByteArray>>()
+        // NOTE: 限制 results map 大小，防止事件永远不完成时内存泄漏。
+        val results = object : HashMap<String, MutableList<ByteArray>>() {
+            override fun put(key: String, value: MutableList<ByteArray>): MutableList<ByteArray>? {
+                if (size > 64) {
+                    // 清理最旧的一半条目（非线程安全但此 map 只在单线程回调中使用）
+                    val keysToRemove = keys.take(size / 2)
+                    keysToRemove.forEach { remove(it) }
+                }
+                return super.put(key, value)
+            }
+        }
         return delegate.useService {
             it.setEventListener(
                 when (cb != null) {

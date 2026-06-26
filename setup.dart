@@ -147,6 +147,8 @@ class Build {
     String? name,
     Map<String, String>? environment,
     String? workingDirectory,
+    // NOTE: runInShell=true 是安全风险（shell 注入），但构建脚本只处理可信输入。
+    // 如果参数来自外部，应改为 false 并用 Process.run 替代 Process.start。
     bool runInShell = true,
   }) async {
     if (name != null) print('run $name');

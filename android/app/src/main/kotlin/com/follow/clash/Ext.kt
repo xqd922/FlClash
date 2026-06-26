@@ -12,7 +12,6 @@ import android.widget.Toast
 import androidx.core.graphics.drawable.toBitmap
 import com.follow.clash.common.GlobalState
 import com.follow.clash.models.SharedState
-import com.google.gson.Gson
 import io.flutter.embedding.engine.FlutterEngine
 import io.flutter.embedding.engine.plugins.FlutterPlugin
 import io.flutter.plugin.common.MethodChannel
@@ -31,7 +30,7 @@ val Application.sharedState: SharedState
         try {
             val sp = getSharedPreferences("FlutterSharedPreferences", MODE_PRIVATE)
             val res = sp.getString("flutter.sharedState", "")
-            return Gson().fromJson(res, SharedState::class.java)
+            return GlobalState.gson.fromJson(res, SharedState::class.java)
         } catch (_: Exception) {
             return SharedState()
         }

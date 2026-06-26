@@ -24,7 +24,6 @@ import com.follow.clash.common.quickIntent
 import com.follow.clash.getPackageIconPath
 import com.follow.clash.models.Package
 import com.follow.clash.showToast
-import com.google.gson.Gson
 import io.flutter.embedding.android.FlutterActivity
 import io.flutter.embedding.engine.plugins.FlutterPlugin
 import io.flutter.embedding.engine.plugins.activity.ActivityAware
@@ -235,7 +234,7 @@ class AppPlugin : FlutterPlugin, MethodChannel.MethodCallHandler, ActivityAware 
 
     private suspend fun getPackagesToJson(): String {
         return withContext(Dispatchers.Default) {
-            Gson().toJson(getPackages())
+            GlobalState.gson.toJson(getPackages())
         }
     }
 
@@ -243,7 +242,7 @@ class AppPlugin : FlutterPlugin, MethodChannel.MethodCallHandler, ActivityAware 
         return withContext(Dispatchers.Default) {
             val packages: List<String> =
                 getPackages().map { it.packageName }.filter { isChinaPackage(it) }
-            Gson().toJson(packages)
+            GlobalState.gson.toJson(packages)
         }
     }
 

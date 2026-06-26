@@ -56,7 +56,13 @@ class VpnService : SystemVpnService(), IBaseService,
     private val connectivity by lazy {
         getSystemService<ConnectivityManager>()
     }
-    private val uidPageNameMap = mutableMapOf<Int, String>()
+    // NOTE: LRU 缓存限制 256 条目，防止长时间运行 VPN 时无限增长。
+    // 原来用 mutableMapOf 永不清理，UID 变化（重装 app）后缓存也过期。
+    private val uidPageNameMap = object : LinkedHashMap<Int, String>(256, 0.75f, true) {
+        override fun removeEldestEntry(eldest: MutableMap.MutableEntry<Int, String>?): Boolean {
+            return size > 256
+        }
+    }
 
     private fun resolverProcess(
         protocol: Int,

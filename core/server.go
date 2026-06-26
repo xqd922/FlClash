@@ -75,7 +75,15 @@ func startServer(arg string) {
 			Method: action.Method,
 		}
 
-		go handleAction(action, result)
+		// NOTE: recover 防止 panic 崩掉整个 Go 运行时。
+		go func() {
+			defer func() {
+				if r := recover(); r != nil {
+					log.Printf("[Action] recovered panic: %v", r)
+				}
+			}()
+			handleAction(action, result)
+		}()
 	}
 }
 

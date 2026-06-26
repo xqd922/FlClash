@@ -53,6 +53,9 @@ class ServiceDelegate<T>(
         }
     }
 
+    // NOTE: 5 秒超时。调用方通过 .getOrNull() 获取结果，
+    // 超时和"服务停止"都返回 null，无法区分。
+    // 如果需要区分，调用方应检查 Result.isFailure。
     suspend inline fun <R> useService(
         timeoutMillis: Long = 5000, crossinline block: suspend (T) -> R
     ): Result<R> {

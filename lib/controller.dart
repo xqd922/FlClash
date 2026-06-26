@@ -985,7 +985,11 @@ extension SystemControllerExt on AppController {
 
   void updateViewSize(Size size) {
     WidgetsBinding.instance.addPostFrameCallback((_) {
-      _ref.read(viewSizeProvider.notifier).value = size;
+      final current = _ref.read(viewSizeProvider);
+      // NOTE: 只在尺寸变化时写入，避免触发不必要的重建循环。
+      if (current != size) {
+        _ref.read(viewSizeProvider.notifier).value = size;
+      }
     });
   }
 

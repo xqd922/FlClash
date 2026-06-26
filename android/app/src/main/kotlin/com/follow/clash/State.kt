@@ -6,7 +6,6 @@ import com.follow.clash.models.SharedState
 import com.follow.clash.plugins.AppPlugin
 import com.follow.clash.plugins.TilePlugin
 import com.follow.clash.service.models.NotificationParams
-import com.google.gson.Gson
 import io.flutter.embedding.engine.FlutterEngine
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.launch
@@ -132,8 +131,8 @@ object State {
         val initParams = mutableMapOf<String, Any>()
         initParams["home-dir"] = GlobalState.application.filesDir.path
         initParams["version"] = android.os.Build.VERSION.SDK_INT
-        val initParamsString = Gson().toJson(initParams)
-        val setupParamsString = Gson().toJson(sharedState.setupParams)
+        val initParamsString = GlobalState.gson.toJson(initParams)
+        val setupParamsString = GlobalState.gson.toJson(sharedState.setupParams)
         Service.quickSetup(
             initParamsString,
             setupParamsString,

@@ -43,6 +43,12 @@ jobs:
           $cargoPath = "$env:USERPROFILE\.cargo\bin"
           Add-Content $env:GITHUB_PATH $cargoPath
 
+      - name: Cache Rust dependencies
+        if: startsWith(matrix.os, 'windows-11-arm')
+        uses: Swatinem/rust-cache@v2
+        with:
+          workspaces: services/helper
+
       - name: Checkout
         uses: actions/checkout@v4
         with:
@@ -93,6 +99,9 @@ jobs:
       - name: Generate Code
         run: dart run build_runner build --delete-conflicting-outputs
 
+      - name: Analyze
+        run: flutter analyze
+
       - name: Setup
         run: dart setup.dart ${{ matrix.platform }} ${{ matrix.arch && format('--arch {0}', matrix.arch) }} ${{ env.IS_STABLE == 'true' && '--env stable' || '' }}
 
@@ -137,6 +146,9 @@ jobs:
           
           mv "$temp" CHANGELOG.md
 
+      # NOTE: 直接 push main 绕过了分支保护规则。
+      # 如果 workflow 被 compromise，可能注入恶意代码。
+      # 理想做法是改为 PR 流程，但 changelog 自动生成需要 write 权限。
       - name: Commit
         if: ${{ env.IS_STABLE == 'true' }}
         run: |

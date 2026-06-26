@@ -1,5 +1,7 @@
 module core
 
+// NOTE: pinned to go 1.20 to match Clash.Meta submodule requirements.
+// CI uses go 1.24 for compilation, but language features are limited to 1.20.
 go 1.20
 
 replace github.com/metacubex/mihomo => ./Clash.Meta

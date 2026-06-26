@@ -6,7 +6,6 @@ import com.follow.clash.State
 import com.follow.clash.common.Components
 import com.follow.clash.invokeMethodOnMainThread
 import com.follow.clash.models.SharedState
-import com.google.gson.Gson
 import io.flutter.embedding.engine.plugins.FlutterPlugin
 import io.flutter.plugin.common.MethodCall
 import io.flutter.plugin.common.MethodChannel
@@ -110,7 +109,7 @@ class ServicePlugin : FlutterPlugin, MethodChannel.MethodCallHandler,
 
     private fun handleSyncState(call: MethodCall, result: MethodChannel.Result) {
         val data = call.arguments<String>()!!
-        State.sharedState = Gson().fromJson(data, SharedState::class.java)
+        State.sharedState = GlobalState.gson.fromJson(data, SharedState::class.java)
         launch {
             State.syncState()
             result.success("")

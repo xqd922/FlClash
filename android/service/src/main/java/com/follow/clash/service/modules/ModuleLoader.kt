@@ -4,6 +4,7 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
 
@@ -38,8 +39,10 @@ fun CoroutineScope.moduleLoader(block: suspend ModuleLoaderScope.() -> Unit): Mo
             }
         }
 
+        // NOTE: 用 runBlocking 确保模块卸载在 cancel() 返回前完成。
+        // 原来 launch 异步执行，Service.onDestroy 后模块可能还没卸载干净。
         override fun cancel() {
-            launch(Dispatchers.IO) {
+            runBlocking(Dispatchers.IO) {
                 job?.cancel()
                 mutex.withLock {
                     modules.asReversed().forEach { it.uninstall() }

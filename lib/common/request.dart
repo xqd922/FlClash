@@ -139,6 +139,9 @@ class Request {
     });
     final res = await Future.any(futures);
     token.cancel();
+    // NOTE: 取消后等待所有 future 结束，防止 dangling completers。
+    // Dio cancel 会触发 catchError 完成 completer，但 timeout 异常可能不触发。
+    Future.wait(futures).catchError((_) {});
     return res;
   }
 

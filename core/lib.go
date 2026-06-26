@@ -207,7 +207,15 @@ func invokeAction(callback unsafe.Pointer, paramsChar *C.char) {
 		Method:   action.Method,
 		callback: callback,
 	}
-	go handleAction(action, result)
+	// NOTE: recover 防止 handleAction 中的 panic（如 crashMethod）崩掉整个 Go 运行时。
+	go func() {
+		defer func() {
+			if r := recover(); r != nil {
+				log.Errorln("[Action] recovered panic: %v", r)
+			}
+		}()
+		handleAction(action, result)
+	}()
 }
 
 //export startTUN

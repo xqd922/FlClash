@@ -49,6 +49,9 @@ fn start(start_params: StartParams) -> impl Reply {
         return format!("The SHA256 hash of the program requesting execution is: {}. The helper program only allows execution of applications with the SHA256 hash: {}.", sha256,  env!("TOKEN"),);
     }
     stop();
+    // NOTE: PROCESS lock 持有期间调用 Command::spawn() 会阻塞 tokio 工作线程。
+    // 如果 spawn 卡住（磁盘 I/O），会饿死异步运行时。
+    // 如有问题，改用 tokio::task::spawn_blocking 或 tokio::process::Command。
     let mut process = PROCESS.lock().unwrap();
     match Command::new(&start_params.path)
         .stderr(Stdio::piped())
