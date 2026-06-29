@@ -1509,10 +1509,11 @@ packages:
   tray_manager:
     dependency: "direct main"
     description:
-      path: "plugins/tray_manager/packages/tray_manager"
-      relative: true
-    source: path
-    version: "0.5.2"
+      name: tray_manager
+      sha256: "1a659b08baa6e9b91ef8ce16eda37740de398be1c4cf322b8a1ddfef25c68c5a"
+      url: "https://pub.dev"
+    source: hosted
+    version: "0.5.3"
   typed_data:
     dependency: transitive
     description:
@@ -1748,7 +1749,7 @@ packages:
     dependency: "direct main"
     description:
       path: "."
-      ref: 79c78a44ec9c2f5f5f97da1a65610c6fb2ead8b3
+      ref: "79c78a44ec9c2f5f5f97da1a65610c6fb2ead8b3"
       resolved-ref: "79c78a44ec9c2f5f5f97da1a65610c6fb2ead8b3"
       url: "https://github.com/chen08209/yaml_writer"
     source: git
