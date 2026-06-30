@@ -107,6 +107,12 @@ class Build {
 
   static String get distPath => join(current, 'dist');
 
+  static String get version {
+    final pubspec = File(join(current, 'pubspec.yaml')).readAsStringSync();
+    final match = RegExp(r'^version:\s*(.+)$', multiLine: true).firstMatch(pubspec);
+    return match?.group(1)?.split('+').first ?? '0.0.0';
+  }
+
   static String _getCc(BuildItem buildItem) {
     final environment = Platform.environment;
     if (buildItem.target == Target.android) {
@@ -297,31 +303,6 @@ class Build {
     return command.split(' ');
   }
 
-  static Future<void> getDistributor() async {
-    final distributorDir = join(
-      current,
-      'plugins',
-      'flutter_distributor',
-      'packages',
-      'flutter_distributor',
-    );
-
-    await exec(
-      name: 'clean distributor',
-      Build.getExecutable('flutter clean'),
-      workingDirectory: distributorDir,
-    );
-    await exec(
-      name: 'upgrade distributor',
-      Build.getExecutable('flutter pub upgrade'),
-      workingDirectory: distributorDir,
-    );
-    await exec(
-      name: 'get distributor',
-      Build.getExecutable('dart pub global activate -s path $distributorDir'),
-    );
-  }
-
   static void copyFile(String sourceFilePath, String destinationFilePath) {
     final sourceFile = File(sourceFilePath);
     if (!sourceFile.existsSync()) {
@@ -386,52 +367,89 @@ class BuildCommand extends Command {
     await envFile.writeAsString(json.encode(data));
   }
 
-  Future<void> _getLinuxDependencies(Arch arch) async {
-    await Build.exec(Build.getExecutable('sudo apt update -y'));
-    await Build.exec(
-      Build.getExecutable('sudo apt install -y ninja-build libgtk-3-dev'),
-    );
-    await Build.exec(
-      Build.getExecutable('sudo apt install -y libayatana-appindicator3-dev'),
-    );
-    await Build.exec(
-      Build.getExecutable('sudo apt-get install -y libkeybinder-3.0-dev'),
-    );
-    await Build.exec(Build.getExecutable('sudo apt install -y locate'));
-    if (arch == Arch.amd64) {
-      await Build.exec(Build.getExecutable('sudo apt install -y rpm patchelf'));
-      await Build.exec(Build.getExecutable('sudo apt install -y libfuse2'));
 
-      final downloadName = arch == Arch.amd64 ? 'x86_64' : 'aarch64';
-      await Build.exec(
-        Build.getExecutable(
-          'wget -O appimagetool https://github.com/AppImage/AppImageKit/releases/download/continuous/appimagetool-$downloadName.AppImage',
-        ),
-      );
-      await Build.exec(Build.getExecutable('chmod +x appimagetool'));
-      await Build.exec(
-        Build.getExecutable('sudo mv appimagetool /usr/local/bin/'),
-      );
-    }
-  }
-
-  Future<void> _getMacosDependencies() async {
-    await Build.exec(Build.getExecutable('npm install -g appdmg'));
-  }
-
-  Future<void> _buildDistributor({
+  Future<void> _buildApp({
     required Target target,
     required String targets,
     String args = '',
     required String env,
+    String? archName,
   }) async {
-    await Build.getDistributor();
     await Build.exec(
-      name: name,
+      name: 'build $name',
       Build.getExecutable(
-        'flutter_distributor package --skip-clean --platform ${target.name} --targets $targets --flutter-build-args=verbose,dart-define-from-file=env.json$args',
+        'flutter build $targets --release --dart-define-from-file=env.json$args',
       ),
     );
+    await _copyDist(target: target, archName: archName);
+  }
+
+  Future<void> _copyDist({
+    required Target target,
+    String? archName,
+  }) async {
+    final distDir = Directory(Build.distPath);
+    if (!distDir.existsSync()) {
+      distDir.createSync(recursive: true);
+    }
+    final suffix = archName != null ? '-$archName' : '';
+    switch (target) {
+      case Target.android:
+        final apkDir = Directory(
+          join(current, 'build', 'app', 'outputs', 'flutter-apk'),
+        );
+        if (apkDir.existsSync()) {
+          for (final f in apkDir.listSync().whereType<File>()) {
+            if (f.path.endsWith('.apk')) {
+              final name = basename(f.path).replaceAll(
+                'app-release',
+                '${Build.appName}-${Build.version}-android$suffix',
+              );
+              f.copySync(join(Build.distPath, name));
+            }
+          }
+        }
+        return;
+      case Target.windows:
+        final buildDir = Directory(
+          join(current, 'build', 'windows', 'x64', 'runner', 'Release'),
+        );
+        if (buildDir.existsSync()) {
+          await Build.exec(
+            name: 'zip windows',
+            Build.getExecutable(
+              'powershell Compress-Archive -Path "${buildDir.path}/*" -DestinationPath "${Build.distPath}/${Build.appName}-${Build.version}-windows$suffix.zip" -Force',
+            ),
+          );
+        }
+        return;
+      case Target.linux:
+        final buildDir = Directory(
+          join(current, 'build', 'linux', 'x64', 'release', 'bundle'),
+        );
+        if (buildDir.existsSync()) {
+          await Build.exec(
+            name: 'zip linux',
+            Build.getExecutable(
+              'tar czf ${Build.distPath}/${Build.appName}-${Build.version}-linux$suffix.tar.gz -C ${buildDir.path} .',
+            ),
+          );
+        }
+        return;
+      case Target.macos:
+        final buildDir = Directory(
+          join(current, 'build', 'macos', 'Build', 'Products', 'Release'),
+        );
+        if (buildDir.existsSync()) {
+          await Build.exec(
+            name: 'zip macos',
+            Build.getExecutable(
+              'tar czf ${Build.distPath}/${Build.appName}-${Build.version}-macos$suffix.tar.gz -C ${buildDir.path} .',
+            ),
+          );
+        }
+        return;
+    }
   }
 
   Future<String?> get systemArch async {
@@ -478,28 +496,23 @@ class BuildCommand extends Command {
 
     switch (target) {
       case Target.windows:
-        _buildDistributor(
+        _buildApp(
           target: target,
-          targets: 'exe,zip',
-          args: ' --description $archName',
+          targets: 'windows',
+          args: ' --target-platform windows-${arch!.name}',
           env: env,
+          archName: archName,
         );
         return;
       case Target.linux:
         final targetMap = {Arch.arm64: 'linux-arm64', Arch.amd64: 'linux-x64'};
-        final targets = [
-          'deb',
-          if (arch == Arch.amd64) 'appimage',
-          if (arch == Arch.amd64) 'rpm',
-        ].join(',');
         final defaultTarget = targetMap[arch];
-        await _getLinuxDependencies(arch!);
-        _buildDistributor(
+        _buildApp(
           target: target,
-          targets: targets,
-          args:
-              ' --description $archName --build-target-platform $defaultTarget',
+          targets: 'linux',
+          args: defaultTarget != null ? ' --target-platform $defaultTarget' : '',
           env: env,
+          archName: archName,
         );
         return;
       case Target.android:
@@ -513,21 +526,20 @@ class BuildCommand extends Command {
             .where((element) => arch == null ? true : element == arch)
             .map((e) => targetMap[e])
             .toList();
-        _buildDistributor(
+        _buildApp(
           target: target,
           targets: 'apk',
-          args:
-              ",split-per-abi --build-target-platform ${defaultTargets.join(",")}",
+          args: " --split-per-abi --target-platform ${defaultTargets.join(",")}",
           env: env,
         );
         return;
       case Target.macos:
-        await _getMacosDependencies();
-        _buildDistributor(
+        _buildApp(
           target: target,
-          targets: 'dmg',
-          args: ' --description $archName',
+          targets: 'macos',
+          args: ' --target-platform macos-${arch!.name}',
           env: env,
+          archName: archName,
         );
         return;
     }
