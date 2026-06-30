@@ -400,13 +400,18 @@ class BuildCommand extends Command {
         );
         if (apkDir.existsSync()) {
           for (final f in apkDir.listSync().whereType<File>()) {
-            if (f.path.endsWith('.apk')) {
-              final name = basename(f.path).replaceAll(
-                'app-release',
-                '${Build.appName}-${Build.version}-android$suffix',
-              );
-              f.copySync(join(Build.distPath, name));
-            }
+            final name = basename(f.path);
+            if (!name.endsWith('.apk') || name.contains('unaligned')) continue;
+            // Only copy split-per-abi APKs
+            if (!name.contains('arm64-v8a') &&
+                !name.contains('armeabi-v7a') &&
+                !name.contains('x86_64') &&
+                !name.contains('x86')) continue;
+            final abi = name
+                .replaceAll('app-', '')
+                .replaceAll('-release.apk', '');
+            final outName = '${Build.appName}-${Build.version}-android-$abi.apk';
+            f.copySync(join(Build.distPath, outName));
           }
         }
         return;
@@ -485,7 +490,7 @@ class BuildCommand extends Command {
 
     String? coreSha256;
 
-    if (Platform.isWindows) {
+    if (target == Target.windows) {
       coreSha256 = await Build.calcSha256(corePaths.first);
       await Build.buildHelper(target, coreSha256);
     }
