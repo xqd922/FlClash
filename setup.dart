@@ -504,7 +504,6 @@ class BuildCommand extends Command {
         _buildApp(
           target: target,
           targets: 'windows',
-          args: ' --target-platform windows-${arch!.name}',
           env: env,
           archName: archName,
         );
