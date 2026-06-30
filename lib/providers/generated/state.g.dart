@@ -97,7 +97,7 @@ final class NavigationItemsStateProvider
 }
 
 String _$navigationItemsStateHash() =>
-    r'1fc37c14d129f9725b0e62fd53f6b25382f51102';
+    r'a1914a7275f3ccb3e39c309f1fb15517901e7a37';
 
 @ProviderFor(currentNavigationItemsState)
 const currentNavigationItemsStateProvider =
@@ -187,7 +187,7 @@ final class UpdateParamsProvider
   }
 }
 
-String _$updateParamsHash() => r'012df72ab0e769a51c573f4692031506d7b1f1b4';
+String _$updateParamsHash() => r'cbf759104be243e16cf21e4c950257573d449b1a';
 
 @ProviderFor(proxyState)
 const proxyStateProvider = ProxyStateProvider._();
@@ -2155,7 +2155,7 @@ final class SharedStateProvider
   }
 }
 
-String _$sharedStateHash() => r'864fdf3f750fb6d1beadcb5f9226a614a9cb2caa';
+String _$sharedStateHash() => r'e5876091ca9dfed0a82c0393d422da1687e0d08f';
 
 @ProviderFor(overlayTopOffset)
 const overlayTopOffsetProvider = OverlayTopOffsetProvider._();

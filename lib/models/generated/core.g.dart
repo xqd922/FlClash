@@ -65,11 +65,6 @@ const _$LogLevelEnumMap = {
   LogLevel.silent: 'silent',
 };
 
-const _$ExternalControllerStatusEnumMap = {
-  ExternalControllerStatus.close: '',
-  ExternalControllerStatus.open: '127.0.0.1:9090',
-};
-
 _VpnOptions _$VpnOptionsFromJson(Map<String, dynamic> json) => _VpnOptions(
   enable: json['enable'] as bool,
   port: (json['port'] as num).toInt(),

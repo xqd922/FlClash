@@ -335,7 +335,7 @@ _ClashConfig _$ClashConfigFromJson(Map<String, dynamic> json) => _ClashConfig(
   redirPort: (json['redir-port'] as num?)?.toInt() ?? 0,
   tproxyPort: (json['tproxy-port'] as num?)?.toInt() ?? 0,
   mode: $enumDecodeNullable(_$ModeEnumMap, json['mode']) ?? Mode.rule,
-  allowLan: json['allow-lan'] as bool? ?? false,
+  allowLan: json['allow-lan'] as bool? ?? true,
   logLevel:
       $enumDecodeNullable(_$LogLevelEnumMap, json['log-level']) ??
       LogLevel.error,

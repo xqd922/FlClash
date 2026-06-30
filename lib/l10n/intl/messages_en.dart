@@ -451,6 +451,10 @@ class MessageLookup extends MessageLookupByLibrary {
     "logcatDesc": MessageLookupByLibrary.simpleMessage(
       "Disabling will hide the log entry",
     ),
+    "openRequests": MessageLookupByLibrary.simpleMessage("Requests"),
+    "openRequestsDesc": MessageLookupByLibrary.simpleMessage(
+      "Enabling will show the requests entry",
+    ),
     "logs": MessageLookupByLibrary.simpleMessage("Logs"),
     "logsDesc": MessageLookupByLibrary.simpleMessage("Log capture records"),
     "logsTest": MessageLookupByLibrary.simpleMessage("Logs test"),

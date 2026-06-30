@@ -404,6 +404,21 @@ class AppLocalizations {
     );
   }
 
+  /// `Requests`
+  String get openRequests {
+    return Intl.message('Requests', name: 'openRequests', desc: '', args: []);
+  }
+
+  /// `Enabling will show the requests entry`
+  String get openRequestsDesc {
+    return Intl.message(
+      'Enabling will show the requests entry',
+      name: 'openRequestsDesc',
+      desc: '',
+      args: [],
+    );
+  }
+
   /// `Auto check updates`
   String get autoCheckUpdate {
     return Intl.message(

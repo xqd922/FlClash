@@ -49,6 +49,8 @@
   "autoRunDesc": "应用打开时自动运行",
   "logcat": "日志捕获",
   "logcatDesc": "禁用将会隐藏日志入口",
+  "openRequests": "请求记录",
+  "openRequestsDesc": "启用将会显示请求入口",
   "autoCheckUpdate": "自动检查更新",
   "autoCheckUpdateDesc": "应用启动时自动检查更新",
   "accessControl": "访问控制",

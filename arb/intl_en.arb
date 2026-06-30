@@ -49,6 +49,8 @@
   "autoRunDesc": "Auto run when the application is opened",
   "logcat": "Logcat",
   "logcatDesc": "Disabling will hide the log entry",
+  "openRequests": "Requests",
+  "openRequestsDesc": "Enabling will show the requests entry",
   "autoCheckUpdate": "Auto check updates",
   "autoCheckUpdateDesc": "Auto check for updates when the app starts",
   "accessControl": "AccessControl",
