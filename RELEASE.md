@@ -1,3 +1,23 @@
+## v(7.0.26)
+
+### 🔧 变更
+
+- 移除 `flutter_distributor` 子模块，改用 Flutter 原生构建命令
+  - Android: `flutter build apk --release`
+  - Windows: `flutter build windows --release`
+  - Linux: `flutter build linux --release`
+  - macOS: `flutter build macos --release`
+- 桌面平台产物从安装包格式改为压缩包
+  - Windows: `.zip`
+  - Linux: `.tar.gz`
+  - macOS: `.tar.gz`
+
+### 🐛 修复
+
+- 修复 Android 构建时错误触发 Windows helper 编译的问题
+- 修复 Android APK 产物重命名逻辑
+- 修复 Windows 构建不支持 `--target-platform` 参数的问题
+
 ## v(7.0.25)
 
 ### 🔧 变更

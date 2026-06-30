@@ -368,6 +368,19 @@ class BuildCommand extends Command {
   }
 
 
+  Future<void> _installLinuxDeps() async {
+    await Build.exec(Build.getExecutable('sudo apt update -y'));
+    await Build.exec(
+      Build.getExecutable('sudo apt install -y ninja-build libgtk-3-dev'),
+    );
+    await Build.exec(
+      Build.getExecutable('sudo apt install -y libayatana-appindicator3-dev'),
+    );
+    await Build.exec(
+      Build.getExecutable('sudo apt-get install -y libkeybinder-3.0-dev'),
+    );
+  }
+
   Future<void> _buildApp({
     required Target target,
     required String targets,
@@ -429,8 +442,10 @@ class BuildCommand extends Command {
         }
         return;
       case Target.linux:
+        String buildArch = 'x64';
+        if (archName == 'arm64') buildArch = 'arm64';
         final buildDir = Directory(
-          join(current, 'build', 'linux', 'x64', 'release', 'bundle'),
+          join(current, 'build', 'linux', buildArch, 'release', 'bundle'),
         );
         if (buildDir.existsSync()) {
           await Build.exec(
@@ -509,12 +524,10 @@ class BuildCommand extends Command {
         );
         return;
       case Target.linux:
-        final targetMap = {Arch.arm64: 'linux-arm64', Arch.amd64: 'linux-x64'};
-        final defaultTarget = targetMap[arch];
+        await _installLinuxDeps();
         _buildApp(
           target: target,
           targets: 'linux',
-          args: defaultTarget != null ? ' --target-platform $defaultTarget' : '',
           env: env,
           archName: archName,
         );
@@ -541,7 +554,6 @@ class BuildCommand extends Command {
         _buildApp(
           target: target,
           targets: 'macos',
-          args: ' --target-platform macos-${arch!.name}',
           env: env,
           archName: archName,
         );
