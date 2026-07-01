@@ -255,19 +255,68 @@ Future<Map<String, dynamic>> _makeRealProfileTask(
     rules = [...finalAddedRules, ...rules];
   }
   rawConfig['rules'] = rules;
-  _stripEmpty(rawConfig);
+  _stripNull(rawConfig);
+  _sortConfig(rawConfig);
   return Map<String, dynamic>.from(rawConfig);
 }
 
-void _stripEmpty(dynamic value) {
+const _configKeyOrder = [
+  'mixed-port',
+  'port',
+  'socks-port',
+  'redir-port',
+  'tproxy-port',
+  'allow-lan',
+  'bind-address',
+  'mode',
+  'log-level',
+  'ipv6',
+  'unified-delay',
+  'tcp-concurrent',
+  'keep-alive-idle',
+  'keep-alive-interval',
+  'find-process-mode',
+  'external-controller',
+  'external-ui',
+  'external-ui-url',
+  'secret',
+  'interface-name',
+  'profile',
+  'sniffer',
+  'dns',
+  'hosts',
+  'proxies',
+  'proxy-groups',
+  'proxy-providers',
+  'rule-providers',
+  'sub-rules',
+  'listeners',
+  'rules',
+];
+
+void _sortConfig(Map<String, dynamic> config) {
+  final sorted = <String, dynamic>{};
+  final remaining = Map<String, dynamic>.from(config);
+  for (final key in _configKeyOrder) {
+    if (remaining.containsKey(key)) {
+      sorted[key] = remaining.remove(key);
+    }
+  }
+  sorted.addAll(remaining);
+  config
+    ..clear()
+    ..addAll(sorted);
+}
+
+void _stripNull(dynamic value) {
   if (value is Map) {
     for (final v in value.values) {
-      _stripEmpty(v);
+      _stripNull(v);
     }
-    value.removeWhere((_, v) => v == null || v == '');
+    value.removeWhere((_, v) => v == null);
   } else if (value is List) {
     for (final v in value) {
-      _stripEmpty(v);
+      _stripNull(v);
     }
   }
 }
