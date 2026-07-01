@@ -258,6 +258,7 @@ class CommonScaffoldState extends State<CommonScaffold> {
   }
 
   PreferredSizeWidget _buildAppBar(VoidCallback? backAction) {
+    final colorScheme = Theme.of(context).colorScheme;
     return PreferredSize(
       preferredSize: const Size.fromHeight(kToolbarHeight),
       child: Stack(
@@ -273,8 +274,13 @@ class CommonScaffoldState extends State<CommonScaffold> {
                           ? false
                           : true,
                       animateColor: true,
+                      backgroundColor: colorScheme.surface,
                       centerTitle: widget.centerTitle ?? false,
+                      elevation: 0,
                       leading: _buildLeading(backAction),
+                      scrolledUnderElevation: 0,
+                      shadowColor: Colors.transparent,
+                      surfaceTintColor: Colors.transparent,
                       title: _buildTitle(state.searchState),
                       actions: _buildActions(
                         state.searchState != null,
