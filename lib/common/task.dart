@@ -255,7 +255,21 @@ Future<Map<String, dynamic>> _makeRealProfileTask(
     rules = [...finalAddedRules, ...rules];
   }
   rawConfig['rules'] = rules;
+  _stripEmpty(rawConfig);
   return Map<String, dynamic>.from(rawConfig);
+}
+
+void _stripEmpty(dynamic value) {
+  if (value is Map) {
+    for (final v in value.values) {
+      _stripEmpty(v);
+    }
+    value.removeWhere((_, v) => v == null || v == '');
+  } else if (value is List) {
+    for (final v in value) {
+      _stripEmpty(v);
+    }
+  }
 }
 
 Future<List<String>> shakingProfileTask(
