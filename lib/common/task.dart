@@ -294,9 +294,9 @@ const _configKeyOrder = [
   'rules',
 ];
 
-void _sortConfig(Map<String, dynamic> config) {
-  final sorted = <String, dynamic>{};
-  final remaining = Map<String, dynamic>.from(config);
+void _sortConfig(Map<dynamic, dynamic> config) {
+  final sorted = <dynamic, dynamic>{};
+  final remaining = Map<dynamic, dynamic>.from(config);
   for (final key in _configKeyOrder) {
     if (remaining.containsKey(key)) {
       sorted[key] = remaining.remove(key);
