@@ -57,19 +57,6 @@ class _DashboardViewState extends ConsumerState<DashboardView> {
             icon: Icon(Icons.add_circle),
           ),
         ),
-      FadeRotationScaleBox(
-        child: isEdit
-            ? IconButton(
-                key: ValueKey(true),
-                icon: Icon(Icons.save, key: ValueKey('save-icon')),
-                onPressed: _handleUpdateIsEdit,
-              )
-            : IconButton(
-                key: ValueKey(false),
-                icon: Icon(Icons.edit, key: ValueKey('edit-icon')),
-                onPressed: _handleUpdateIsEdit,
-              ),
-      ),
     ];
   }
 
