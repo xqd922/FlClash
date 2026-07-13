@@ -162,7 +162,7 @@ class _PrimaryColorItemState extends ConsumerState<_PrimaryColorItem> {
     ref.read(themeSettingProvider.notifier).update((state) {
       return state.copyWith(
         primaryColors: defaultPrimaryColors,
-        primaryColor: defaultPrimaryColor,
+        primaryColor: null,
       );
     });
   }
@@ -184,11 +184,7 @@ class _PrimaryColorItemState extends ConsumerState<_PrimaryColorItem> {
         ..remove(_removablePrimaryColor);
       int? newPrimaryColor = state.primaryColor;
       if (state.primaryColor == _removablePrimaryColor) {
-        if (newPrimaryColors.contains(defaultPrimaryColor)) {
-          newPrimaryColor = defaultPrimaryColor;
-        } else {
-          newPrimaryColor = null;
-        }
+        newPrimaryColor = null;
       }
       return state.copyWith(
         primaryColors: newPrimaryColors,
@@ -232,7 +228,7 @@ class _PrimaryColorItemState extends ConsumerState<_PrimaryColorItem> {
       themeSettingProvider.select((state) => state.primaryColors),
     );
     final isDefault =
-        primaryColor == defaultPrimaryColor &&
+        primaryColor == null &&
         intListEquality.equals(primaryColors, defaultPrimaryColors);
     final allColors = [null, ...primaryColors];
 
