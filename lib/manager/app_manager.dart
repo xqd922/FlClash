@@ -231,7 +231,7 @@ class AppSidebarContainer extends ConsumerWidget {
               children: [
                 if (system.isMacOS) const SizedBox(height: 22),
                 const SizedBox(height: 10),
-                if (!system.isMacOS) ...[
+                if (system.isWindows || system.isLinux) ...[
                   const ClipRect(child: AppIcon()),
                   const SizedBox(height: 12),
                 ],

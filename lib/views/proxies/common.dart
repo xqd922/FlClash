@@ -74,9 +74,12 @@ Future<void> proxyDelayTest(Proxy proxy, [String? testUrl]) async {
 }
 
 Future<void> delayTest(List<Proxy> proxies, [String? testUrl]) async {
-  final delayProxies = proxies.map<Future>((proxy) async {
-    await proxyDelayTest(proxy, testUrl);
-  }).toList();
+  final delayProxies = proxies
+      .where((proxy) => proxy.type != 'Direct')
+      .map<Future>((proxy) async {
+        await proxyDelayTest(proxy, testUrl);
+      })
+      .toList();
 
   final batchesDelayProxies = delayProxies.batch(100);
   for (final batchDelayProxies in batchesDelayProxies) {

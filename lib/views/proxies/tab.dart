@@ -60,9 +60,15 @@ class ProxiesTabViewState extends ConsumerState<ProxiesTabView>
   }
 
   Future<void> delayTestCurrentGroup() async {
-    final currentGroupName = getCurrentGroupName();
-    final currentState = _keyMap[currentGroupName]?.currentState;
-    await delayTest(currentState?.currentProxies ?? [], currentState?.testUrl);
+    final groups = ref.read(
+      proxiesTabStateProvider.select((state) => state.groups),
+    );
+    final groupIndex = _tabController?.index;
+    if (groupIndex == null || groupIndex < 0 || groupIndex >= groups.length) {
+      return;
+    }
+    final currentGroup = groups[groupIndex];
+    await delayTest(currentGroup.all, currentGroup.testUrl);
   }
 
   Widget _buildMoreButton() {
@@ -408,19 +414,22 @@ class _DelayTestButtonState extends State<DelayTestButton>
 
   @override
   Widget build(BuildContext context) {
-    final appLocalizations = context.appLocalizations;
     return AnimatedBuilder(
       animation: _controller.view,
       builder: (_, child) {
-        return FadeTransition(
-          opacity: _animation,
-          child: ScaleTransition(scale: _animation, child: child),
+        return SizedBox(
+          width: 56,
+          height: 56,
+          child: FadeTransition(
+            opacity: _animation,
+            child: ScaleTransition(scale: _animation, child: child),
+          ),
         );
       },
-      child: CommonFloatingActionButton(
+      child: FloatingActionButton(
+        heroTag: null,
         onPressed: _healthcheck,
-        label: appLocalizations.delayTest,
-        icon: const Icon(Icons.network_ping),
+        child: const Icon(Icons.network_ping),
       ),
     );
   }
