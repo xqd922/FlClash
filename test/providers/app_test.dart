@@ -86,6 +86,29 @@ void main() {
 
       expect(container.read(providersProvider).single, provider);
     });
+
+    test('syncProviders retries empty initial responses', () async {
+      var attempts = 0;
+      final provider = ExternalProvider(
+        name: 'Proxy',
+        type: 'Proxy',
+        count: 1,
+        vehicleType: 'HTTP',
+        updateAt: DateTime(2026),
+      );
+
+      await container
+          .read(providersProvider.notifier)
+          .syncProviders(
+            load: () async {
+              attempts++;
+              return attempts < 3 ? [] : [provider];
+            },
+          );
+
+      expect(attempts, 3);
+      expect(container.read(providersProvider), [provider]);
+    });
   });
 
   group('SystemBrightness provider', () {

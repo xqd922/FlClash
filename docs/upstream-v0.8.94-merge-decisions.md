@@ -42,7 +42,7 @@
 ### 4.2 隐私与依赖
 
 - 移除 Firebase、Crashlytics、Analytics、Google Services 配置和无效设置入口。
-- 保留上游免责声明和隐私入口；移除遥测不等于删除法律说明。
+- 保留启动时必要的免责声明流程，但工具页不再提供重复入口。
 
 ### 4.3 明确产品偏好
 
@@ -50,6 +50,8 @@
 - 日志和请求记录入口默认隐藏，但用户可重新开启。
 - 代理卡片默认使用紧凑样式。
 - 自定义主色和十六进制色值展示的需求。
+- 简洁 Dashboard、隐藏编辑入口、稳定无滚动叠色的 AppBar。
+- 默认关闭页面切换动画，并使用 HTTP 204 地址减少测速中的 TLS 干扰。
 
 ### 4.4 行为需求
 
@@ -57,6 +59,7 @@
 - Profile DNS 配置不能只因缺少 `dns.enable` 就被整体替换。
 - `external-controller` 必须有统一解析规则，并在 UI 关闭时真正关闭。
 - Android 恢复时以真实 Service/Core 状态为准，而不是只相信 Flutter 内存状态。
+- 生成配置只删除 `null`、保留空字符串，并按稳定顶层顺序输出。
 
 ## 5. 调整后保留
 
@@ -83,13 +86,14 @@
 - 保留上游 `schemeVariant`、`pureBlack`、`textScale` 等新能力。
 - 默认体验采用系统主题和空预设颜色列表。
 - 在上游主题组件上最小增加 HCT 自定义色和 HEX 展示，不整体恢复旧主题实现。
-- Dashboard 先采用 v0.8.94 结构；确有必要时再单独简化入口，不恢复旧 header 的整文件实现。
+- Dashboard 保持 XClash 的简洁布局，删除编辑状态机和核心状态头部，同时复用 v0.8.94 的新 Provider 数据源。
 
 ### 5.4 构建发布
 
 - 以上游 v0.8.94 的 Rust/Core、Windows ARM64 和平台插件构建链为基础。
 - Telegram 通知可以 non-blocking；正式分发步骤必须明确报告失败。
 - XClash 产物命名继续保留。
+- `tray_manager` 使用公共稳定版本；新版 Rust/Core buildkit 继续保留，旧原生构建脚本不直接恢复。
 
 ## 6. 丢弃
 
@@ -99,14 +103,11 @@
 - `core/singbox/engine.go`：孤立、未接入且与提交主题无关。
 - `.scratch/restore-color-picker/` 一次性开发拆解资料。
 - 旧 `lib/controller.dart` 和围绕旧控制器的实现。
-- 直接对运行配置做全局键排序、递归删除空字符串的实现。
-- HTTP 默认测速地址；恢复上游 HTTPS 默认值。
-- 删除免责声明入口的修改。
+- 删除空字符串的实现；空字符串可能表达显式清空，必须保留。
 - Direct 测速“修改后又撤销”的历史链。
 - DNS IPv6 来回修改的中间状态。
-- 将 `tray_manager` 切换到公共包的旧实现；优先采用 v0.8.94 依赖基线。
 - 旧版 `flutter_distributor` 替换方案和会隐式安装系统依赖的构建脚本。
-- 旧 Dashboard header 回退和只隐藏入口却保留不可达编辑逻辑的实现。
+- 只隐藏 Dashboard 编辑入口却保留不可达编辑逻辑的中间实现；最终版本应完整删除编辑状态机。
 - 所有旧生成文件和旧锁文件的手工差异。
 
 ## 7. 合并热点
@@ -127,4 +128,3 @@
 - Profile、DNS、`external-controller`、自定义 overwrite 和空字符串显式清空均有测试。
 - Android 前后台、Doze、进程重建、VPN 残留、IP 刷新需真机验证。
 - Windows x64/ARM64、macOS Core/Rust、Linux 静默启动和各平台 XClash 产物名需分别验证。
-

@@ -301,9 +301,12 @@ class Utils {
   Future<String?> getLocalIpAddress() async {
     final List<NetworkInterface> interfaces =
         await NetworkInterface.list(includeLoopback: false)
+          ..removeWhere((interface) => interface.isVirtual)
           ..sort((a, b) {
             if (a.isWifi && !b.isWifi) return -1;
             if (!a.isWifi && b.isWifi) return 1;
+            if (a.isMobileData && !b.isMobileData) return -1;
+            if (!a.isMobileData && b.isMobileData) return 1;
             if (a.includesIPv4 && !b.includesIPv4) return -1;
             if (!a.includesIPv4 && b.includesIPv4) return 1;
             return 0;

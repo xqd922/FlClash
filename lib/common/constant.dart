@@ -60,7 +60,7 @@ const repository = 'xqd922/FlClash';
 const defaultExternalController = '127.0.0.1:9090';
 const maxMobileWidth = 600;
 const maxLaptopWidth = 840;
-const defaultTestUrl = 'https://www.gstatic.com/generate_204';
+const defaultTestUrl = 'http://www.gstatic.com/generate_204';
 final commonFilter = ImageFilter.blur(
   sigmaX: 5,
   sigmaY: 5,
@@ -115,15 +115,7 @@ const mainIsolate = 'FlClashMainIsolate';
 
 const serviceIsolate = 'FlClashServiceIsolate';
 
-const defaultPrimaryColors = [
-  0xFF795548,
-  0xFF03A9F4,
-  0xFFFFFF00,
-  0XFFBBC9CC,
-  0XFFABD397,
-  defaultPrimaryColor,
-  0XFF665390,
-];
+const defaultPrimaryColors = <int>[];
 
 const scriptTemplate = '''
 const main = (config) => {

@@ -8,6 +8,7 @@ class Navigation {
 
   List<NavigationItem> getItems({
     bool openLogs = false,
+    bool openRequests = false,
     bool hasProxies = false,
   }) {
     return [
@@ -39,7 +40,9 @@ class Navigation {
         builder: (_) =>
             const RequestsView(key: GlobalObjectKey(PageLabel.requests)),
         description: 'requestsDesc',
-        modes: [NavigationItemMode.desktop, NavigationItemMode.more],
+        modes: openRequests
+            ? [NavigationItemMode.desktop, NavigationItemMode.more]
+            : [],
       ),
       NavigationItem(
         icon: const Icon(Icons.ballot),

@@ -46,6 +46,7 @@ GroupsState currentGroupsState(Ref ref) {
 @riverpod
 NavigationItemsState navigationItemsState(Ref ref) {
   final openLogs = ref.watch(appSettingProvider).openLogs;
+  final openRequests = ref.watch(appSettingProvider).openRequests;
   final hasProfiles = ref.watch(
     profilesProvider.select((state) => state.isNotEmpty),
   );
@@ -56,6 +57,7 @@ NavigationItemsState navigationItemsState(Ref ref) {
   return NavigationItemsState(
     value: navigation.getItems(
       openLogs: openLogs,
+      openRequests: openRequests,
       hasProxies: !isInit ? hasProfiles : hasProxies,
     ),
   );

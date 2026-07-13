@@ -6,6 +6,7 @@ import 'package:fl_clash/common/common.dart';
 import 'package:fl_clash/enum/enum.dart';
 import 'package:fl_clash/models/models.dart';
 import 'package:fl_clash/providers/config.dart';
+import 'package:fl_clash/providers/state.dart';
 import 'package:fl_clash/state.dart';
 import 'package:fl_clash/widgets/widgets.dart';
 import 'package:flutter/material.dart';
@@ -343,53 +344,86 @@ class _PrimaryColorItemState extends ConsumerState<_PrimaryColorItem> {
                   runSpacing: 16,
                   children: [
                     for (final color in primaryColors)
-                      Container(
-                        clipBehavior: Clip.none,
+                      SizedBox(
                         width: itemWidth,
-                        height: itemWidth,
-                        child: Stack(
-                          alignment: Alignment.center,
-                          clipBehavior: Clip.none,
+                        child: Column(
+                          mainAxisSize: MainAxisSize.min,
                           children: [
-                            EffectGestureDetector(
-                              child: ColorSchemeBox(
-                                isSelected: color == primaryColor,
-                                primaryColor: color != null
-                                    ? Color(color)
-                                    : null,
-                                onPressed: () {
-                                  setState(() {
-                                    _removablePrimaryColor = null;
-                                  });
-                                  ref
-                                      .read(themeSettingProvider.notifier)
-                                      .update(
-                                        (state) =>
-                                            state.copyWith(primaryColor: color),
-                                      );
+                            SizedBox(
+                              width: itemWidth,
+                              height: itemWidth,
+                              child: Stack(
+                                alignment: Alignment.center,
+                                clipBehavior: Clip.none,
+                                children: [
+                                  EffectGestureDetector(
+                                    child: ColorSchemeBox(
+                                      isSelected: color == primaryColor,
+                                      primaryColor: color == null
+                                          ? null
+                                          : Color(color),
+                                      onPressed: () {
+                                        setState(() {
+                                          _removablePrimaryColor = null;
+                                        });
+                                        ref
+                                            .read(themeSettingProvider.notifier)
+                                            .update(
+                                              (state) => state.copyWith(
+                                                primaryColor: color,
+                                              ),
+                                            );
+                                      },
+                                    ),
+                                    onLongPress: () {
+                                      if (color == null) return;
+                                      setState(() {
+                                        _removablePrimaryColor = color;
+                                      });
+                                    },
+                                  ),
+                                  if (_removablePrimaryColor != null &&
+                                      _removablePrimaryColor == color)
+                                    Container(
+                                      color: Colors.white.opacity0,
+                                      padding: const EdgeInsets.all(8),
+                                      child: IconButton.filledTonal(
+                                        onPressed: _handleDel,
+                                        padding: const EdgeInsets.all(12),
+                                        iconSize: 30,
+                                        icon: Icon(
+                                          color: context.colorScheme.primary,
+                                          Icons.delete,
+                                        ),
+                                      ),
+                                    ),
+                                ],
+                              ),
+                            ),
+                            Padding(
+                              padding: const EdgeInsets.only(top: 4),
+                              child: Builder(
+                                builder: (context) {
+                                  final displayColor = color == null
+                                      ? ref
+                                            .watch(
+                                              genColorSchemeProvider(
+                                                Theme.of(context).brightness,
+                                              ),
+                                            )
+                                            .primary
+                                      : Color(color);
+                                  return Text(
+                                    displayColor.hex,
+                                    style: TextStyle(
+                                      fontSize: 10,
+                                      color: context.colorScheme.onSurface
+                                          .withValues(alpha: 0.6),
+                                    ),
+                                  );
                                 },
                               ),
-                              onLongPress: () {
-                                setState(() {
-                                  _removablePrimaryColor = color;
-                                });
-                              },
                             ),
-                            if (_removablePrimaryColor != null &&
-                                _removablePrimaryColor == color)
-                              Container(
-                                color: Colors.white.opacity0,
-                                padding: const EdgeInsets.all(8),
-                                child: IconButton.filledTonal(
-                                  onPressed: _handleDel,
-                                  padding: const EdgeInsets.all(12),
-                                  iconSize: 30,
-                                  icon: Icon(
-                                    color: context.colorScheme.primary,
-                                    Icons.delete,
-                                  ),
-                                ),
-                              ),
                           ],
                         ),
                       ),

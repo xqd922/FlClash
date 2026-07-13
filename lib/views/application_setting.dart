@@ -220,6 +220,30 @@ class OpenLogsItem extends ConsumerWidget {
   }
 }
 
+class OpenRequestsItem extends ConsumerWidget {
+  const OpenRequestsItem({super.key});
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final appLocalizations = context.appLocalizations;
+    final openRequests = ref.watch(
+      appSettingProvider.select((state) => state.openRequests),
+    );
+    return ListItem.switchItem(
+      title: Text(appLocalizations.requests),
+      subtitle: Text(appLocalizations.requestsDesc),
+      delegate: SwitchDelegate(
+        value: openRequests,
+        onChanged: (bool value) {
+          ref
+              .read(appSettingProvider.notifier)
+              .update((state) => state.copyWith(openRequests: value));
+        },
+      ),
+    );
+  }
+}
+
 class AutoCheckUpdateItem extends ConsumerWidget {
   const AutoCheckUpdateItem({super.key});
 
@@ -259,6 +283,7 @@ class ApplicationSettingView extends StatelessWidget {
       if (system.isAndroid) ...[const HiddenItem()],
       const AnimateTabItem(),
       const OpenLogsItem(),
+      const OpenRequestsItem(),
       const CloseConnectionsItem(),
       const UsageItem(),
       const AutoCheckUpdateItem(),

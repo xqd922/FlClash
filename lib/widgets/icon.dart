@@ -17,15 +17,19 @@ class CommonTargetIcon extends StatelessWidget {
     return const Icon(IconsExt.target);
   }
 
-  Widget _buildIcon() {
+  Widget _buildIcon(BuildContext context) {
     if (src.isEmpty) {
       return _defaultIcon();
     }
 
+    final size = IconTheme.of(context).size ?? 24;
+    final cacheSize = (size * MediaQuery.devicePixelRatioOf(context)).ceil();
     final base64 = src.getBase64;
     if (base64 != null) {
       return Image.memory(
         base64,
+        cacheWidth: cacheSize,
+        cacheHeight: cacheSize,
         gaplessPlayback: true,
         errorBuilder: (_, error, _) {
           return _defaultIcon();
@@ -33,12 +37,16 @@ class CommonTargetIcon extends StatelessWidget {
       );
     }
 
-    return ImageCacheWidget(src: src, defaultWidget: _defaultIcon());
+    return ImageCacheWidget(
+      src: src,
+      cacheSize: cacheSize,
+      defaultWidget: _defaultIcon(),
+    );
   }
 
   @override
   Widget build(BuildContext context) {
-    return _buildIcon();
+    return _buildIcon(context);
   }
 }
 
@@ -46,11 +54,13 @@ final _cacheMange = DefaultCacheManager();
 
 class ImageCacheWidget extends StatefulWidget {
   final String src;
+  final int cacheSize;
   final Widget defaultWidget;
 
   const ImageCacheWidget({
     super.key,
     required this.src,
+    required this.cacheSize,
     required this.defaultWidget,
   });
 
@@ -116,6 +126,8 @@ class _ImageCacheWidgetState extends State<ImageCacheWidget> {
         return CommonImage(
           data: data,
           isSvg: widget.src.isSvg,
+          cacheWidth: widget.cacheSize,
+          cacheHeight: widget.cacheSize,
           errorBuilder: (_, _, _) {
             return widget.defaultWidget;
           },
@@ -128,6 +140,8 @@ class _ImageCacheWidgetState extends State<ImageCacheWidget> {
 class CommonImage extends StatelessWidget {
   final File data;
   final bool isSvg;
+  final int? cacheWidth;
+  final int? cacheHeight;
   final Widget Function(
     BuildContext context,
     Object error,
@@ -140,12 +154,19 @@ class CommonImage extends StatelessWidget {
     required this.data,
     this.errorBuilder,
     this.isSvg = false,
+    this.cacheWidth,
+    this.cacheHeight,
   });
 
   @override
   Widget build(BuildContext context) {
     return isSvg
         ? SvgPicture.file(data, errorBuilder: errorBuilder)
-        : Image.file(data, errorBuilder: errorBuilder);
+        : Image.file(
+            data,
+            cacheWidth: cacheWidth,
+            cacheHeight: cacheHeight,
+            errorBuilder: errorBuilder,
+          );
   }
 }

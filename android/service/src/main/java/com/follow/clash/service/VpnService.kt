@@ -20,6 +20,7 @@ import com.follow.clash.service.models.toCIDR
 import com.follow.clash.service.modules.NetworkObserveModule
 import com.follow.clash.service.modules.NotificationModule
 import com.follow.clash.service.modules.SuspendModule
+import com.follow.clash.service.modules.VpnResidualCleaner
 import com.follow.clash.service.modules.moduleLoader
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -97,9 +98,11 @@ class VpnService : SystemVpnService(), IBaseService,
         }
 
 
-    override fun onLowMemory() {
-        Core.forceGC()
-        super.onLowMemory()
+    override fun onTrimMemory(level: Int) {
+        super.onTrimMemory(level)
+        if (level >= android.content.ComponentCallbacks2.TRIM_MEMORY_RUNNING_LOW) {
+            Core.forceGC()
+        }
     }
 
     private val binder = LocalBinder()
@@ -235,6 +238,10 @@ class VpnService : SystemVpnService(), IBaseService,
 
     override fun start() {
         try {
+            if (VpnResidualCleaner.hasTunInterface()) {
+                Log.d("VpnService", "Cleaning residual TUN interface")
+                VpnResidualCleaner.waitForTunRelease(timeoutMs = 3000L)
+            }
             loader.load()
             State.options?.let {
                 handleStart(it)

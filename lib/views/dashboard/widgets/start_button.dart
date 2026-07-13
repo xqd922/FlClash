@@ -25,7 +25,7 @@ class _StartButtonState extends ConsumerState<StartButton>
     _controller = AnimationController(
       vsync: this,
       value: isStart ? 1 : 0,
-      duration: const Duration(milliseconds: 200),
+      duration: const Duration(milliseconds: 300),
     );
     _animation = CurvedAnimation(
       parent: _controller!,

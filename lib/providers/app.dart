@@ -73,8 +73,25 @@ class Providers extends _$Providers with AutoDisposeNotifierMixin {
     value = newState;
   }
 
-  Future<void> syncProviders() async {
-    value = await coreController.getExternalProviders();
+  Future<void> syncProviders({
+    Future<List<ExternalProvider>> Function()? load,
+  }) async {
+    final loadProviders = load ?? coreController.getExternalProviders;
+    Object? lastError;
+    for (var attempt = 0; attempt < 3; attempt++) {
+      try {
+        final providers = await loadProviders();
+        if (providers.isNotEmpty || attempt == 2) {
+          value = providers;
+          return;
+        }
+      } catch (error) {
+        lastError = error;
+        if (attempt == 2) rethrow;
+      }
+      await Future.delayed(commonDuration);
+    }
+    if (lastError != null) throw lastError;
   }
 }
 

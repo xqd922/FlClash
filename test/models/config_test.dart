@@ -102,14 +102,16 @@ void main() {
       expect(restored.silentLaunch, false);
       expect(restored.autoRun, false);
       expect(restored.openLogs, false);
+      expect(restored.openRequests, false);
       expect(restored.closeConnections, true);
-      expect(restored.isAnimateToPage, true);
+      expect(restored.isAnimateToPage, false);
       expect(restored.autoCheckUpdate, true);
       expect(restored.showLabel, false);
       expect(restored.minimizeOnExit, true);
       expect(restored.restoreStrategy, RestoreStrategy.compatible);
       expect(restored.customUserAgent, '');
       expect(restored.testUrl, defaultTestUrl);
+      expect(restored.testUrl, 'http://www.gstatic.com/generate_204');
     });
 
     test('custom values survive round-trip', () {
@@ -243,7 +245,10 @@ void main() {
       const config = PatchClashConfig();
 
       expect(config.mixedPort, defaultMixedPort);
-      expect(config.allowLan, false);
+      expect(config.allowLan, true);
+      expect(config.ipv6, true);
+      expect(config.dns.ipv6, false);
+      expect(config.unifiedDelay, false);
       expect(config.mode, Mode.rule);
       expect(config.externalController, ExternalControllerStatus.close);
       expect(config.geodataLoader, GeodataLoader.memconservative);
@@ -300,7 +305,7 @@ void main() {
     test('default values', () {
       const props = ThemeProps();
       expect(props.primaryColor, null);
-      expect(props.primaryColors, defaultPrimaryColors);
+      expect(props.primaryColors, isEmpty);
       expect(props.themeMode, ThemeMode.system);
       expect(props.pureBlack, false);
       expect(props.textScale.scale, 1.0);

@@ -4,6 +4,7 @@ import 'package:fl_clash/common/common.dart';
 import 'package:fl_clash/core/controller.dart';
 import 'package:fl_clash/enum/enum.dart';
 import 'package:fl_clash/manager/window_manager.dart';
+import 'package:fl_clash/plugins/service.dart';
 import 'package:fl_clash/providers/providers.dart';
 import 'package:fl_clash/state.dart';
 import 'package:flutter/foundation.dart';
@@ -22,6 +23,8 @@ class AppStateManager extends ConsumerStatefulWidget {
 
 class _AppStateManagerState extends ConsumerState<AppStateManager>
     with WidgetsBindingObserver {
+  Future<void>? _androidResumeFuture;
+
   @override
   void initState() {
     super.initState();
@@ -86,12 +89,32 @@ class _AppStateManagerState extends ConsumerState<AppStateManager>
       render?.resume();
       WidgetsBinding.instance.addPostFrameCallback((_) {
         final ref = globalState.container;
-        ref.read(setupActionProvider.notifier).tryCheckIp();
         if (system.isAndroid) {
-          ref.read(coreActionProvider.notifier).tryStartCore();
+          _androidResumeFuture ??= _handleAndroidResume().whenComplete(() {
+            _androidResumeFuture = null;
+          });
+        } else {
+          ref.read(setupActionProvider.notifier).tryCheckIp();
         }
       });
     }
+  }
+
+  Future<void> _handleAndroidResume() async {
+    final ref = globalState.container;
+    final setupAction = ref.read(setupActionProvider.notifier);
+    final wasStart = ref.read(isStartProvider);
+    setupAction.startTime = await service?.getRunTime();
+    ref.read(commonActionProvider.notifier).updateRunTime();
+    final hasServiceRunTime = setupAction.startTime != null;
+    final coreStatus = ref.read(coreStatusProvider);
+    if (hasServiceRunTime &&
+        (!wasStart || coreStatus == CoreStatus.disconnected)) {
+      await ref.read(coreActionProvider.notifier).tryStartCore(true);
+    } else if (!hasServiceRunTime && wasStart) {
+      await setupAction.updateStatus(false, isInit: true);
+    }
+    ref.read(checkIpNumProvider.notifier).add();
   }
 
   @override
