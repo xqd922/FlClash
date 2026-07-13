@@ -511,16 +511,10 @@ String proxyDesc(Ref ref, Proxy proxy) {
 }
 
 @riverpod
-VM3<bool, int, bool> checkIp(Ref ref) {
+VM2<bool, int> checkIp(Ref ref) {
   final isInit = ref.watch(initProvider);
   final checkIpNum = ref.watch(checkIpNumProvider);
-  final containsDetection = ref.watch(
-    dashboardStateProvider.select(
-      (state) =>
-          state.dashboardWidgets.contains(DashboardWidget.networkDetection),
-    ),
-  );
-  return VM3(isInit, checkIpNum, containsDetection);
+  return VM2(isInit, checkIpNum);
 }
 
 @riverpod
@@ -530,12 +524,10 @@ ColorScheme genColorScheme(
   Color? color,
   bool ignoreConfig = false,
 }) {
-  final vm2 = ref.watch(
-    themeSettingProvider.select(
-      (state) => VM2(state.primaryColor, state.schemeVariant),
-    ),
+  final primaryColor = ref.watch(
+    themeSettingProvider.select((state) => state.primaryColor),
   );
-  if (color == null && (ignoreConfig == true || vm2.a == null)) {
+  if (color == null && (ignoreConfig == true || primaryColor == null)) {
     // if (globalState.corePalette != null) {
     //   return globalState.corePalette!.toColorScheme(brightness: brightness);
     // }
@@ -546,13 +538,11 @@ ColorScheme genColorScheme(
               .primary ??
           globalState.accentColor,
       brightness: brightness,
-      dynamicSchemeVariant: vm2.b,
     );
   }
   return ColorScheme.fromSeed(
-    seedColor: color ?? Color(vm2.a!),
+    seedColor: color ?? Color(primaryColor!),
     brightness: brightness,
-    dynamicSchemeVariant: vm2.b,
   );
 }
 

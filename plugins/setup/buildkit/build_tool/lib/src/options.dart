@@ -30,14 +30,14 @@ class BuildConfig {
   });
 
   static const _defaults = BuildConfig(
-    tags: 'with_gvisor',
+    tags: 'with_gvisor,no_fake_tcp',
     goLdflags: '-w -s',
     coreDir: 'core',
     coreName: 'FlClashCore',
     libName: 'libclash',
     outputDir: 'libclash',
     helperDir: 'services/helper',
-    helperName: 'FlClashHelperService',
+    helperName: 'XClashHelperService',
     distDir: 'dist',
   );
 

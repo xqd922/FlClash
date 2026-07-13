@@ -246,14 +246,6 @@ const _$ProxyCardTypeEnumMap = {
   ProxyCardType.min: 'min',
 };
 
-_TextScale _$TextScaleFromJson(Map<String, dynamic> json) => _TextScale(
-  enable: json['enable'] as bool? ?? false,
-  scale: (json['scale'] as num?)?.toDouble() ?? 1.0,
-);
-
-Map<String, dynamic> _$TextScaleToJson(_TextScale instance) =>
-    <String, dynamic>{'enable': instance.enable, 'scale': instance.scale};
-
 _ThemeProps _$ThemePropsFromJson(Map<String, dynamic> json) => _ThemeProps(
   primaryColor: (json['primaryColor'] as num?)?.toInt(),
   primaryColors:
@@ -264,16 +256,6 @@ _ThemeProps _$ThemePropsFromJson(Map<String, dynamic> json) => _ThemeProps(
   themeMode:
       $enumDecodeNullable(_$ThemeModeEnumMap, json['themeMode']) ??
       ThemeMode.system,
-  schemeVariant:
-      $enumDecodeNullable(
-        _$DynamicSchemeVariantEnumMap,
-        json['schemeVariant'],
-      ) ??
-      DynamicSchemeVariant.content,
-  pureBlack: json['pureBlack'] as bool? ?? false,
-  textScale: json['textScale'] == null
-      ? const TextScale()
-      : TextScale.fromJson(json['textScale'] as Map<String, dynamic>),
 );
 
 Map<String, dynamic> _$ThemePropsToJson(_ThemeProps instance) =>
@@ -281,27 +263,12 @@ Map<String, dynamic> _$ThemePropsToJson(_ThemeProps instance) =>
       'primaryColor': instance.primaryColor,
       'primaryColors': instance.primaryColors,
       'themeMode': _$ThemeModeEnumMap[instance.themeMode]!,
-      'schemeVariant': _$DynamicSchemeVariantEnumMap[instance.schemeVariant]!,
-      'pureBlack': instance.pureBlack,
-      'textScale': instance.textScale,
     };
 
 const _$ThemeModeEnumMap = {
   ThemeMode.system: 'system',
   ThemeMode.light: 'light',
   ThemeMode.dark: 'dark',
-};
-
-const _$DynamicSchemeVariantEnumMap = {
-  DynamicSchemeVariant.tonalSpot: 'tonalSpot',
-  DynamicSchemeVariant.fidelity: 'fidelity',
-  DynamicSchemeVariant.monochrome: 'monochrome',
-  DynamicSchemeVariant.neutral: 'neutral',
-  DynamicSchemeVariant.vibrant: 'vibrant',
-  DynamicSchemeVariant.expressive: 'expressive',
-  DynamicSchemeVariant.content: 'content',
-  DynamicSchemeVariant.rainbow: 'rainbow',
-  DynamicSchemeVariant.fruitSalad: 'fruitSalad',
 };
 
 _Config _$ConfigFromJson(Map<String, dynamic> json) => _Config(

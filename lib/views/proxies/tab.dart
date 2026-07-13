@@ -174,7 +174,6 @@ class ProxiesTabViewState extends ConsumerState<ProxiesTabView>
   @override
   Widget build(BuildContext context) {
     final appLocalizations = context.appLocalizations;
-    ref.watch(themeSettingProvider.select((state) => state.textScale));
     final state = ref.watch(proxiesTabStateProvider.select((state) => state));
     final groups = state.groups;
     if (groups.isEmpty || _tabController == null) {
@@ -202,10 +201,7 @@ class ProxiesTabViewState extends ConsumerState<ProxiesTabView>
                 children: [
                   TabBar(
                     controller: _tabController,
-                    padding: EdgeInsets.only(
-                      left: 16,
-                      right: 16 + (value ? 16 : 0),
-                    ),
+                    padding: const EdgeInsets.only(left: 16, right: 16),
                     dividerColor: Colors.transparent,
                     isScrollable: true,
                     tabAlignment: TabAlignment.start,

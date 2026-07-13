@@ -112,15 +112,15 @@ Future<VM2<String, String>> _makeRealProfileTask(
     );
   }
 
-  rawConfig['external-controller'] =
-      switch (realPatchConfig.externalController) {
-        ExternalControllerStatus.close => '',
-        ExternalControllerStatus.open =>
-          rawConfig['external-controller'] ?? defaultExternalController,
-      };
-  rawConfig['external-ui'] = '';
+  rawConfig['external-controller'] = switch (realPatchConfig
+      .externalController) {
+    ExternalControllerStatus.close => '',
+    ExternalControllerStatus.open => switch (rawConfig['external-controller']) {
+      final String value => value,
+      _ => '',
+    },
+  };
   rawConfig['interface-name'] = '';
-  rawConfig['external-ui-url'] = '';
   rawConfig['tcp-concurrent'] ??= realPatchConfig.tcpConcurrent;
   rawConfig['unified-delay'] ??= realPatchConfig.unifiedDelay;
   rawConfig['ipv6'] ??= realPatchConfig.ipv6;

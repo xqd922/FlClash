@@ -29,6 +29,14 @@ class NetworkObserveModule(private val service: Service) : Module() {
         service.getSystemService<ConnectivityManager>()
     }
     private var preDnsList = listOf<String>()
+    private var lastNetworkType = -1
+    private var disconnectWindowStart = 0L
+    private var disconnectCount = 0
+
+    private companion object {
+        const val MAX_DISCONNECTS_IN_WINDOW = 2
+        const val DISCONNECT_WINDOW_MS = 5000L
+    }
 
     private val request = NetworkRequest.Builder().apply {
         addCapability(NetworkCapabilities.NET_CAPABILITY_NOT_VPN)
@@ -43,6 +51,7 @@ class NetworkObserveModule(private val service: Service) : Module() {
         override fun onAvailable(network: Network) {
             networkInfos[network] = NetworkInfo()
             onUpdateNetwork()
+            handleNetworkTypeChange()
             super.onAvailable(network)
         }
 
@@ -56,6 +65,7 @@ class NetworkObserveModule(private val service: Service) : Module() {
         override fun onLost(network: Network) {
             networkInfos.remove(network)
             onUpdateNetwork()
+            handleNetworkTypeChange()
             setUnderlyingNetworks(network)
             super.onLost(network)
         }
@@ -70,8 +80,39 @@ class NetworkObserveModule(private val service: Service) : Module() {
 
 
     override fun onInstall() {
+        lastNetworkType = getCurrentNetworkType()
         onUpdateNetwork()
         connectivity?.registerNetworkCallback(request, callback)
+    }
+
+    private fun getCurrentNetworkType(): Int {
+        val activeNetwork = connectivity?.activeNetwork ?: return -1
+        val capabilities = connectivity?.getNetworkCapabilities(activeNetwork) ?: return -1
+        return when {
+            capabilities.hasTransport(NetworkCapabilities.TRANSPORT_WIFI) -> 1
+            capabilities.hasTransport(NetworkCapabilities.TRANSPORT_CELLULAR) -> 2
+            else -> 0
+        }
+    }
+
+    private fun handleNetworkTypeChange() {
+        val currentType = getCurrentNetworkType()
+        if (lastNetworkType == -1) {
+            lastNetworkType = currentType
+            return
+        }
+        if (currentType == -1 || currentType == lastNetworkType) return
+
+        lastNetworkType = currentType
+        val now = System.currentTimeMillis()
+        if (now - disconnectWindowStart > DISCONNECT_WINDOW_MS) {
+            disconnectWindowStart = now
+            disconnectCount = 0
+        }
+        if (disconnectCount >= MAX_DISCONNECTS_IN_WINDOW) return
+
+        disconnectCount++
+        Core.invokeAction("""{"id":"net-change","method":"closeConnections"}""") { }
     }
 
     private fun networkToInt(entry: Map.Entry<Network, NetworkInfo>): Int {

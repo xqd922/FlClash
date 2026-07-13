@@ -3,7 +3,6 @@
 import 'dart:math';
 
 import 'package:fl_clash/common/common.dart';
-import 'package:fl_clash/enum/enum.dart';
 import 'package:fl_clash/models/models.dart';
 import 'package:fl_clash/providers/config.dart';
 import 'package:fl_clash/providers/state.dart';
@@ -11,7 +10,6 @@ import 'package:fl_clash/state.dart';
 import 'package:fl_clash/widgets/widgets.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:intl/intl.dart';
 import 'package:material_color_utilities/hct/hct.dart';
 
 class ThemeModeItem {
@@ -24,13 +22,6 @@ class ThemeModeItem {
     required this.iconData,
     required this.label,
   });
-}
-
-class FontFamilyItem {
-  final FontFamily fontFamily;
-  final String label;
-
-  const FontFamilyItem({required this.fontFamily, required this.label});
 }
 
 class ThemeView extends StatelessWidget {
@@ -46,10 +37,6 @@ class ThemeView extends StatelessWidget {
           _ThemeModeItem(),
           SliverToBoxAdapter(child: SizedBox(height: 16)),
           _PrimaryColorItem(),
-          SliverToBoxAdapter(child: SizedBox(height: 16)),
-          _PrueBlackItem(),
-          SliverToBoxAdapter(child: SizedBox(height: 16)),
-          _TextScaleFactorItem(),
           SliverToBoxAdapter(child: SizedBox(height: 32)),
         ],
       ),
@@ -179,8 +166,7 @@ class _PrimaryColorItemState extends ConsumerState<_PrimaryColorItem> {
     ref.read(themeSettingProvider.notifier).update((state) {
       return state.copyWith(
         primaryColors: defaultPrimaryColors,
-        primaryColor: defaultPrimaryColor,
-        schemeVariant: DynamicSchemeVariant.content,
+        primaryColor: null,
       );
     });
   }
@@ -203,11 +189,7 @@ class _PrimaryColorItemState extends ConsumerState<_PrimaryColorItem> {
         ..remove(_removablePrimaryColor);
       int? newPrimaryColor = state.primaryColor;
       if (state.primaryColor == _removablePrimaryColor) {
-        if (newPrimaryColors.contains(defaultPrimaryColor)) {
-          newPrimaryColor = defaultPrimaryColor;
-        } else {
-          newPrimaryColor = null;
-        }
+        newPrimaryColor = null;
       }
       return state.copyWith(
         primaryColors: newPrimaryColors,
@@ -243,48 +225,22 @@ class _PrimaryColorItemState extends ConsumerState<_PrimaryColorItem> {
     });
   }
 
-  Future<void> _handleChangeSchemeVariant() async {
-    final schemeVariant = ref.read(
-      themeSettingProvider.select((state) => state.schemeVariant),
-    );
-    final value = await globalState.showCommonDialog<DynamicSchemeVariant>(
-      child: OptionsDialog<DynamicSchemeVariant>(
-        title: context.appLocalizations.colorSchemes,
-        options: DynamicSchemeVariant.values,
-        textBuilder: (item) => Intl.message('${item.name}Scheme'),
-        value: schemeVariant,
-      ),
-    );
-    if (value == null) {
-      return;
-    }
-    ref.read(themeSettingProvider.notifier).update((state) {
-      return state.copyWith(schemeVariant: value);
-    });
-  }
-
   @override
   Widget build(BuildContext context) {
     final appLocalizations = context.appLocalizations;
-    final vm4 = ref.watch(
+    final vm3 = ref.watch(
       themeSettingProvider.select(
-        (state) => VM4(
+        (state) => VM3(
           state.primaryColor,
           state.primaryColors,
-          state.schemeVariant,
-          state.primaryColor == defaultPrimaryColor &&
-              intListEquality.equals(
-                state.primaryColors,
-                defaultPrimaryColors,
-              ) &&
-              state.schemeVariant == DynamicSchemeVariant.content,
+          state.primaryColor == null &&
+              intListEquality.equals(state.primaryColors, defaultPrimaryColors),
         ),
       ),
     );
-    final primaryColor = vm4.a;
-    final primaryColors = [null, ...vm4.b];
-    final schemeVariant = vm4.c;
-    final isEquals = vm4.d;
+    final primaryColor = vm3.a;
+    final primaryColors = [null, ...vm3.b];
+    final isEquals = vm3.c;
 
     return SliverToBoxAdapter(
       child: CommonPopScope(
@@ -303,14 +259,6 @@ class _PrimaryColorItemState extends ConsumerState<_PrimaryColorItem> {
             iconData: Icons.palette,
           ),
           actions: genActions([
-            if (_removablePrimaryColor == null)
-              FilledButton(
-                style: FilledButton.styleFrom(
-                  visualDensity: VisualDensity.compact,
-                ),
-                onPressed: _handleChangeSchemeVariant,
-                child: Text(Intl.message('${schemeVariant.name}Scheme')),
-              ),
             if (_removablePrimaryColor != null)
               FilledButton(
                 style: FilledButton.styleFrom(
@@ -409,6 +357,7 @@ class _PrimaryColorItemState extends ConsumerState<_PrimaryColorItem> {
                                             .watch(
                                               genColorSchemeProvider(
                                                 Theme.of(context).brightness,
+                                                ignoreConfig: true,
                                               ),
                                             )
                                             .primary
@@ -447,120 +396,6 @@ class _PrimaryColorItemState extends ConsumerState<_PrimaryColorItem> {
             ),
           ),
         ),
-      ),
-    );
-  }
-}
-
-class _PrueBlackItem extends ConsumerWidget {
-  const _PrueBlackItem();
-
-  @override
-  Widget build(BuildContext context, WidgetRef ref) {
-    final appLocalizations = context.appLocalizations;
-    final prueBlack = ref.watch(
-      themeSettingProvider.select((state) => state.pureBlack),
-    );
-    return SliverToBoxAdapter(
-      child: ListItem.switchItem(
-        leading: const Icon(Icons.contrast),
-        horizontalTitleGap: 12,
-        title: Text(
-          appLocalizations.pureBlackMode,
-          style: Theme.of(context).textTheme.titleSmall?.copyWith(
-            color: context.colorScheme.onSurfaceVariant,
-          ),
-        ),
-        delegate: SwitchDelegate(
-          value: prueBlack,
-          onChanged: (value) {
-            ref
-                .read(themeSettingProvider.notifier)
-                .update((state) => state.copyWith(pureBlack: value));
-          },
-        ),
-      ),
-    );
-  }
-}
-
-class _TextScaleFactorItem extends ConsumerWidget {
-  const _TextScaleFactorItem();
-
-  @override
-  Widget build(BuildContext context, WidgetRef ref) {
-    final appLocalizations = context.appLocalizations;
-    final textScale = ref.watch(
-      themeSettingProvider.select((state) => state.textScale),
-    );
-    final String process = '${(textScale.scale * 100).round()}%';
-    return SliverToBoxAdapter(
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Padding(
-            padding: const EdgeInsets.only(bottom: 8),
-            child: ListItem.switchItem(
-              leading: const Icon(Icons.text_fields),
-              horizontalTitleGap: 12,
-              title: Text(
-                appLocalizations.textScale,
-                style: Theme.of(context).textTheme.titleSmall?.copyWith(
-                  color: context.colorScheme.onSurfaceVariant,
-                ),
-              ),
-              delegate: SwitchDelegate(
-                value: textScale.enable,
-                onChanged: (value) {
-                  ref
-                      .read(themeSettingProvider.notifier)
-                      .update(
-                        (state) => state.copyWith.textScale(enable: value),
-                      );
-                },
-              ),
-            ),
-          ),
-          Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 16),
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              mainAxisSize: MainAxisSize.max,
-              spacing: 32,
-              children: [
-                Expanded(
-                  child: DisabledMask(
-                    status: !textScale.enable,
-                    child: ActivateBox(
-                      active: textScale.enable,
-                      child: SliderTheme(
-                        data: SliderDefaultsM3(context),
-                        child: Slider(
-                          padding: EdgeInsets.zero,
-                          min: minTextScale,
-                          max: maxTextScale,
-                          value: textScale.scale,
-                          onChanged: (value) {
-                            ref
-                                .read(themeSettingProvider.notifier)
-                                .update(
-                                  (state) =>
-                                      state.copyWith.textScale(scale: value),
-                                );
-                          },
-                        ),
-                      ),
-                    ),
-                  ),
-                ),
-                Padding(
-                  padding: const EdgeInsets.only(right: 4),
-                  child: Text(process, style: context.textTheme.titleMedium),
-                ),
-              ],
-            ),
-          ),
-        ],
       ),
     );
   }

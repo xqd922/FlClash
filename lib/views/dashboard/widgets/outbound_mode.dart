@@ -125,7 +125,7 @@ class OutboundModeV2 extends StatelessWidget {
             );
             final thumbColor = switch (mode) {
               Mode.rule => context.colorScheme.secondaryContainer,
-              Mode.global => globalState.theme.darken3PrimaryContainer,
+              Mode.global => context.colorScheme.primaryContainer.darken(30),
               Mode.direct => context.colorScheme.tertiaryContainer,
             };
             return LayoutBuilder(

@@ -8,13 +8,19 @@
 ### ✨ XClash 定制
 
 - 保留 XClash 跨平台品牌、仅中英文和无 Firebase/Crashlytics 的隐私策略
-- 默认跟随系统主题，代理卡片默认使用紧凑样式
-- Profile 启用外部控制器时优先保留配置中的地址，缺省时使用应用默认地址
-- 恢复 Dashboard、代理测速、Android 平板侧栏和启动按钮的精简交互设计
+- 恢复精简主题：默认跟随系统颜色，保留 HCT 自定义色和正确 HEX 预览，移除纯黑、文字缩放、配色变体和全局主题缓存
+- Profile 启用外部控制器时只服从配置中的合法地址，不再强塞应用默认地址；保留 external-ui 配置
+- 恢复简洁 Dashboard、紧凑代理卡片、无意义 Direct 测速入口清理、图标式测速按钮和 Android 平板侧栏精简
+
+### ⚡ 性能与稳定性
+
+- 恢复批量测速按批懒创建、配置应用后 Core GC、50MB 图片缓存和 FlutterEngine 复用
+- 恢复 MTU 4064、网络切换清理旧连接、真实网络接口优先和 Dashboard 外独立 IP 刷新
+- 恢复 Go `-trimpath`、Android 16KB 页面对齐、低内存构建标签与 XClashHelperService 全链配置
 
 ### 📝 迁移说明
 
-- 新增 `docs/upstream-v0.8.94-merge-decisions.md`，记录本地修改初心、保留项、调整项和丢弃项
+- 新增 `docs/upstream-v0.8.94-merge-decisions.md` 与 `docs/pre-v0.8.94-customization-audit.md`，逐项记录修改初心、精简、优化、迁移和丢弃决策
 
 ## v(7.0.31)
 

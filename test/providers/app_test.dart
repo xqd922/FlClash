@@ -7,6 +7,7 @@ import 'package:fl_clash/common/request.dart';
 import 'package:fl_clash/enum/enum.dart';
 import 'package:fl_clash/models/models.dart';
 import 'package:fl_clash/providers/app.dart';
+import 'package:fl_clash/providers/state.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:riverpod/riverpod.dart';
@@ -399,6 +400,18 @@ void main() {
         expect(container.read(networkDetectionProvider).isLoading, false);
       },
     );
+  });
+
+  test('checkIp remains active without dashboard widget gating', () {
+    final container = ProviderContainer(
+      overrides: [initProvider.overrideWithBuild((_, _) => true)],
+    );
+    addTearDown(container.dispose);
+
+    final state = container.read(checkIpProvider);
+
+    expect(state.a, true);
+    expect(state.b, 0);
   });
 }
 

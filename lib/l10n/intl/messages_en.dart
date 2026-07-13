@@ -720,7 +720,6 @@ class MessageLookup extends MessageLookupByLibrary {
     ),
     "proxyType": MessageLookupByLibrary.simpleMessage("Proxy type"),
     "pruneCache": MessageLookupByLibrary.simpleMessage("Prune cache"),
-    "pureBlackMode": MessageLookupByLibrary.simpleMessage("Pure black mode"),
     "qrcode": MessageLookupByLibrary.simpleMessage("QR code"),
     "qrcodeDesc": MessageLookupByLibrary.simpleMessage(
       "Scan QR code to obtain profile",
@@ -983,7 +982,6 @@ class MessageLookup extends MessageLookupByLibrary {
     "testInterval": MessageLookupByLibrary.simpleMessage("Test interval"),
     "testUrl": MessageLookupByLibrary.simpleMessage("Test url"),
     "testWhenUsed": MessageLookupByLibrary.simpleMessage("Test when used"),
-    "textScale": MessageLookupByLibrary.simpleMessage("Text Scaling"),
     "theme": MessageLookupByLibrary.simpleMessage("Theme"),
     "themeColor": MessageLookupByLibrary.simpleMessage("Theme color"),
     "themeDesc": MessageLookupByLibrary.simpleMessage(

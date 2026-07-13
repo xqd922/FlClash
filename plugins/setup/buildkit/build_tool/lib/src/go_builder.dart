@@ -12,6 +12,18 @@ import 'util.dart';
 
 final _log = Logger('go_builder');
 
+String buildTagsForTarget(String tags, Target target) {
+  return target.abi == 'armeabi-v7a' ? '$tags,with_low_memory' : tags;
+}
+
+String buildLdflagsForTarget(String ldflags, Target target) {
+  final uses16KbPages = target.goos == 'android' &&
+      (target.goarch == 'arm64' || target.goarch == 'amd64');
+  return uses16KbPages
+      ? '$ldflags -extldflags "-Wl,-z,max-page-size=16384"'
+      : ldflags;
+}
+
 String _resolveCc(Target target) {
   final ndk = Environment.androidNdk;
   final prebuiltDir = Directory(
@@ -64,8 +76,9 @@ class GoBuilder {
 
     final args = [
       'build',
-      '-ldflags=${config.goLdflags}',
-      '-tags=${config.tags}',
+      '-trimpath',
+      '-ldflags=${buildLdflagsForTarget(config.goLdflags, target)}',
+      '-tags=${buildTagsForTarget(config.tags, target)}',
       if (target.isLib) '-buildmode=c-shared',
       '-o',
       outFile,

@@ -1,4 +1,3 @@
-import 'package:fl_clash/common/theme.dart';
 import 'package:fl_clash/l10n/l10n.dart';
 import 'package:fl_clash/providers/app.dart';
 import 'package:fl_clash/state.dart';
@@ -101,10 +100,6 @@ class _TestApp extends StatelessWidget {
         GlobalWidgetsLocalizations.delegate,
       ],
       supportedLocales: AppLocalizations.delegate.supportedLocales,
-      builder: (context, child) {
-        globalState.theme = CommonTheme.of(context, 1);
-        return child!;
-      },
       home: child,
     );
   }

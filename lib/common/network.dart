@@ -5,13 +5,15 @@ extension NetworkInterfaceExt on NetworkInterface {
     final nameLowCase = name.toLowerCase();
     return nameLowCase.startsWith('tun') ||
         nameLowCase.startsWith('utun') ||
-        nameLowCase.startsWith('tap');
+        nameLowCase.startsWith('tap') ||
+        nameLowCase.startsWith('ppp');
   }
 
   bool get isWifi {
     final nameLowCase = name.toLowerCase();
     if (nameLowCase.contains('wlan') ||
         nameLowCase.contains('wi-fi') ||
+        nameLowCase.startsWith('wlp') ||
         nameLowCase == 'en0' ||
         nameLowCase == 'eth0') {
       return true;

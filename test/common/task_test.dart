@@ -61,12 +61,21 @@ void main() {
       expect(profile['external-controller'], '0.0.0.0:9090');
     });
 
-    test('uses the app default when the profile omits it', () async {
+    test('leaves the controller empty when the profile omits it', () async {
       final profile = await buildExternalControllerProfile(
         ExternalControllerStatus.open,
       );
 
-      expect(profile['external-controller'], '127.0.0.1:9090');
+      expect(profile['external-controller'], '');
+    });
+
+    test('rejects a non-string profile controller', () async {
+      final profile = await buildExternalControllerProfile(
+        ExternalControllerStatus.open,
+        externalController: 9090,
+      );
+
+      expect(profile['external-controller'], '');
     });
   });
 
@@ -78,6 +87,8 @@ void main() {
           'allow-lan': false,
           'ipv6': false,
           'unified-delay': true,
+          'external-ui': 'dashboard',
+          'external-ui-url': 'https://example.com/ui.zip',
           'tun': {'enable': true, 'stack': 'system'},
         },
       );
@@ -86,6 +97,8 @@ void main() {
       expect(profile['allow-lan'], false);
       expect(profile['ipv6'], false);
       expect(profile['unified-delay'], true);
+      expect(profile['external-ui'], 'dashboard');
+      expect(profile['external-ui-url'], 'https://example.com/ui.zip');
       expect(profile['tun']['enable'], true);
       expect(profile['tun']['stack'], 'system');
     });

@@ -2,6 +2,8 @@
 
 ## 1. 审计范围
 
+逐提交和逐版本结论见 `docs/pre-v0.8.94-customization-audit.md`。
+
 - 当前分支：`optimize`，合并前提交 `9e87fb6`。
 - 共同基线：`672eacc`。
 - 上游目标：`v0.8.94`，提交 `7e7f1f8`。
@@ -72,7 +74,7 @@
 3. Profile 原始显式配置。
 4. App 缺省值。
 
-`external-controller` 单独处理：UI 关闭时为空；UI 开启且 Profile 有合法地址时使用 Profile；否则使用 App 默认地址。
+`external-controller` 单独处理：UI 关闭时为空；UI 开启且 Profile 有合法地址时使用 Profile；缺失或非法时保持空值，不由 App 强塞默认地址。
 
 ### 5.2 Android 优化
 
@@ -83,8 +85,8 @@
 
 ### 5.3 主题和界面
 
-- 保留上游 `schemeVariant`、`pureBlack`、`textScale` 等新能力。
-- 默认体验采用系统主题和空预设颜色列表。
+- 不恢复合并前已主动删除的 `schemeVariant`、`pureBlack`、`textScale` 复杂主题项。
+- 主题固定使用 `content` 配色算法，文字缩放跟随系统；默认采用系统主题和空预设颜色列表。
 - 在上游主题组件上最小增加 HCT 自定义色和 HEX 展示，不整体恢复旧主题实现。
 - Dashboard 保持 XClash 的简洁布局，删除编辑状态机和核心状态头部，同时复用 v0.8.94 的新 Provider 数据源。
 
@@ -104,7 +106,7 @@
 - `.scratch/restore-color-picker/` 一次性开发拆解资料。
 - 旧 `lib/controller.dart` 和围绕旧控制器的实现。
 - 删除空字符串的实现；空字符串可能表达显式清空，必须保留。
-- Direct 测速“修改后又撤销”的历史链。
+- Direct 测速的中间实现；最终产品行为仍为批量测速跳过 Direct、Direct 卡片隐藏延迟入口。
 - DNS IPv6 来回修改的中间状态。
 - 旧版 `flutter_distributor` 替换方案和会隐式安装系统依赖的构建脚本。
 - 只隐藏 Dashboard 编辑入口却保留不可达编辑逻辑的中间实现；最终版本应完整删除编辑状态机。

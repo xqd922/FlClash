@@ -287,7 +287,6 @@ class _ProxiesListViewState extends State<ProxiesListView> {
     return Consumer(
       builder: (_, ref, _) {
         final state = ref.watch(proxiesListStateProvider);
-        ref.watch(themeSettingProvider.select((state) => state.textScale));
         if (state.groups.isEmpty) {
           return NullStatus(
             illustration: const ProxyEmptyIllustration(),

@@ -10,7 +10,7 @@ import 'package:fl_clash/models/models.dart';
 import 'package:flutter/material.dart';
 
 const appName = 'XClash';
-const appHelperService = 'FlClashHelperService';
+const appHelperService = 'XClashHelperService';
 const coreName = 'clash.meta';
 const browserUa =
     'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36';
@@ -18,8 +18,6 @@ const packageName = 'com.follow.clash';
 final unixSocketPath = '/tmp/XClashSocket_${Random().nextInt(10000)}.sock';
 final windowsPipeName = '\\\\.\\pipe\\FlClashCore_${Random().nextInt(10000)}';
 const helperPort = 47890;
-const maxTextScale = 1.4;
-const minTextScale = 0.8;
 final baseInfoEdgeInsets = EdgeInsets.symmetric(
   vertical: 16.mAp,
   horizontal: 16.mAp,

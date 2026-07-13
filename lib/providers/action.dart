@@ -412,6 +412,7 @@ class SetupAction extends _$SetupAction {
         }
         ref.read(checkIpNumProvider.notifier).add();
         await onUpdated?.call();
+        Future.delayed(const Duration(seconds: 2), coreController.requestGc);
       },
       silence: true,
       tag: !silence ? LoadingTag.proxies : null,

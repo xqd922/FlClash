@@ -12,6 +12,7 @@ import 'common/common.dart';
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
+  PaintingBinding.instance.imageCache.maximumSizeBytes = 50 * 1024 * 1024;
   try {
     if (system.isDesktop) {
       await RustLib.init();

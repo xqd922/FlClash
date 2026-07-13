@@ -1823,13 +1823,8 @@ final class ProxyDescFamily extends $Family
 final checkIpProvider = CheckIpProvider._();
 
 final class CheckIpProvider
-    extends
-        $FunctionalProvider<
-          VM3<bool, int, bool>,
-          VM3<bool, int, bool>,
-          VM3<bool, int, bool>
-        >
-    with $Provider<VM3<bool, int, bool>> {
+    extends $FunctionalProvider<VM2<bool, int>, VM2<bool, int>, VM2<bool, int>>
+    with $Provider<VM2<bool, int>> {
   CheckIpProvider._()
     : super(
         from: null,
@@ -1846,25 +1841,24 @@ final class CheckIpProvider
 
   @$internal
   @override
-  $ProviderElement<VM3<bool, int, bool>> $createElement(
-    $ProviderPointer pointer,
-  ) => $ProviderElement(pointer);
+  $ProviderElement<VM2<bool, int>> $createElement($ProviderPointer pointer) =>
+      $ProviderElement(pointer);
 
   @override
-  VM3<bool, int, bool> create(Ref ref) {
+  VM2<bool, int> create(Ref ref) {
     return checkIp(ref);
   }
 
   /// {@macro riverpod.override_with_value}
-  Override overrideWithValue(VM3<bool, int, bool> value) {
+  Override overrideWithValue(VM2<bool, int> value) {
     return $ProviderOverride(
       origin: this,
-      providerOverride: $SyncValueProvider<VM3<bool, int, bool>>(value),
+      providerOverride: $SyncValueProvider<VM2<bool, int>>(value),
     );
   }
 }
 
-String _$checkIpHash() => r'7d8be66f0e8164bcf20c32659da2a4bea9893596';
+String _$checkIpHash() => r'e11c5e5957097038679cdb5b79ef9ecc4e41614b';
 
 @ProviderFor(genColorScheme)
 final genColorSchemeProvider = GenColorSchemeFamily._();
@@ -1929,7 +1923,7 @@ final class GenColorSchemeProvider
   }
 }
 
-String _$genColorSchemeHash() => r'25f648db7c33ac00e7152f3d304da372a4de9fdd';
+String _$genColorSchemeHash() => r'd33727cf0cb63a2535e3e4cc34f848d5d69cfbbb';
 
 final class GenColorSchemeFamily extends $Family
     with
