@@ -6,11 +6,11 @@
     -->
     <application
         android:icon="@mipmap/ic_launcher"
-        android:label="XClash Debug"
+        android:label="FlClash Debug"
         tools:replace="android:label">
         <service
             android:name=".TileService"
-            android:label="XClash Debug"
+            android:label="FlClash Debug"
             tools:replace="android:label" />
     </application>
 </manifest>

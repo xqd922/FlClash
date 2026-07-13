@@ -1,7 +1,6 @@
 package com.follow.clash.service.modules
 
 import android.app.Notification.FOREGROUND_SERVICE_IMMEDIATE
-import android.app.NotificationManager
 import android.app.Service
 import android.app.Service.STOP_FOREGROUND_REMOVE
 import android.content.Intent
@@ -46,12 +45,6 @@ val NotificationParams.extended: ExtendedNotificationParams
 
 class NotificationModule(private val service: Service) : Module() {
     private val scope = CoroutineScope(Dispatchers.Default)
-    @Volatile
-    private var hasStartedForeground = false
-
-    private val notificationManager by lazy {
-        service.getSystemService<NotificationManager>()
-    }
 
     override fun onInstall() {
         scope.launch {
@@ -92,44 +85,40 @@ class NotificationModule(private val service: Service) : Module() {
 
     private val notificationBuilder: NotificationCompat.Builder by lazy {
         val intent = Intent().setComponent(Components.MAIN_ACTIVITY)
-        with(
-            NotificationCompat.Builder(
-                service, GlobalState.NOTIFICATION_CHANNEL
-            )
-        ) {
-            setSmallIcon(R.drawable.ic)
+
+        NotificationCompat.Builder(
+            service, GlobalState.NOTIFICATION_CHANNEL
+        ).apply {
+            setSmallIcon(R.drawable.ic_service)
             setContentTitle("FlClash")
             setContentIntent(intent.toPendingIntent)
             setPriority(NotificationCompat.PRIORITY_HIGH)
             setCategory(NotificationCompat.CATEGORY_SERVICE)
+            setOngoing(true)
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
                 foregroundServiceBehavior = FOREGROUND_SERVICE_IMMEDIATE
             }
-            setOngoing(true)
             setShowWhen(true)
             setOnlyAlertOnce(true)
+//            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.UPSIDE_DOWN_CAKE) {
+//                setRequestPromotedOngoing(true)
+//            }
         }
     }
 
     private fun update(params: ExtendedNotificationParams) {
-        val notification = with(notificationBuilder) {
-            setContentTitle(params.title)
-            setContentText(params.contentText)
-            clearActions()
-            addAction(
-                0, params.stopText, QuickAction.STOP.quickIntent.toPendingIntent
-            ).build()
-        }
-        if (!hasStartedForeground) {
-            service.startForeground(notification)
-            hasStartedForeground = true
-        } else {
-            notificationManager?.notify(GlobalState.NOTIFICATION_ID, notification)
-        }
+        service.startForeground(
+            with(notificationBuilder) {
+                setContentTitle(params.title)
+                setContentText(params.contentText)
+                clearActions()
+                addAction(
+                    0, params.stopText, QuickAction.STOP.quickIntent.toPendingIntent
+                ).build()
+            })
     }
 
     override fun onUninstall() {
-        hasStartedForeground = false
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
             service.stopForeground(STOP_FOREGROUND_REMOVE)
         } else {

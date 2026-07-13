@@ -1,9 +1,11 @@
 import 'dart:math';
 
 import 'package:defer_pointer/defer_pointer.dart';
+import 'package:dynamic_color/dynamic_color.dart';
 import 'package:fl_clash/common/common.dart';
 import 'package:fl_clash/enum/enum.dart';
 import 'package:fl_clash/providers/providers.dart';
+import 'package:fl_clash/state.dart';
 import 'package:fl_clash/widgets/widgets.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -25,7 +27,7 @@ class _DashboardViewState extends ConsumerState<DashboardView> {
   final _addedWidgetsNotifier = ValueNotifier<List<GridItem>>([]);
 
   @override
-  dispose() {
+  void dispose() {
     _isEditNotifier.dispose();
     _addedWidgetsNotifier.dispose();
     super.dispose();
@@ -40,8 +42,114 @@ class _DashboardViewState extends ConsumerState<DashboardView> {
     );
   }
 
+  Future<void> _handleConnection() async {
+    final coreStatus = ref.read(coreStatusProvider);
+    if (coreStatus == CoreStatus.connecting) {
+      return;
+    }
+    final tip = coreStatus == CoreStatus.connected
+        ? context.appLocalizations.forceRestartCoreTip
+        : context.appLocalizations.restartCoreTip;
+    final res = await globalState.showMessage(message: TextSpan(text: tip));
+    if (res != true) {
+      return;
+    }
+    globalState.container.read(coreActionProvider.notifier).restartCore();
+  }
+
   List<Widget> _buildActions(bool isEdit) {
+    final appLocalizations = context.appLocalizations;
     return [
+      if (!isEdit)
+        Consumer(
+          builder: (_, ref, _) {
+            final coreStatus = ref.watch(coreStatusProvider);
+            return Tooltip(
+              message: appLocalizations.coreStatus,
+              child: FadeScaleBox(
+                alignment: Alignment.centerRight,
+                child: coreStatus == CoreStatus.connected
+                    ? IconButton.filled(
+                        visualDensity: VisualDensity.compact,
+                        iconSize: 20,
+                        padding: EdgeInsets.zero,
+                        style: IconButton.styleFrom(
+                          backgroundColor: Colors.green.harmonizeWith(
+                            context.colorScheme.primary,
+                          ),
+                          foregroundColor: switch (Theme.brightnessOf(
+                            context,
+                          )) {
+                            Brightness.light =>
+                              context.colorScheme.onSurfaceVariant,
+                            Brightness.dark =>
+                              context.colorScheme.onPrimaryFixedVariant,
+                          },
+                        ),
+                        onPressed: _handleConnection,
+                        icon: const Icon(
+                          Icons.check,
+                          fontWeight: FontWeight.w900,
+                        ),
+                      )
+                    : FilledButton.icon(
+                        key: ValueKey(coreStatus),
+                        onPressed: _handleConnection,
+                        style: FilledButton.styleFrom(
+                          visualDensity: VisualDensity.compact,
+                          padding: const EdgeInsets.symmetric(horizontal: 12),
+                          backgroundColor: switch (coreStatus) {
+                            CoreStatus.connecting => null,
+                            CoreStatus.connected => Colors.greenAccent,
+                            CoreStatus.disconnected =>
+                              context.colorScheme.error,
+                          },
+                          foregroundColor: switch (coreStatus) {
+                            CoreStatus.connecting => null,
+                            CoreStatus.connected => switch (Theme.brightnessOf(
+                              context,
+                            )) {
+                              Brightness.light =>
+                                context.colorScheme.onSurfaceVariant,
+                              Brightness.dark => null,
+                            },
+                            CoreStatus.disconnected =>
+                              context.colorScheme.onError,
+                          },
+                        ),
+                        icon: SizedBox(
+                          height: globalState.measure.bodyMediumHeight,
+                          width: globalState.measure.bodyMediumHeight,
+                          child: switch (coreStatus) {
+                            CoreStatus.connecting => Padding(
+                              padding: const EdgeInsets.all(2),
+                              child: CircularProgressIndicator(
+                                strokeWidth: 3,
+                                color: context.colorScheme.onPrimary,
+                                backgroundColor: Colors.transparent,
+                              ),
+                            ),
+                            CoreStatus.connected => const Icon(
+                              Icons.check_sharp,
+                              fontWeight: FontWeight.w900,
+                            ),
+                            CoreStatus.disconnected => const Icon(
+                              Icons.restart_alt_sharp,
+                              fontWeight: FontWeight.w900,
+                            ),
+                          },
+                        ),
+                        label: Text(switch (coreStatus) {
+                          CoreStatus.connecting => appLocalizations.connecting,
+                          CoreStatus.connected => appLocalizations.connected,
+                          CoreStatus.disconnected =>
+                            appLocalizations.disconnected,
+                        }),
+                      ),
+              ),
+            );
+          },
+        ),
       if (isEdit)
         ValueListenableBuilder(
           valueListenable: _addedWidgetsNotifier,
@@ -55,27 +163,39 @@ class _DashboardViewState extends ConsumerState<DashboardView> {
             onPressed: () {
               _showAddWidgetsModal();
             },
-            icon: Icon(Icons.add_circle),
+            icon: const Icon(Icons.add_circle),
           ),
         ),
+      FadeRotationScaleBox(
+        child: isEdit
+            ? IconButton(
+                key: const ValueKey(true),
+                icon: const Icon(Icons.save, key: ValueKey('save-icon')),
+                onPressed: _handleUpdateIsEdit,
+              )
+            : IconButton(
+                key: const ValueKey(false),
+                icon: const Icon(Icons.edit, key: ValueKey('edit-icon')),
+                onPressed: _handleUpdateIsEdit,
+              ),
+      ),
     ];
   }
 
   void _showAddWidgetsModal() {
     showSheet(
-      builder: (_, type) {
+      builder: (_) {
         return ValueListenableBuilder(
           valueListenable: _addedWidgetsNotifier,
           builder: (_, value, _) {
             return AdaptiveSheetScaffold(
-              type: type,
               body: _AddDashboardWidgetModal(
                 items: value,
                 onAdd: (gridItem) {
                   key.currentState?.handleAdd(gridItem);
                 },
               ),
-              title: appLocalizations.add,
+              title: context.appLocalizations.add,
             );
           },
         );
@@ -96,7 +216,7 @@ class _DashboardViewState extends ConsumerState<DashboardView> {
     if (currentState == null) {
       return;
     }
-    if (mounted) {
+    if (mounted && currentState.children.isNotEmpty) {
       await currentState.isTransformCompleter;
       final dashboardWidgets = currentState.children
           .map((item) => DashboardWidget.getDashboardWidget(item))
@@ -133,7 +253,7 @@ class _DashboardViewState extends ConsumerState<DashboardView> {
     });
     return _buildIsEdit(
       (isEdit) => CommonScaffold(
-        title: appLocalizations.dashboard,
+        title: context.appLocalizations.dashboard,
         actions: _buildActions(isEdit),
         floatingActionButton: const StartButton(),
         body: Align(
@@ -148,15 +268,7 @@ class _DashboardViewState extends ConsumerState<DashboardView> {
                         crossAxisCount: columns,
                         crossAxisSpacing: spacing,
                         mainAxisSpacing: spacing,
-                        children: [
-                          ...dashboardState.dashboardWidgets
-                              .where(
-                                (item) => item.platforms.contains(
-                                  SupportPlatform.currentPlatform,
-                                ),
-                              )
-                              .map((item) => item.widget),
-                        ],
+                        children: children,
                         onUpdate: () {
                           _handleSave();
                         },
@@ -190,7 +302,7 @@ class _AddDashboardWidgetModal extends StatelessWidget {
   Widget build(BuildContext context) {
     return DeferredPointerHandler(
       child: SingleChildScrollView(
-        padding: EdgeInsets.all(16),
+        padding: const EdgeInsets.all(16),
         child: Grid(
           crossAxisCount: 8,
           crossAxisSpacing: 16,
@@ -261,9 +373,9 @@ class _AddedContainerState extends State<_AddedContainer> {
               height: 24,
               child: IconButton.filled(
                 iconSize: 20,
-                padding: EdgeInsets.all(2),
+                padding: const EdgeInsets.all(2),
                 onPressed: _handleAdd,
-                icon: Icon(Icons.add),
+                icon: const Icon(Icons.add),
               ),
             ),
           ),

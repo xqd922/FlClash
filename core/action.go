@@ -2,6 +2,8 @@ package main
 
 import (
 	"encoding/json"
+	"fmt"
+	"runtime"
 	"unsafe"
 )
 
@@ -37,6 +39,14 @@ func (result ActionResult) error(data interface{}) {
 }
 
 func handleAction(action *Action, result ActionResult) {
+	defer func() {
+		if r := recover(); r != nil {
+			buf := make([]byte, 4096)
+			n := runtime.Stack(buf, false)
+			logError("panic in handleAction(%s): %v\n%s", action.Method, r, buf[:n])
+			result.error(fmt.Sprintf("internal panic: %v", r))
+		}
+	}()
 	switch action.Method {
 	case initClashMethod:
 		paramsString := action.Data.(string)
@@ -119,19 +129,11 @@ func handleAction(action *Action, result ActionResult) {
 	case getExternalProviderMethod:
 		externalProviderName := action.Data.(string)
 		result.success(handleGetExternalProvider(externalProviderName))
+		return
 	case updateGeoDataMethod:
-		paramsString := action.Data.(string)
-		var params = map[string]string{}
-		err := json.Unmarshal([]byte(paramsString), &params)
-		if err != nil {
-			result.success(err.Error())
-			return
-		}
-		geoType := params["geo-type"]
-		geoName := params["geo-name"]
-		handleUpdateGeoData(geoType, geoName, func(value string) {
-			result.success(value)
-		})
+		geoType := action.Data.(string)
+		handleUpdateGeoData(geoType)
+		result.success("")
 		return
 	case updateExternalProviderMethod:
 		providerName := action.Data.(string)

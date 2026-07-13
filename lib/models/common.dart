@@ -6,7 +6,10 @@ import 'package:fl_clash/enum/enum.dart';
 import 'package:flutter/material.dart';
 import 'package:freezed_annotation/freezed_annotation.dart';
 
+import 'clash_config.dart';
+
 part 'generated/common.freezed.dart';
+
 part 'generated/common.g.dart';
 
 @freezed
@@ -143,7 +146,7 @@ String _logDateTime(dynamic _) {
 abstract class Log with _$Log {
   const factory Log({
     // @JsonKey(fromJson: _logId) required String id,
-    @JsonKey(name: 'LogLevel') @Default(LogLevel.error) LogLevel logLevel,
+    @JsonKey(name: 'LogLevel') @Default(LogLevel.info) LogLevel logLevel,
     @JsonKey(name: 'Payload') @Default('') String payload,
     @JsonKey(fromJson: _logDateTime) required String dateTime,
   }) = _Log;
@@ -236,8 +239,8 @@ abstract class FileInfo with _$FileInfo {
 }
 
 extension FileInfoExt on FileInfo {
-  String get desc =>
-      '${size.traffic.show}  ·  ${lastModified.lastUpdateTimeDesc}';
+  String getDesc(BuildContext context) =>
+      '${size.traffic.show}  ·  ${lastModified.getLastUpdateTimeDesc(context)}';
 }
 
 @freezed
@@ -269,7 +272,7 @@ extension TrafficExt on Traffic {
   }
 
   String get trayTitle {
-    return '${up.shortTraffic.show}↑ ${down.shortTraffic.show}↓';
+    return '${up.shortTraffic.show}/s\n${down.shortTraffic.show}/s';
   }
 
   num get speed => up + down;
@@ -286,20 +289,9 @@ extension TrafficShowExt on TrafficShow {
 }
 
 @freezed
-abstract class Proxy with _$Proxy {
-  const factory Proxy({
-    required String name,
-    required String type,
-    String? now,
-  }) = _Proxy;
-
-  factory Proxy.fromJson(Map<String, Object?> json) => _$ProxyFromJson(json);
-}
-
-@freezed
 abstract class Group with _$Group {
   const factory Group({
-    required GroupType type,
+    @JsonKey(fromJson: GroupType.parse) required GroupType type,
     @Default([]) List<Proxy> all,
     String? now,
     bool? hidden,
@@ -350,7 +342,7 @@ extension ColorSchemesExt on ColorSchemes {
               dynamicSchemeVariant: schemeVariant,
             )
           : ColorScheme.fromSeed(
-              seedColor: Color(defaultPrimaryColor),
+              seedColor: const Color(defaultPrimaryColor),
               brightness: Brightness.dark,
               dynamicSchemeVariant: schemeVariant,
             );
@@ -361,7 +353,7 @@ extension ColorSchemesExt on ColorSchemes {
             dynamicSchemeVariant: schemeVariant,
           )
         : ColorScheme.fromSeed(
-            seedColor: Color(defaultPrimaryColor),
+            seedColor: const Color(defaultPrimaryColor),
             dynamicSchemeVariant: schemeVariant,
           );
   }
@@ -534,7 +526,7 @@ extension ScriptsExt on List<Script> {
 extension ScriptExt on Script {
   String get fileName => '$id.js';
 
-  Future<String> get path async => await appPath.getScriptPath(id.toString());
+  Future<String> get path async => appPath.getScriptPath(id.toString());
 
   Future<String?> get content async {
     final file = File(await path);
@@ -583,8 +575,8 @@ extension DelayStateExt on DelayState {
     if (delay != other.delay) {
       return delay.compareTo(other.delay);
     }
-    if (group && !group) return -1;
-    if (!group && group) return 1;
+    if (group && !other.group) return -1;
+    if (!group && other.group) return 1;
     return 0;
   }
 }
@@ -595,4 +587,12 @@ abstract class UpdatingMessage with _$UpdatingMessage {
     required String label,
     required String message,
   }) = _UpdatingMessage;
+}
+
+@freezed
+abstract class IconButtonData with _$IconButtonData {
+  const factory IconButtonData({
+    required IconData icon,
+    required VoidCallback onPressed,
+  }) = _IconButtonData;
 }

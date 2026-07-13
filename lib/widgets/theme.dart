@@ -11,7 +11,7 @@ class CommonMinFilledButtonTheme extends StatelessWidget {
     return FilledButtonTheme(
       data: FilledButtonThemeData(
         style: FilledButton.styleFrom(
-          padding: EdgeInsets.symmetric(horizontal: 8),
+          padding: const EdgeInsets.symmetric(horizontal: 8),
           tapTargetSize: MaterialTapTargetSize.shrinkWrap,
           visualDensity: VisualDensity.compact,
         ),
@@ -31,7 +31,7 @@ class CommonMinIconButtonTheme extends StatelessWidget {
     return IconButtonTheme(
       data: IconButtonThemeData(
         style: IconButton.styleFrom(
-          padding: EdgeInsets.symmetric(horizontal: 4),
+          padding: const EdgeInsets.symmetric(horizontal: 4),
           visualDensity: VisualDensity.compact,
           tapTargetSize: MaterialTapTargetSize.shrinkWrap,
           iconSize: 20.ap,
@@ -55,27 +55,24 @@ class SliderDefaultsM3 extends SliderThemeData {
   Color? get inactiveTrackColor => _colors.secondaryContainer;
 
   @override
-  Color? get secondaryActiveTrackColor =>
-      _colors.primary.withValues(alpha: 0.54);
+  Color? get secondaryActiveTrackColor => _colors.primary.withOpacity(0.54);
 
   @override
-  Color? get disabledActiveTrackColor =>
-      _colors.onSurface.withValues(alpha: 0.38);
+  Color? get disabledActiveTrackColor => _colors.onSurface.withOpacity(0.38);
 
   @override
-  Color? get disabledInactiveTrackColor =>
-      _colors.onSurface.withValues(alpha: 0.12);
+  Color? get disabledInactiveTrackColor => _colors.onSurface.withOpacity(0.12);
 
   @override
   Color? get disabledSecondaryActiveTrackColor =>
-      _colors.onSurface.withValues(alpha: 0.38);
+      _colors.onSurface.withOpacity(0.38);
 
   @override
-  Color? get activeTickMarkColor => _colors.onPrimary.withValues(alpha: 1.0);
+  Color? get activeTickMarkColor => _colors.onPrimary.withOpacity(1.0);
 
   @override
   Color? get inactiveTickMarkColor =>
-      _colors.onSecondaryContainer.withValues(alpha: 1.0);
+      _colors.onSecondaryContainer.withOpacity(1.0);
 
   @override
   Color? get disabledActiveTickMarkColor => _colors.onInverseSurface;
@@ -87,21 +84,21 @@ class SliderDefaultsM3 extends SliderThemeData {
   Color? get thumbColor => _colors.primary;
 
   @override
-  Color? get disabledThumbColor =>
-      _colors.onSurface.withValues(alpha: 0.38);
+  Color? get disabledThumbColor => _colors.onSurface.withOpacity(0.38);
 
   @override
   Color? get overlayColor =>
       WidgetStateColor.resolveWith((Set<WidgetState> states) {
         if (states.contains(WidgetState.dragged)) {
-          return _colors.primary.withValues(alpha: 0.1);
+          return _colors.primary.withOpacity(0.1);
         }
         if (states.contains(WidgetState.hovered)) {
-          return _colors.primary.withValues(alpha: 0.08);
+          return _colors.primary.withOpacity(0.08);
         }
         if (states.contains(WidgetState.focused)) {
-          return _colors.primary.withValues(alpha: 0.1);
+          return _colors.primary.withOpacity(0.1);
         }
+
         return Colors.transparent;
       });
 

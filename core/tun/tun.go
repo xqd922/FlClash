@@ -56,7 +56,7 @@ func Start(fd int, stack string, address, dns string) *sing_tun.Listener {
 		AutoDetectInterface: false,
 		Inet4Address:        prefix4,
 		Inet6Address:        prefix6,
-		MTU:                 4064,
+		MTU:                 9000,
 		FileDescriptor:      fd,
 	}
 

@@ -1,26 +1,16 @@
 import 'dart:io';
 
 extension NetworkInterfaceExt on NetworkInterface {
-  bool get isVirtual {
-    final nameLowCase = name.toLowerCase();
-    return nameLowCase.startsWith('tun') ||
-        nameLowCase.startsWith('tap') ||
-        nameLowCase.startsWith('ppp');
-  }
-
   bool get isWifi {
     final nameLowCase = name.toLowerCase();
-    return nameLowCase == 'wlan0' ||
+    if (nameLowCase.contains('wlan') ||
         nameLowCase.contains('wi-fi') ||
-        nameLowCase.startsWith('wlp') ||
         nameLowCase == 'en0' ||
-        nameLowCase == 'eth0';
-  }
+        nameLowCase == 'eth0') {
+      return true;
+    }
 
-  bool get isMobileData {
-    final nameLowCase = name.toLowerCase();
-    return nameLowCase.startsWith('rmnet') ||
-        nameLowCase.startsWith('ccmni');
+    return false;
   }
 
   bool get includesIPv4 {

@@ -176,6 +176,10 @@ class RemoteService : Service(),
             }
         }
 
+        override fun setCrashlytics(enable: Boolean) {
+            GlobalState.setCrashlytics(enable)
+        }
+
         override fun getRunTime(): Long {
             return State.runTime
         }

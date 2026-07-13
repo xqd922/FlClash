@@ -1,0 +1,130 @@
+# XClash 合并上游 v0.8.94 取舍说明
+
+## 1. 审计范围
+
+- 当前分支：`optimize`，合并前提交 `9e87fb6`。
+- 共同基线：`672eacc`。
+- 上游目标：`v0.8.94`，提交 `7e7f1f8`。
+- 本地独有提交：85 个；净修改 122 个文件，新增 3,073 行、删除 4,704 行。
+- 上游自共同基线后的主要变化：自定义覆写、新 Provider/Action 架构、数据库与 IPC 重构、Windows ARM64、Linux 静默启动修复、macOS 性能修复和新版 Core。
+- 试合并得到 49 个文本或修改/删除冲突，因此不能用全局 `ours` 或 `theirs` 机械解决。
+
+## 2. 修改初心
+
+本分支的目标不是简单改名，而是把 FlClash 调整为一个更精简、偏隐私、适合个人长期维护的 XClash 发行版：
+
+1. 统一 XClash 品牌，只维护中文和英文。
+2. 移除 Firebase/Crashlytics，避免个人发行包默认携带遥测和 Google Services 构建依赖。
+3. 让 Profile/YAML 中的显式配置优先，App 设置只补缺省值，避免订阅内容被无条件覆盖。
+4. 改善 Android 后台耗电、VPN/Core 状态恢复和 IP 刷新。
+5. 默认隐藏日志、请求记录等低频诊断入口，降低导航和界面信息密度。
+6. 默认跟随系统主题，同时保留高级用户自定义主色的能力。
+7. 简化构建和发布步骤，使附属发布渠道失败不阻断主要产物。
+
+## 3. 合并原则
+
+本次采用“上游架构 + XClash 产品语义”：
+
+- Core、IPC、Provider/Action、数据库、平台插件和构建基础以 v0.8.94 为准。
+- 不恢复上游已经删除的旧 `lib/controller.dart`。
+- 不手工拼接 Freezed、JSON、Riverpod 和本地化生成文件；源模型解决后统一重新生成。
+- 品牌、隐私政策和明确的默认体验在上游新结构上做最小移植。
+- Android 优化和配置优先级只保留需求，不原样搬运旧生命周期或旧 Map 后处理实现。
+
+## 4. 保留
+
+### 4.1 发行版身份
+
+- XClash、XClashCore、XClashHelperService 的跨平台品牌一致性。
+- 仓库和更新地址指向 XClash 发行仓库。
+- 仅发布中文和英文；不恢复日语、俄语资源。
+
+### 4.2 隐私与依赖
+
+- 移除 Firebase、Crashlytics、Analytics、Google Services 配置和无效设置入口。
+- 保留上游免责声明和隐私入口；移除遥测不等于删除法律说明。
+
+### 4.3 明确产品偏好
+
+- 默认主题跟随系统。
+- 日志和请求记录入口默认隐藏，但用户可重新开启。
+- 代理卡片默认使用紧凑样式。
+- 自定义主色和十六进制色值展示的需求。
+
+### 4.4 行为需求
+
+- Profile 显式值不应被 App 默认值无条件覆盖。
+- Profile DNS 配置不能只因缺少 `dns.enable` 就被整体替换。
+- `external-controller` 必须有统一解析规则，并在 UI 关闭时真正关闭。
+- Android 恢复时以真实 Service/Core 状态为准，而不是只相信 Flutter 内存状态。
+
+## 5. 调整后保留
+
+### 5.1 配置优先级
+
+旧实现直接修改最终 `rawConfig`。v0.8.94 已引入标准、脚本和自定义覆写，因此改为使用上游覆写体系表达优先级：
+
+1. 应用运行和安全必需字段。
+2. 用户自定义覆写。
+3. Profile 原始显式配置。
+4. App 缺省值。
+
+`external-controller` 单独处理：UI 关闭时为空；UI 开启且 Profile 有合法地址时使用 Profile；否则使用 App 默认地址。
+
+### 5.2 Android 优化
+
+- 保留“进入 Doze 且屏幕关闭才挂起”的需求。
+- 保留恢复时同步 VPN/Core/UI 和刷新 IP 的需求。
+- 基于 v0.8.94 的新 Core/Provider API 重做，不恢复旧控制器和旧 Service 调用链。
+- Android 签名容错仅用于 PR/测试构建；正式 tag/release 缺少签名必须失败。
+
+### 5.3 主题和界面
+
+- 保留上游 `schemeVariant`、`pureBlack`、`textScale` 等新能力。
+- 默认体验采用系统主题和空预设颜色列表。
+- 在上游主题组件上最小增加 HCT 自定义色和 HEX 展示，不整体恢复旧主题实现。
+- Dashboard 先采用 v0.8.94 结构；确有必要时再单独简化入口，不恢复旧 header 的整文件实现。
+
+### 5.4 构建发布
+
+- 以上游 v0.8.94 的 Rust/Core、Windows ARM64 和平台插件构建链为基础。
+- Telegram 通知可以 non-blocking；正式分发步骤必须明确报告失败。
+- XClash 产物命名继续保留。
+
+## 6. 丢弃
+
+- 所有旧 v7.0.0-v7.0.31 版本号、旧发布说明和 `bb4d7ff` 错误升版。
+- `5018953` 包可见性加固及 `482efd0` 回滚形成的无效历史链。
+- `3aeb754` Android Impeller 临时测试开关。
+- `core/singbox/engine.go`：孤立、未接入且与提交主题无关。
+- `.scratch/restore-color-picker/` 一次性开发拆解资料。
+- 旧 `lib/controller.dart` 和围绕旧控制器的实现。
+- 直接对运行配置做全局键排序、递归删除空字符串的实现。
+- HTTP 默认测速地址；恢复上游 HTTPS 默认值。
+- 删除免责声明入口的修改。
+- Direct 测速“修改后又撤销”的历史链。
+- DNS IPv6 来回修改的中间状态。
+- 将 `tray_manager` 切换到公共包的旧实现；优先采用 v0.8.94 依赖基线。
+- 旧版 `flutter_distributor` 替换方案和会隐式安装系统依赖的构建脚本。
+- 旧 Dashboard header 回退和只隐藏入口却保留不可达编辑逻辑的实现。
+- 所有旧生成文件和旧锁文件的手工差异。
+
+## 7. 合并热点
+
+- `lib/common/task.dart`：以上游覆写流程为主体，重新验证 Profile/App/overwrite 优先级。
+- `lib/models/config.dart`：保留上游模型，最小恢复 XClash 默认值和可见性字段。
+- `lib/application.dart`、`lib/manager/app_manager.dart`：迁移 Android 恢复行为，不恢复旧控制器。
+- Android Gradle/Service：保留新版构建链，重新移除 Firebase，并复核通知前台状态机。
+- `pubspec.yaml`：以上游依赖为基线；`pubspec.lock` 重新生成。
+- macOS/Windows/Linux 工程：保留上游平台修复和插件体系，再恢复 XClash 名称。
+- 本地化：ARB 源文件手工处理，只生成中英文输出。
+
+## 8. 验证清单
+
+- `flutter pub get`、代码生成、`flutter analyze --no-fatal-infos`、`flutter test --reporter expanded`。
+- 无旧 `lib/controller.dart` import，无 Firebase/Crashlytics/Google Services 残留。
+- 仅注册中文和英文 locale。
+- Profile、DNS、`external-controller`、自定义 overwrite 和空字符串显式清空均有测试。
+- Android 前后台、Doze、进程重建、VPN 残留、IP 刷新需真机验证。
+- Windows x64/ARM64、macOS Core/Rust、Linux 静默启动和各平台 XClash 产物名需分别验证。
+

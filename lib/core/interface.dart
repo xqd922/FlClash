@@ -4,7 +4,6 @@ import 'dart:convert';
 import 'package:fl_clash/common/common.dart';
 import 'package:fl_clash/enum/enum.dart';
 import 'package:fl_clash/models/models.dart';
-import 'package:flutter/foundation.dart';
 
 mixin CoreInterface {
   Future<bool> init(InitParams params);
@@ -25,8 +24,6 @@ mixin CoreInterface {
 
   Future<String> updateConfig(UpdateParams updateParams);
 
-  Future<String> updateExternalController(String externalController);
-
   Future<String> setupConfig(SetupParams setupParams);
 
   Future<ProxiesData> getProxies();
@@ -41,7 +38,7 @@ mixin CoreInterface {
 
   Future<String>? getExternalProvider(String externalProviderName);
 
-  Future<String> updateGeoData(UpdateGeoDataParams params);
+  Future<String> updateGeoData(String type);
 
   Future<String> sideLoadExternalProvider({
     required String providerName,
@@ -96,15 +93,14 @@ abstract class CoreHandlerInterface with CoreInterface {
       );
       return null;
     }
-    if (kDebugMode && watchExecution) {
-      commonPrint.log('Invoke ${method.name} ${DateTime.now()} $data');
-    }
-
     return await utils.handleWatch(
-      function: () async {
-        return await invoke<T>(method: method, data: data, timeout: timeout);
+      onStart: () {
+        commonPrint.log('Invoke ${method.name} ${DateTime.now()} $data');
       },
-      onWatch: (data, elapsedMilliseconds) {
+      function: () async {
+        return invoke<T>(method: method, data: data, timeout: timeout);
+      },
+      onEnd: (data, elapsedMilliseconds) {
         commonPrint.log('Invoke ${method.name} ${elapsedMilliseconds}ms');
       },
     );
@@ -164,15 +160,6 @@ abstract class CoreHandlerInterface with CoreInterface {
   }
 
   @override
-  Future<String> updateExternalController(String externalController) async {
-    return await _invoke<String>(
-          method: ActionMethod.updateConfig,
-          data: json.encode({externalControllerKey: externalController}),
-        ) ??
-        '';
-  }
-
-  @override
   Future<Result> getConfig(String path) async {
     final res = await _invoke(method: ActionMethod.getConfig, data: path);
     return res ?? Result.success({});
@@ -199,7 +186,7 @@ abstract class CoreHandlerInterface with CoreInterface {
     );
     return data != null
         ? ProxiesData.fromJson(data)
-        : ProxiesData(proxies: {}, all: []);
+        : const ProxiesData(proxies: {}, all: []);
   }
 
   @override
@@ -227,10 +214,10 @@ abstract class CoreHandlerInterface with CoreInterface {
   }
 
   @override
-  Future<String> updateGeoData(UpdateGeoDataParams params) async {
+  Future<String> updateGeoData(String type) async {
     return await _invoke<String>(
           method: ActionMethod.updateGeoData,
-          data: json.encode(params),
+          data: type,
         ) ??
         '';
   }
@@ -305,17 +292,17 @@ abstract class CoreHandlerInterface with CoreInterface {
   }
 
   @override
-  resetTraffic() {
+  FutureOr<void> resetTraffic() {
     _invoke(method: ActionMethod.resetTraffic);
   }
 
   @override
-  startLog() {
+  FutureOr<void> startLog() {
     _invoke(method: ActionMethod.startLog);
   }
 
   @override
-  stopLog() {
+  FutureOr<void> stopLog() {
     _invoke<bool>(method: ActionMethod.stopLog);
   }
 
@@ -339,7 +326,7 @@ abstract class CoreHandlerInterface with CoreInterface {
     return await _invoke<String>(
           method: ActionMethod.asyncTestDelay,
           data: json.encode(delayParams),
-          timeout: Duration(seconds: 6),
+          timeout: const Duration(seconds: 6),
         ) ??
         json.encode(Delay(name: proxyName, value: -1, url: url));
   }
