@@ -4,6 +4,7 @@ export 'builder.dart';
 export 'button.dart';
 export 'card.dart';
 export 'chip.dart';
+export 'color_scheme_box.dart';
 export 'container.dart';
 export 'dialog.dart';
 export 'disabled_mask.dart';

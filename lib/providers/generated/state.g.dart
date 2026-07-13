@@ -1873,7 +1873,7 @@ final class GenColorSchemeProvider
     with $Provider<ColorScheme> {
   const GenColorSchemeProvider._({
     required GenColorSchemeFamily super.from,
-    required Brightness super.argument,
+    required (Brightness, {Color? color, bool ignoreConfig}) super.argument,
   }) : super(
          retry: null,
          name: r'genColorSchemeProvider',
@@ -1889,7 +1889,7 @@ final class GenColorSchemeProvider
   String toString() {
     return r'genColorSchemeProvider'
         ''
-        '($argument)';
+        '$argument';
   }
 
   @$internal
@@ -1899,8 +1899,14 @@ final class GenColorSchemeProvider
 
   @override
   ColorScheme create(Ref ref) {
-    final argument = this.argument as Brightness;
-    return genColorScheme(ref, argument);
+    final argument =
+        this.argument as (Brightness, {Color? color, bool ignoreConfig});
+    return genColorScheme(
+      ref,
+      argument.$1,
+      color: argument.color,
+      ignoreConfig: argument.ignoreConfig,
+    );
   }
 
   /// {@macro riverpod.override_with_value}
@@ -1922,10 +1928,14 @@ final class GenColorSchemeProvider
   }
 }
 
-String _$genColorSchemeHash() => r'42245df13fadafb70c2f2b390891007512682e08';
+String _$genColorSchemeHash() => r'd33727cf0cb63a2535e3e4cc34f848d5d69cfbbb';
 
 final class GenColorSchemeFamily extends $Family
-    with $FunctionalFamilyOverride<ColorScheme, Brightness> {
+    with
+        $FunctionalFamilyOverride<
+          ColorScheme,
+          (Brightness, {Color? color, bool ignoreConfig})
+        > {
   const GenColorSchemeFamily._()
     : super(
         retry: null,
@@ -1935,8 +1945,14 @@ final class GenColorSchemeFamily extends $Family
         isAutoDispose: true,
       );
 
-  GenColorSchemeProvider call(Brightness brightness) =>
-      GenColorSchemeProvider._(argument: brightness, from: this);
+  GenColorSchemeProvider call(
+    Brightness brightness, {
+    Color? color,
+    bool ignoreConfig = false,
+  }) => GenColorSchemeProvider._(
+    argument: (brightness, color: color, ignoreConfig: ignoreConfig),
+    from: this,
+  );
 
   @override
   String toString() => r'genColorSchemeProvider';

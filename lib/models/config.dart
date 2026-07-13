@@ -189,6 +189,8 @@ abstract class ProxiesStyleProps with _$ProxiesStyleProps {
 @freezed
 abstract class ThemeProps with _$ThemeProps {
   const factory ThemeProps({
+    int? primaryColor,
+    @Default(defaultPrimaryColors) List<int> primaryColors,
     @Default(ThemeMode.system) ThemeMode themeMode,
   }) = _ThemeProps;
 

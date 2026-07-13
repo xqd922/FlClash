@@ -510,15 +510,25 @@ VM2<bool, int> checkIp(Ref ref) {
 @riverpod
 ColorScheme genColorScheme(
   Ref ref,
-  Brightness brightness,
-) {
-  ref.watch(themeSettingProvider);
+  Brightness brightness, {
+  Color? color,
+  bool ignoreConfig = false,
+}) {
+  final primaryColor = ref.watch(
+    themeSettingProvider.select((state) => state.primaryColor),
+  );
+  if (color == null && (ignoreConfig == true || primaryColor == null)) {
+    return ColorScheme.fromSeed(
+      seedColor:
+          globalState.corePalette
+              ?.toColorScheme(brightness: brightness)
+              .primary ??
+          globalState.accentColor,
+      brightness: brightness,
+    );
+  }
   return ColorScheme.fromSeed(
-    seedColor:
-        globalState.corePalette
-            ?.toColorScheme(brightness: brightness)
-            .primary ??
-        globalState.accentColor,
+    seedColor: color ?? Color(primaryColor!),
     brightness: brightness,
   );
 }
