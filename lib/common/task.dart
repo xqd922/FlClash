@@ -112,7 +112,12 @@ Future<VM2<String, String>> _makeRealProfileTask(
     );
   }
 
-  rawConfig['external-controller'] = realPatchConfig.externalController.value;
+  rawConfig['external-controller'] =
+      switch (realPatchConfig.externalController) {
+        ExternalControllerStatus.close => '',
+        ExternalControllerStatus.open =>
+          rawConfig['external-controller'] ?? defaultExternalController,
+      };
   rawConfig['external-ui'] = '';
   rawConfig['interface-name'] = '';
   rawConfig['external-ui-url'] = '';

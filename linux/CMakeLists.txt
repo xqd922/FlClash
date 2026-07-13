@@ -4,7 +4,7 @@ project(runner LANGUAGES CXX)
 
 # The name of the executable created for the application. Change this to change
 # the on-disk name of your application.
-set(BINARY_NAME "FlClash")
+set(BINARY_NAME "XClash")
 # The unique GTK application identifier for this application. See:
 # https://wiki.gnome.org/HowDoI/ChooseApplicationID
 set(APPLICATION_ID "com.follow.clash")
@@ -105,6 +105,14 @@ foreach(bundled_library ${PLUGIN_BUNDLED_LIBRARIES})
     DESTINATION "${INSTALL_BUNDLE_LIB_DIR}"
     COMPONENT Runtime)
 endforeach(bundled_library)
+
+install(PROGRAMS "${CMAKE_CURRENT_SOURCE_DIR}/../libclash/linux/FlClashCore"
+  DESTINATION "${CMAKE_INSTALL_PREFIX}"
+  RENAME "XClashCore"
+  COMPONENT Runtime)
+install(CODE "
+  file(REMOVE \"${CMAKE_INSTALL_PREFIX}/FlClashCore\")
+  " COMPONENT Runtime)
 
 # Copy the native assets provided by the build.dart from all packages.
 set(NATIVE_ASSETS_DIR "${PROJECT_BUILD_DIR}native_assets/linux/")

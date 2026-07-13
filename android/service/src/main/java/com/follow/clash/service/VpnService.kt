@@ -204,7 +204,7 @@ class VpnService : SystemVpnService(), IBaseService,
                     }
                 }
             }
-            setSession("FlClash")
+            setSession("XClash")
             setBlocking(false)
             if (Build.VERSION.SDK_INT >= 29) {
                 setMetered(false)
