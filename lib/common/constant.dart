@@ -100,7 +100,7 @@ const profilesStoreKey = PageStorageKey<String>('profiles');
 
 const defaultPrimaryColor = 0XFFD8C0C3;
 
-const defaultPrimaryColors = <int>[];
+const defaultPrimaryColors = <int>[0xFF475D92, 0xFF67568F];
 
 double getWidgetHeight(num lines) {
   final space = 14.mAp;
