@@ -24,6 +24,7 @@ class Window {
     if (system.isWindows) {
       protocol.register('clash');
       protocol.register('clashmeta');
+      protocol.register('xlclash');
       protocol.register('flclash');
     }
     await windowManager.ensureInitialized();

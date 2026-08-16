@@ -1,14 +1,14 @@
-display_name: XClash
+display_name: Xlclash
 
 icon: ./assets/images/icon.png
 
 keywords:
-  - XClash
+  - Xlclash
   - Clash
   - ClashMeta
   - Proxy
 
-generic_name: XClash
+generic_name: Xlclash
 
 categories:
   - Network

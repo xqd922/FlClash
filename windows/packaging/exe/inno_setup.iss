@@ -25,7 +25,8 @@ var
   i: Integer;
   ResultCode: Integer;
 begin
-  Processes := ['XClash.exe', 'XClashCore.exe', 'XClashHelperService.exe'];
+  Processes := ['Xlclash.exe', 'XlclashCore.exe', 'XlclashHelperService.exe',
+    'XClash.exe', 'XClashCore.exe', 'XClashHelperService.exe'];
 
   for i := 0 to GetArrayLength(Processes)-1 do
   begin

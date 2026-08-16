@@ -1,4 +1,4 @@
-display_name: XClash
+display_name: Xlclash
 
 packager: chen08209
 packagerEmail: chen08209@gmail.com
@@ -11,12 +11,12 @@ essential: false
 icon: ./assets/images/icon.png
 
 keywords:
-  - XClash
+  - Xlclash
   - Clash
   - ClashMeta
   - Proxy
 
-generic_name: XClash
+generic_name: Xlclash
 
 group: Applications/Internet
 

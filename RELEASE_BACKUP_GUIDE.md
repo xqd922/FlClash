@@ -63,7 +63,7 @@ flutter build linux --release
 #### 步骤 3：安装包位置
 - **Android APK**: `build/app/outputs/flutter-apk/app-release.apk`
 - **Windows**: `build/windows/x64/runner/Release/`
-- **macOS**: `build/macos/Build/Products/Release/FlClash.app`
+- **macOS**: `build/macos/Build/Products/Release/Xlclash.app`
 - **Linux**: `build/linux/x64/release/bundle/`
 
 ### 方法 2：临时恢复 Tag 并构建

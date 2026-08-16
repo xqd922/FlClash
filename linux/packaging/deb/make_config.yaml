@@ -1,5 +1,5 @@
-display_name: XClash
-package_name: XClash
+display_name: Xlclash
+package_name: xlclash
 maintainer:
   name: chen08209
   email: chen08209@gmail.com
@@ -15,12 +15,12 @@ dependencies:
   - libkeybinder-3.0-dev
 
 keywords:
-  - XClash
+  - Xlclash
   - Clash
   - ClashMeta
   - Proxy
 
-generic_name: XClash
+generic_name: Xlclash
 
 categories:
   - Network

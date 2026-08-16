@@ -1,11 +1,11 @@
 script_template: inno_setup.iss
 app_id: 728B3532-C74B-4870-9068-BE70FE12A3E6
-app_name: XClash
+app_name: Xlclash
 publisher: xqdwmq
 publisher_url: https://github.com/xqdwmq/FlClash
-display_name: XClash
-executable_name: XClash.exe
-output_base_file_name: XClash.exe
+display_name: Xlclash
+executable_name: Xlclash.exe
+output_base_file_name: Xlclash.exe
 setup_icon_file: ..\windows\runner\resources\app_icon.ico
 locales:
   - lang: zh

@@ -18,7 +18,7 @@ class MainActivity : FlutterActivity(),
     CoroutineScope by CoroutineScope(SupervisorJob() + Dispatchers.Default) {
 
     companion object {
-        private const val ENGINE_ID = "flclash_main_engine"
+        private const val ENGINE_ID = "xlclash_main_engine"
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {

@@ -93,9 +93,9 @@ class Build {
     BuildItem(target: Target.android, arch: Arch.amd64, archName: 'x86_64'),
   ];
 
-  static String get appName => 'XClash';
+  static String get appName => 'Xlclash';
 
-  static String get coreName => 'XClashCore';
+  static String get coreName => 'XlclashCore';
 
   static String get libName => 'libclash';
 
@@ -109,7 +109,10 @@ class Build {
 
   static String get version {
     final pubspec = File(join(current, 'pubspec.yaml')).readAsStringSync();
-    final match = RegExp(r'^version:\s*(.+)$', multiLine: true).firstMatch(pubspec);
+    final match = RegExp(
+      r'^version:\s*(.+)$',
+      multiLine: true,
+    ).firstMatch(pubspec);
     return match?.group(1)?.split('+').first ?? '0.0.0';
   }
 
@@ -294,7 +297,7 @@ class Build {
     final targetPath = join(
       outDir,
       target.name,
-      'XClashHelperService${target.executableExtensionName}',
+      'XlclashHelperService${target.executableExtensionName}',
     );
     await File(outPath).copy(targetPath);
   }
@@ -367,7 +370,6 @@ class BuildCommand extends Command {
     await envFile.writeAsString(json.encode(data));
   }
 
-
   Future<void> _installLinuxDeps() async {
     await Build.exec(Build.getExecutable('sudo apt update -y'));
     await Build.exec(
@@ -397,10 +399,7 @@ class BuildCommand extends Command {
     await _copyDist(target: target, archName: archName);
   }
 
-  Future<void> _copyDist({
-    required Target target,
-    String? archName,
-  }) async {
+  Future<void> _copyDist({required Target target, String? archName}) async {
     final distDir = Directory(Build.distPath);
     if (!distDir.existsSync()) {
       distDir.createSync(recursive: true);
@@ -419,11 +418,14 @@ class BuildCommand extends Command {
             if (!name.contains('arm64-v8a') &&
                 !name.contains('armeabi-v7a') &&
                 !name.contains('x86_64') &&
-                !name.contains('x86')) continue;
+                !name.contains('x86')) {
+              continue;
+            }
             final abi = name
                 .replaceAll('app-', '')
                 .replaceAll('-release.apk', '');
-            final outName = '${Build.appName}-${Build.version}-android-$abi.apk';
+            final outName =
+                '${Build.appName}-${Build.version}-android-$abi.apk';
             f.copySync(join(Build.distPath, outName));
           }
         }
@@ -546,7 +548,8 @@ class BuildCommand extends Command {
         _buildApp(
           target: target,
           targets: 'apk',
-          args: " --split-per-abi --target-platform ${defaultTargets.join(",")}",
+          args:
+              " --split-per-abi --target-platform ${defaultTargets.join(",")}",
           env: env,
         );
         return;

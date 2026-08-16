@@ -58,7 +58,7 @@ CLAUDE.md
 /android/core/**/cmake-build-*/
 /android/core/**/jniLibs/
 
-#FlClash
+# Xlclash
 /libclash/
 /android/app/src/main/jniLibs/
 /services/helper/target

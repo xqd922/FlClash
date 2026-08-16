@@ -16,7 +16,7 @@ use windows_service::{
     service_dispatcher, Result,
 };
 
-const SERVICE_NAME: &str = "FlClashHelperService";
+const SERVICE_NAME: &str = "XlclashHelperService";
 
 const SERVICE_TYPE: ServiceType = ServiceType::OWN_PROCESS;
 
@@ -61,7 +61,3 @@ async fn run_windows_service() -> anyhow::Result<()> {
 
     run_service().await
 }
-
-
-
-
