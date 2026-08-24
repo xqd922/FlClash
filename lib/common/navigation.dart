@@ -8,13 +8,12 @@ class Navigation {
 
   List<NavigationItem> getItems({
     bool openLogs = false,
-    bool openRequests = false,
     bool hasProxies = false,
   }) {
     return [
       NavigationItem(
         keep: false,
-        icon: Icon(Icons.space_dashboard),
+        icon: const Icon(Icons.space_dashboard),
         label: PageLabel.dashboard,
         builder: (_) =>
             const DashboardView(key: GlobalObjectKey(PageLabel.dashboard)),
@@ -29,23 +28,21 @@ class Navigation {
             : [],
       ),
       NavigationItem(
-        icon: Icon(Icons.folder),
+        icon: const Icon(Icons.folder),
         label: PageLabel.profiles,
         builder: (_) =>
             const ProfilesView(key: GlobalObjectKey(PageLabel.profiles)),
       ),
       NavigationItem(
-        icon: Icon(Icons.view_timeline),
+        icon: const Icon(Icons.view_timeline),
         label: PageLabel.requests,
         builder: (_) =>
             const RequestsView(key: GlobalObjectKey(PageLabel.requests)),
         description: 'requestsDesc',
-        modes: openRequests
-            ? [NavigationItemMode.desktop, NavigationItemMode.more]
-            : [],
+        modes: [NavigationItemMode.desktop, NavigationItemMode.more],
       ),
       NavigationItem(
-        icon: Icon(Icons.ballot),
+        icon: const Icon(Icons.ballot),
         label: PageLabel.connections,
         builder: (_) =>
             const ConnectionsView(key: GlobalObjectKey(PageLabel.connections)),
@@ -53,7 +50,7 @@ class Navigation {
         modes: [NavigationItemMode.desktop, NavigationItemMode.more],
       ),
       NavigationItem(
-        icon: Icon(Icons.storage),
+        icon: const Icon(Icons.storage),
         label: PageLabel.resources,
         description: 'resourcesDesc',
         builder: (_) =>
@@ -70,7 +67,7 @@ class Navigation {
             : [],
       ),
       NavigationItem(
-        icon: Icon(Icons.construction),
+        icon: const Icon(Icons.construction),
         label: PageLabel.tools,
         builder: (_) => const ToolsView(key: GlobalObjectKey(PageLabel.tools)),
         modes: [NavigationItemMode.desktop, NavigationItemMode.mobile],

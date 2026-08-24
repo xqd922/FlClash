@@ -41,7 +41,7 @@ final class AppSettingProvider
   }
 }
 
-String _$appSettingHash() => r'0efd340a05a5be1b1190b3f2e9465bdfc6182046';
+String _$appSettingHash() => r'520a3125e1d0baca1fb65abb2110ad4419f8b2d9';
 
 abstract class _$AppSetting extends $Notifier<AppSettingProps> {
   AppSettingProps build();
@@ -93,7 +93,7 @@ final class WindowSettingProvider
   }
 }
 
-String _$windowSettingHash() => r'd245796233fec671722ebed58e39c967d9a12142';
+String _$windowSettingHash() => r'563249378a248ed631ade7157b3a0c5289186d10';
 
 abstract class _$WindowSetting extends $Notifier<WindowProps> {
   WindowProps build();
@@ -144,7 +144,7 @@ final class VpnSettingProvider extends $NotifierProvider<VpnSetting, VpnProps> {
   }
 }
 
-String _$vpnSettingHash() => r'051f90f388a52678052b655827c48947150b7ca1';
+String _$vpnSettingHash() => r'dd0ff8720c2c4f22fc973305de8c87bcbee4536e';
 
 abstract class _$VpnSetting extends $Notifier<VpnProps> {
   VpnProps build();
@@ -196,7 +196,7 @@ final class NetworkSettingProvider
   }
 }
 
-String _$networkSettingHash() => r'54bd68084a1eb1b68650e353089c240d4a07f3a5';
+String _$networkSettingHash() => r'fa204b5ad21bc3e73c07aa6989f68c288ca20aaf';
 
 abstract class _$NetworkSetting extends $Notifier<NetworkProps> {
   NetworkProps build();
@@ -248,7 +248,7 @@ final class ThemeSettingProvider
   }
 }
 
-String _$themeSettingHash() => r'5b64a2e3968a60967534805b4bef3adf3712e77a';
+String _$themeSettingHash() => r'47c656bdac6ea1320d54c4599ce1fde993e989a1';
 
 abstract class _$ThemeSetting extends $Notifier<ThemeProps> {
   ThemeProps build();
@@ -508,7 +508,7 @@ final class ProxiesStyleSettingProvider
 }
 
 String _$proxiesStyleSettingHash() =>
-    r'b785ed2e71d74384150d80456d2b852e80629b8e';
+    r'af5e94bbe4145170f8a8c4771830b115a89e8c3c';
 
 abstract class _$ProxiesStyleSetting extends $Notifier<ProxiesStyleProps> {
   ProxiesStyleProps build();
@@ -528,12 +528,12 @@ abstract class _$ProxiesStyleSetting extends $Notifier<ProxiesStyleProps> {
   }
 }
 
-@ProviderFor(PatchClashConfig)
-final patchClashConfigProvider = PatchClashConfigProvider._();
+@ProviderFor(_PatchClashConfig)
+final patchClashConfigProvider = _PatchClashConfigProvider._();
 
-final class PatchClashConfigProvider
-    extends $NotifierProvider<PatchClashConfig, ClashConfig> {
-  PatchClashConfigProvider._()
+final class _PatchClashConfigProvider
+    extends $NotifierProvider<_PatchClashConfig, PatchClashConfig> {
+  _PatchClashConfigProvider._()
     : super(
         from: null,
         argument: null,
@@ -545,34 +545,86 @@ final class PatchClashConfigProvider
       );
 
   @override
-  String debugGetCreateSourceHash() => _$patchClashConfigHash();
+  String debugGetCreateSourceHash() => _$_patchClashConfigHash();
 
   @$internal
   @override
-  PatchClashConfig create() => PatchClashConfig();
+  _PatchClashConfig create() => _PatchClashConfig();
 
   /// {@macro riverpod.override_with_value}
-  Override overrideWithValue(ClashConfig value) {
+  Override overrideWithValue(PatchClashConfig value) {
     return $ProviderOverride(
       origin: this,
-      providerOverride: $SyncValueProvider<ClashConfig>(value),
+      providerOverride: $SyncValueProvider<PatchClashConfig>(value),
     );
   }
 }
 
-String _$patchClashConfigHash() => r'ff92f991ccb3a3d13a938affc006d7e2cb85fecd';
+String _$_patchClashConfigHash() => r'2a02c8f1ff5746c6c0b2248343bd729d4f2a5886';
 
-abstract class _$PatchClashConfig extends $Notifier<ClashConfig> {
-  ClashConfig build();
+abstract class _$PatchClashConfig extends $Notifier<PatchClashConfig> {
+  PatchClashConfig build();
   @$mustCallSuper
   @override
   WhenComplete runBuild() {
-    final ref = this.ref as $Ref<ClashConfig, ClashConfig>;
+    final ref = this.ref as $Ref<PatchClashConfig, PatchClashConfig>;
     final element =
         ref.element
             as $ClassProviderElement<
-              AnyNotifier<ClashConfig, ClashConfig>,
-              ClashConfig,
+              AnyNotifier<PatchClashConfig, PatchClashConfig>,
+              PatchClashConfig,
+              Object?,
+              Object?
+            >;
+    return element.handleCreate(ref, build);
+  }
+}
+
+@ProviderFor(ExcludeSSIDs)
+final excludeSSIDsProvider = ExcludeSSIDsProvider._();
+
+final class ExcludeSSIDsProvider
+    extends $NotifierProvider<ExcludeSSIDs, List<String>> {
+  ExcludeSSIDsProvider._()
+    : super(
+        from: null,
+        argument: null,
+        retry: null,
+        name: r'excludeSSIDsProvider',
+        isAutoDispose: true,
+        dependencies: null,
+        $allTransitiveDependencies: null,
+      );
+
+  @override
+  String debugGetCreateSourceHash() => _$excludeSSIDsHash();
+
+  @$internal
+  @override
+  ExcludeSSIDs create() => ExcludeSSIDs();
+
+  /// {@macro riverpod.override_with_value}
+  Override overrideWithValue(List<String> value) {
+    return $ProviderOverride(
+      origin: this,
+      providerOverride: $SyncValueProvider<List<String>>(value),
+    );
+  }
+}
+
+String _$excludeSSIDsHash() => r'a67805c76b58d19da1656783f4514111d6bf4e35';
+
+abstract class _$ExcludeSSIDs extends $Notifier<List<String>> {
+  List<String> build();
+  @$mustCallSuper
+  @override
+  WhenComplete runBuild() {
+    final ref = this.ref as $Ref<List<String>, List<String>>;
+    final element =
+        ref.element
+            as $ClassProviderElement<
+              AnyNotifier<List<String>, List<String>>,
+              List<String>,
               Object?,
               Object?
             >;
@@ -618,4 +670,4 @@ final class _ConfigProvider extends $FunctionalProvider<Config, Config, Config>
   }
 }
 
-String _$_configHash() => r'17dad8563f5727690a7fd484815e7344e6a46ffa';
+String _$_configHash() => r'7f29da1e31a3393fb36ab43c21f0d1b38223afec';

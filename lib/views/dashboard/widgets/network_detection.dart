@@ -26,6 +26,7 @@ class _NetworkDetectionState extends ConsumerState<NetworkDetection> {
 
   @override
   Widget build(BuildContext context) {
+    final appLocalizations = context.appLocalizations;
     final networkDetection = ref.watch(networkDetectionProvider);
     final ipInfo = networkDetection.ipInfo;
     final isLoading = networkDetection.isLoading;
@@ -67,6 +68,27 @@ class _NetworkDetectionState extends ConsumerState<NetworkDetection> {
                       ),
                     ),
                   ),
+                  const SizedBox(width: 2),
+                  AspectRatio(
+                    aspectRatio: 1,
+                    child: IconButton(
+                      padding: EdgeInsets.zero,
+                      onPressed: () {
+                        globalState.showMessage(
+                          title: appLocalizations.tip,
+                          message: TextSpan(
+                            text: appLocalizations.detectionTip,
+                          ),
+                          cancelable: false,
+                        );
+                      },
+                      icon: Icon(
+                        size: 16.ap,
+                        Icons.info_outline,
+                        color: context.colorScheme.onSurfaceVariant,
+                      ),
+                    ),
+                  ),
                 ],
               ),
             ),
@@ -87,7 +109,7 @@ class _NetworkDetectionState extends ConsumerState<NetworkDetection> {
                         )
                       : isLoading == false && ipInfo == null
                       ? Text(
-                          'timeout',
+                          'Timeout',
                           style: context.textTheme.bodyMedium
                               ?.copyWith(color: Colors.red)
                               .adjustSize(1),

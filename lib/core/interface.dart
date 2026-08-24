@@ -1,5 +1,4 @@
 import 'dart:async';
-import 'dart:io';
 
 import 'package:fl_clash/common/common.dart';
 import 'package:fl_clash/models/models.dart';
@@ -29,8 +28,6 @@ mixin CoreInterface {
   Future<Delay> asyncTestDelay(String url, String proxyName);
 
   Future<String> updateConfig(UpdateParams updateParams);
-
-  Future<String> updateExternalController(String externalController);
 
   Future<String> setupConfig(SetupParams setupParams);
 
@@ -80,50 +77,6 @@ mixin CoreInterface {
   FutureOr<bool> closeConnections();
 
   FutureOr<bool> resetConnections();
-
-  // ── 兼容垫片:产品层沿用的旧生命周期语义,基于新 start/stop/close 实现 ──
-
-  /// 内核服务是否已完成连接(对应旧 init completer 的 isCompleted)
-  bool get isCompleted;
-
-  /// 连接内核服务并等待就绪;返回错误消息,空串表示成功
-  Future<String> preload() async {
-    try {
-      await start();
-      return '';
-    } catch (e) {
-      return e.toString();
-    }
-  }
-
-  /// 停止内核服务
-  Future<void> shutdown([bool isUser = true]) async {
-    await stop();
-  }
-
-  /// 销毁内核生命周期(退出应用时调用)
-  Future<void> destroy() async {
-    await close();
-  }
-
-  /// 删除内核目录下的文件或目录;返回错误消息,空串表示成功。
-  /// 新内核已移除 deleteFile 方法,文件均位于应用私有目录,直接本地删除。
-  Future<String> deleteFile(String path) async {
-    try {
-      final type = FileSystemEntity.typeSync(path);
-      if (type == FileSystemEntityType.notFound) {
-        return '';
-      }
-      if (type == FileSystemEntityType.directory) {
-        await Directory(path).delete(recursive: true);
-      } else {
-        await File(path).delete();
-      }
-      return '';
-    } catch (e) {
-      return e.toString();
-    }
-  }
 }
 
 abstract class CoreHandlerInterface with CoreInterface {
@@ -192,15 +145,6 @@ abstract class CoreHandlerInterface with CoreInterface {
     return await _invokeMethod<String>(
           method: CoreMethod.updateConfig,
           arguments: updateParams.toJson(),
-        ) ??
-        '';
-  }
-
-  @override
-  Future<String> updateExternalController(String externalController) async {
-    return await _invokeMethod<String>(
-          method: CoreMethod.updateConfig,
-          arguments: {externalControllerKey: externalController},
         ) ??
         '';
   }

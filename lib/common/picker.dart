@@ -7,12 +7,12 @@ import 'package:image_picker/image_picker.dart';
 import 'package:mobile_scanner/mobile_scanner.dart';
 
 class Picker {
+  // file_picker 12 稳定版 saveFile 返回 Uri?,统一转换为路径字符串
+  String? _uriToPath(Uri? uri) => uri?.toFilePath(windows: Platform.isWindows);
+
   Future<PlatformFile?> pickerFile() async {
     return FilePicker.pickFile(initialDirectory: await appPath.downloadDirPath);
   }
-
-  // file_picker 12 稳定版 saveFile 返回 Uri?,统一转换为路径字符串
-  String? _uriToPath(Uri? uri) => uri?.toFilePath(windows: Platform.isWindows);
 
   Future<String?> saveFile(String fileName, Uint8List bytes) async {
     final path = _uriToPath(

@@ -24,9 +24,6 @@ class CoreService extends CoreHandlerInterface {
   late final StreamSubscription<DesktopCoreFailure> _crashSubscription;
   Future<CoreLifecycleResult>? _closeOperation;
 
-  @override
-  bool get isCompleted => _lifecycle.state is DesktopCoreRunning;
-
   factory CoreService() {
     return _instance ??= CoreService._create();
   }

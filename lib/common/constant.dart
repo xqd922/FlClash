@@ -9,28 +9,20 @@ import 'package:fl_clash/enum/enum.dart';
 import 'package:fl_clash/models/models.dart';
 import 'package:flutter/material.dart';
 
-const appName = 'Xlclash';
-const appHelperService = 'XlclashHelperService';
+const appName = 'FlClash';
+const appHelperService = 'FlClashHelperService';
+const coreManifestName = 'manifest.json';
 const coreName = 'clash.meta';
 const browserUa =
     'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36';
 const packageName = 'com.follow.clash';
-final unixSocketPath = '/tmp/XlclashSocket_${Random().nextInt(10000)}.sock';
-final windowsPipeName = '\\\\.\\pipe\\XlclashCore_${_randomPipeId()}';
+final unixSocketPath = '/tmp/FlClashSocket_${Random().nextInt(10000)}.sock';
+final windowsPipeName = '\\\\.\\pipe\\FlClashCore_${_randomPipeId()}';
 const helperPort = 47890;
-// 与 services/helper 端 PROTOCOL_VERSION_HEADER/PROTOCOL_VERSION 对应的线上协议常量
 const helperProtocolVersionHeader = 'x-flclash-helper-protocol';
 const helperProtocolVersion = '6';
-const coreManifestName = 'manifest.json';
-
-String _randomPipeId() {
-  final random = Random.secure();
-  return List.generate(
-    16,
-    (_) => random.nextInt(256).toRadixString(16).padLeft(2, '0'),
-  ).join();
-}
-
+const maxTextScale = 1.4;
+const minTextScale = 0.8;
 final baseInfoEdgeInsets = EdgeInsets.symmetric(
   vertical: 16.mAp,
   horizontal: 16.mAp,
@@ -41,12 +33,26 @@ final listHeaderPadding = EdgeInsets.only(
   top: 24.mAp,
   bottom: 8.mAp,
 );
+const sheetAppBarHeight = 68.0;
 
-const watchExecution = true;
+const watchExecution = false;
+
+String _randomPipeId() {
+  final random = Random.secure();
+  return List.generate(
+    16,
+    (_) => random.nextInt(256).toRadixString(16).padLeft(2, '0'),
+  ).join();
+}
 
 final defaultTextScaleFactor =
     WidgetsBinding.instance.platformDispatcher.textScaleFactor;
 const httpTimeoutDuration = Duration(milliseconds: 5000);
+
+/// Keep at or below the Core's delay-test concurrency (`mBatch` in
+/// core/common.go). Surplus requests queue inside the Core behind a full wave
+/// of 5s timeouts, which no RPC timeout can cover.
+const maxConcurrentDelayTests = 50;
 const moreDuration = Duration(milliseconds: 100);
 const animateDuration = Duration(milliseconds: 100);
 const midDuration = Duration(milliseconds: 200);
@@ -66,15 +72,15 @@ const localhost = '127.0.0.1';
 const clashConfigKey = 'clash_config';
 const configKey = 'config';
 const double dialogCommonWidth = 300;
-const repository = 'xqdwmq/FlClash';
+const repository = 'chen08209/FlClash';
 const defaultExternalController = '127.0.0.1:9090';
 const maxMobileWidth = 600;
 const maxLaptopWidth = 840;
-const defaultTestUrl = 'http://www.gstatic.com/generate_204';
+const defaultTestUrl = 'https://www.gstatic.com/generate_204';
 final commonFilter = ImageFilter.blur(
   sigmaX: 5,
   sigmaY: 5,
-  tileMode: TileMode.mirror,
+  tileMode: TileMode.clamp,
 );
 
 const listEquality = ListEquality();
@@ -89,6 +95,7 @@ const scriptListEquality = ListEquality<Script>();
 const externalProviderListEquality = ListEquality<ExternalProvider>();
 const packageListEquality = ListEquality<Package>();
 const profileListEquality = ListEquality<Profile>();
+const proxyGroupsEquality = ListEquality<ProxyGroup>();
 const hotKeyActionListEquality = ListEquality<HotKeyAction>();
 const stringAndStringMapEquality = MapEquality<String, String>();
 const stringAndStringMapEntryListEquality =
@@ -113,8 +120,6 @@ const profilesStoreKey = PageStorageKey<String>('profiles');
 
 const defaultPrimaryColor = 0XFFD8C0C3;
 
-const defaultPrimaryColors = <int>[0xFF35618E, 0xFF67568F];
-
 double getWidgetHeight(num lines) {
   final space = 14.mAp;
   return max(lines * (80.ap + space) - space, 0);
@@ -122,9 +127,19 @@ double getWidgetHeight(num lines) {
 
 const maxLength = 1000;
 
-final mainIsolate = 'XlclashMainIsolate';
+const mainIsolate = 'FlClashMainIsolate';
 
-final serviceIsolate = 'XlclashServiceIsolate';
+const serviceIsolate = 'FlClashServiceIsolate';
+
+const defaultPrimaryColors = [
+  0xFF795548,
+  0xFF03A9F4,
+  0xFFFFFF00,
+  0XFFBBC9CC,
+  0XFFABD397,
+  defaultPrimaryColor,
+  0XFF665390,
+];
 
 const scriptTemplate = '''
 const main = (config) => {

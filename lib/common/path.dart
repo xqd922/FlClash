@@ -8,7 +8,7 @@ import 'package:path_provider/path_provider.dart';
 class AppPath {
   static AppPath? _instance;
   Completer<Directory> dataDir = Completer();
-  Completer<Directory> downloadDir = Completer();
+  late final Future<Directory?> _downloadDir = getDownloadsDirectory();
   Completer<Directory> tempDir = Completer();
   Completer<Directory> cacheDir = Completer();
   late String appDirPath;
@@ -20,9 +20,6 @@ class AppPath {
     });
     getTemporaryDirectory().then((value) {
       tempDir.complete(value);
-    });
-    getDownloadsDirectory().then((value) {
-      downloadDir.complete(value);
     });
     getApplicationCacheDirectory().then((value) {
       cacheDir.complete(value);
@@ -44,7 +41,7 @@ class AppPath {
   }
 
   String get corePath {
-    return join(executableDirPath, 'XlclashCore$executableExtension');
+    return join(executableDirPath, 'FlClashCore$executableExtension');
   }
 
   String get helperPath {
@@ -52,8 +49,8 @@ class AppPath {
   }
 
   Future<String> get downloadDirPath async {
-    final directory = await downloadDir.future;
-    return directory.path;
+    final directory = await _downloadDir;
+    return directory?.path ?? await homeDirPath;
   }
 
   Future<String> get homeDirPath async {
@@ -83,7 +80,7 @@ class AppPath {
 
   Future<String> get lockFilePath async {
     final homeDirPath = await appPath.homeDirPath;
-    return join(homeDirPath, 'Xlclash.lock');
+    return join(homeDirPath, 'FlClash.lock');
   }
 
   Future<String> get configFilePath async {

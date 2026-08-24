@@ -97,29 +97,6 @@ class CoreController {
     return _interface.updateConfig(updateParams);
   }
 
-  Future<String> updateExternalController(String externalController) async {
-    return await _interface.updateExternalController(externalController);
-  }
-
-  // ── 兼容垫片转发:旧产品层生命周期 API(实现见 CoreInterface)──
-  bool get isCompleted => _interface.isCompleted;
-
-  Future<String> preload() {
-    return _interface.preload();
-  }
-
-  Future<void> shutdown([bool isUser = true]) async {
-    await _interface.shutdown(isUser);
-  }
-
-  Future<void> destroy() async {
-    await _interface.destroy();
-  }
-
-  Future<String> deleteFile(String path) {
-    return _interface.deleteFile(path);
-  }
-
   Future<String> setupConfig({
     required SetupParams params,
     Future<void> Function()? preloadInvoke,
