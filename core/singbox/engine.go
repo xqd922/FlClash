@@ -1,3 +1,8 @@
+//go:build singbox
+
+// 实验性 sing-box 引擎,当前未被任何代码引用,且依赖的 SagerNet/sing-box
+// 已不在模块依赖图中。默认不参与编译;需要时使用 `-tags singbox` 并补回依赖。
+
 package singbox
 
 import (
