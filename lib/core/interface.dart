@@ -32,6 +32,9 @@ mixin CoreInterface {
   // 本地定制:部分补丁外部控制器地址(空串即关闭)
   Future<String> updateExternalController(String externalController);
 
+  /// 内核是否处于运行状态(本地定制,用于停止前清理判断)
+  bool get isCompleted;
+
   Future<String> setupConfig(SetupParams setupParams);
 
   Future<ProxiesData> getProxies();

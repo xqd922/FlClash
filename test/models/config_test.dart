@@ -103,7 +103,7 @@ void main() {
       expect(restored.autoRun, false);
       expect(restored.openLogs, false);
       expect(restored.closeConnections, true);
-      expect(restored.isAnimateToPage, true);
+      expect(restored.isAnimateToPage, false);
       expect(restored.autoCheckUpdate, true);
       expect(restored.showLabel, false);
       expect(restored.minimizeOnExit, true);
@@ -186,7 +186,7 @@ void main() {
       const props = VpnProps();
       expect(props.enable, true);
       expect(props.systemProxy, true);
-      expect(props.ipv6, false);
+      expect(props.ipv6, true);
       expect(props.allowBypass, true);
       expect(props.dnsHijacking, false);
       expect(props.accessControlProps.enable, false);

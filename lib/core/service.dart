@@ -24,6 +24,17 @@ class CoreService extends CoreHandlerInterface {
   late final StreamSubscription<DesktopCoreFailure> _crashSubscription;
   Future<CoreLifecycleResult>? _closeOperation;
 
+  @override
+  bool get isCompleted {
+    // 容忍状态源异常(如测试替身未打桩),视为未运行
+    try {
+      final DesktopCoreState? state = _lifecycle.state;
+      return state is DesktopCoreRunning;
+    } catch (_) {
+      return false;
+    }
+  }
+
   factory CoreService() {
     return _instance ??= CoreService._create();
   }
@@ -76,7 +87,17 @@ class CoreService extends CoreHandlerInterface {
   Future<CoreLifecycleResult> restart() => _lifecycle.restart();
 
   @override
-  Future<CoreLifecycleResult> stop() => _lifecycle.stop();
+  Future<CoreLifecycleResult> stop() async {
+    // 本地定制:停止前清空外部控制器,避免 REST 端口残留暴露
+    if (isCompleted) {
+      try {
+        await updateExternalController('');
+      } catch (_) {
+        // 内核可能已退出,忽略
+      }
+    }
+    return _lifecycle.stop();
+  }
 
   @override
   Future<CoreLifecycleResult> close() {

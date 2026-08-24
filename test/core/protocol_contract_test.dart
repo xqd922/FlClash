@@ -13,6 +13,9 @@ class _RecordingCoreHandler extends CoreHandlerInterface {
   final Map<CoreMethod, Object?> calls = {};
 
   @override
+  bool get isCompleted => true;
+
+  @override
   Future<CoreLifecycleResult> start() async => const CoreLifecycleResult(
     revision: 1,
     outcome: CoreLifecycleOutcome.applied,

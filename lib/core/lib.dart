@@ -18,6 +18,9 @@ class CoreLib extends CoreHandlerInterface {
   int _methodCallId = 0;
   bool _closed = false;
 
+  @override
+  bool get isCompleted => _connectedCompleter.isCompleted;
+
   CoreLib._internal();
 
   factory CoreLib() {
@@ -77,6 +80,12 @@ class CoreLib extends CoreHandlerInterface {
         revision: revision,
         outcome: CoreLifecycleOutcome.coalesced,
       );
+    }
+    // 本地定制:停止前清空外部控制器,避免 REST 端口残留暴露
+    try {
+      await updateExternalController('');
+    } catch (_) {
+      // 内核可能已退出,忽略
     }
     _connectedCompleter = Completer<bool>();
     final stopped = await service?.shutdown() ?? true;
