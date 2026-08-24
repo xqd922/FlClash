@@ -11,14 +11,15 @@ import 'application.dart';
 import 'common/common.dart';
 
 Future<void> main() async {
-  WidgetsFlutterBinding.ensureInitialized();
   try {
+    WidgetsFlutterBinding.ensureInitialized();
+    PaintingBinding.instance.imageCache.maximumSizeBytes = 50 * 1024 * 1024;
     if (system.isDesktop) {
       await RustLib.init();
     }
     final version = await system.init();
     final container = await globalState.init(version);
-    HttpOverrides.global = FlClashHttpOverrides();
+    HttpOverrides.global = XlclashHttpOverrides();
     runApp(
       UncontrolledProviderScope(
         container: container,

@@ -3479,10 +3479,10 @@ class AppLocalizations {
     );
   }
 
-  /// `Helper service unavailable; TUN mode cannot be enabled. Reinstall FlClash to restore it.`
+  /// `Helper service unavailable; TUN mode cannot be enabled. Reinstall Xlclash to restore it.`
   String get helperCorruptTip {
     return Intl.message(
-      'Helper service unavailable; TUN mode cannot be enabled. Reinstall FlClash to restore it.',
+      'Helper service unavailable; TUN mode cannot be enabled. Reinstall Xlclash to restore it.',
       name: 'helperCorruptTip',
       desc: '',
       args: [],
@@ -4531,8 +4531,6 @@ class AppLocalizationDelegate extends LocalizationsDelegate<AppLocalizations> {
   List<Locale> get supportedLocales {
     return const <Locale>[
       Locale.fromSubtags(languageCode: 'en'),
-      Locale.fromSubtags(languageCode: 'ja'),
-      Locale.fromSubtags(languageCode: 'ru'),
       Locale.fromSubtags(languageCode: 'zh', countryCode: 'CN'),
     ];
   }
