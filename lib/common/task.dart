@@ -112,35 +112,39 @@ Future<VM2<String, String>> _makeRealProfileTask(
     );
   }
 
-  rawConfig['external-controller'] = realPatchConfig.externalController.value;
+  // 本地定制:关闭时清空外部控制器;开启时保留配置自带地址或回退默认值
+  rawConfig[externalControllerKey] =
+      realPatchConfig.externalController == ExternalControllerStatus.close
+          ? ''
+          : (rawConfig[externalControllerKey] as String? ??
+                realPatchConfig.externalController.value);
   rawConfig['external-ui'] = '';
   rawConfig['interface-name'] = '';
   rawConfig['external-ui-url'] = '';
-  rawConfig['tcp-concurrent'] = realPatchConfig.tcpConcurrent;
-  rawConfig['unified-delay'] = realPatchConfig.unifiedDelay;
-  rawConfig['ipv6'] = realPatchConfig.ipv6;
-  rawConfig['log-level'] = realPatchConfig.logLevel.name;
-  rawConfig['port'] = 0;
-  rawConfig['socks-port'] = 0;
-  rawConfig['keep-alive-interval'] = realPatchConfig.keepAliveInterval;
-  rawConfig['mixed-port'] = realPatchConfig.mixedPort;
-  rawConfig['port'] = realPatchConfig.port;
-  rawConfig['socks-port'] = realPatchConfig.socksPort;
-  rawConfig['redir-port'] = realPatchConfig.redirPort;
-  rawConfig['tproxy-port'] = realPatchConfig.tproxyPort;
-  rawConfig['find-process-mode'] = realPatchConfig.findProcessMode.name;
-  rawConfig['allow-lan'] = realPatchConfig.allowLan;
-  rawConfig['mode'] = realPatchConfig.mode.name;
+  // 本地定制:仅补默认值,保留配置文件已显式设置的项
+  rawConfig['tcp-concurrent'] ??= realPatchConfig.tcpConcurrent;
+  rawConfig['unified-delay'] ??= realPatchConfig.unifiedDelay;
+  rawConfig['ipv6'] ??= realPatchConfig.ipv6;
+  rawConfig['log-level'] ??= realPatchConfig.logLevel.name;
+  rawConfig['port'] ??= realPatchConfig.port;
+  rawConfig['socks-port'] ??= realPatchConfig.socksPort;
+  rawConfig['keep-alive-interval'] ??= realPatchConfig.keepAliveInterval;
+  rawConfig['mixed-port'] ??= realPatchConfig.mixedPort;
+  rawConfig['redir-port'] ??= realPatchConfig.redirPort;
+  rawConfig['tproxy-port'] ??= realPatchConfig.tproxyPort;
+  rawConfig['find-process-mode'] ??= realPatchConfig.findProcessMode.name;
+  rawConfig['allow-lan'] ??= realPatchConfig.allowLan;
+  rawConfig['mode'] ??= realPatchConfig.mode.name;
   if (rawConfig['tun'] == null) {
     rawConfig['tun'] = {};
   }
-  rawConfig['tun']['enable'] = realPatchConfig.tun.enable;
-  rawConfig['tun']['device'] = realPatchConfig.tun.device;
-  rawConfig['tun']['dns-hijack'] = realPatchConfig.tun.dnsHijack;
-  rawConfig['tun']['stack'] = realPatchConfig.tun.stack.name;
-  rawConfig['tun']['route-address'] = realPatchConfig.tun.routeAddress;
-  rawConfig['tun']['auto-route'] = realPatchConfig.tun.autoRoute;
-  rawConfig['geodata-loader'] = realPatchConfig.geodataLoader.name;
+  rawConfig['tun']['enable'] ??= realPatchConfig.tun.enable;
+  rawConfig['tun']['device'] ??= realPatchConfig.tun.device;
+  rawConfig['tun']['dns-hijack'] ??= realPatchConfig.tun.dnsHijack;
+  rawConfig['tun']['stack'] ??= realPatchConfig.tun.stack.name;
+  rawConfig['tun']['route-address'] ??= realPatchConfig.tun.routeAddress;
+  rawConfig['tun']['auto-route'] ??= realPatchConfig.tun.autoRoute;
+  rawConfig['geodata-loader'] ??= realPatchConfig.geodataLoader.name;
   if (rawConfig['sniffer']?['sniff'] != null) {
     for (final value in (rawConfig['sniffer']?['sniff'] as Map).values) {
       if (value['ports'] != null && value['ports'] is List) {
@@ -267,8 +271,72 @@ Future<VM2<String, String>> _makeRealProfileTask(
     rawConfig['proxy-groups'] = data.proxyGroups;
   }
   rawConfig['rules'] = rules;
+  // 本地定制:剔除 null 字段并按固定顺序排列顶层键
+  _stripNull(rawConfig);
+  _sortConfig(rawConfig);
   final yaml = await _encodeYaml(Map<String, dynamic>.from(rawConfig));
   return VM2(yaml, yaml.toMd5());
+}
+
+const _configKeyOrder = [
+  'mixed-port',
+  'port',
+  'socks-port',
+  'redir-port',
+  'tproxy-port',
+  'allow-lan',
+  'bind-address',
+  'mode',
+  'log-level',
+  'ipv6',
+  'unified-delay',
+  'tcp-concurrent',
+  'keep-alive-idle',
+  'keep-alive-interval',
+  'find-process-mode',
+  'external-controller',
+  'external-ui',
+  'external-ui-url',
+  'secret',
+  'interface-name',
+  'profile',
+  'sniffer',
+  'dns',
+  'hosts',
+  'proxies',
+  'proxy-groups',
+  'proxy-providers',
+  'rule-providers',
+  'sub-rules',
+  'listeners',
+  'rules',
+];
+
+void _sortConfig(Map<dynamic, dynamic> config) {
+  final sorted = <dynamic, dynamic>{};
+  final remaining = Map<dynamic, dynamic>.from(config);
+  for (final key in _configKeyOrder) {
+    if (remaining.containsKey(key)) {
+      sorted[key] = remaining.remove(key);
+    }
+  }
+  sorted.addAll(remaining);
+  config
+    ..clear()
+    ..addAll(sorted);
+}
+
+void _stripNull(dynamic value) {
+  if (value is Map) {
+    for (final v in value.values) {
+      _stripNull(v);
+    }
+    value.removeWhere((_, v) => v == null);
+  } else if (value is List) {
+    for (final v in value) {
+      _stripNull(v);
+    }
+  }
 }
 
 Future<List<String>> shakingProfileTask(
