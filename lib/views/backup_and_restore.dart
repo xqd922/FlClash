@@ -103,7 +103,7 @@ class BackupAndRestore extends ConsumerWidget {
   }
 
   Future<void> _restoreOnLocal(RestoreOption option) async {
-    final file = await picker.pickerFile(withData: false);
+    final file = await picker.pickerFile();
     final path = file?.path;
     if (path == null) return;
     await File(path).safeCopy(await appPath.backupFilePath);

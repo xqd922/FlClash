@@ -43,6 +43,7 @@ class GlobalState {
   UpdateTasks tasks = [];
   SetupState? lastSetupState;
   VpnState? lastVpnState;
+  late ProviderContainer container;
 
   bool get isStart => startTime != null && startTime!.isBeforeNow;
 
@@ -96,7 +97,7 @@ class GlobalState {
       },
     );
     final configOverrides = buildConfigOverrides(config);
-    final container = ProviderContainer(
+    container = ProviderContainer(
       overrides: [...appStateOverrides, ...configOverrides],
     );
     final profiles = await database.profilesDao.all().get();

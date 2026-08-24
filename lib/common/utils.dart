@@ -329,13 +329,15 @@ class Utils {
 
   FutureOr<T> handleWatch<T>({
     required Function function,
-    required void Function(T data, int elapsedMilliseconds) onWatch,
+    required void Function() onStart,
+    required void Function(T data, int elapsedMilliseconds) onEnd,
   }) async {
     if (kDebugMode && watchExecution) {
+      onStart();
       final stopwatch = Stopwatch()..start();
       final res = await function();
       stopwatch.stop();
-      onWatch(res, stopwatch.elapsedMilliseconds);
+      onEnd(res, stopwatch.elapsedMilliseconds);
       return res;
     }
     return await function();

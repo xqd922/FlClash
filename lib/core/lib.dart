@@ -18,6 +18,9 @@ class CoreLib extends CoreHandlerInterface {
   int _methodCallId = 0;
   bool _closed = false;
 
+  @override
+  bool get isCompleted => _connectedCompleter.isCompleted;
+
   CoreLib._internal();
 
   factory CoreLib() {

@@ -346,15 +346,15 @@ extension ProfilesControllerExt on AppController {
 
   Future<void> addProfileFormFile() async {
     final platformFile = await safeRun(picker.pickerFile);
-    final bytes = platformFile?.bytes;
-    if (bytes == null) {
+    if (platformFile == null) {
       return;
     }
+    final bytes = await platformFile.readBytes();
     if (!_context.mounted) return;
     globalState.navigatorKey.currentState?.popUntil((route) => route.isFirst);
     toProfiles();
     final profile = await loadingRun(tag: LoadingTag.profiles, () async {
-      return await Profile.normal(label: platformFile?.name).saveFile(bytes);
+      return await Profile.normal(label: platformFile.name).saveFile(bytes);
     }, title: appLocalizations.addProfile);
     if (profile != null) {
       putProfile(profile);
@@ -698,7 +698,7 @@ extension SetupControllerExt on AppController {
     bool silence = false,
     bool force = false,
     bool? enableExternalController,
-    VoidCallback? preloadInvoke,
+    Future<void> Function()? preloadInvoke,
   }) async {
     if (!force && !await needSetup()) {
       return;
@@ -790,7 +790,7 @@ extension SetupControllerExt on AppController {
   }
 
   Future<void> _setupConfig(
-    VoidCallback? preloadInvoke, {
+    Future<void> Function()? preloadInvoke, {
     bool? enableExternalController,
   }) async {
     commonPrint.log('setup ===>');
@@ -820,7 +820,6 @@ extension SetupControllerExt on AppController {
           enableExternalController ?? _ref.read(isStartProvider),
     );
     final message = await coreController.setupConfig(
-      setupState: setupState,
       params: setupParams,
       preloadInvoke: preloadInvoke,
     );

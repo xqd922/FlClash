@@ -1,3 +1,14 @@
+## Xlclash upstream merge (v0.8.96 kernel, 2026-08-24)
+
+Adopt upstream v0.8.96 kernel & low-level layers; local UI/product intent unchanged.
+
+- Go core: wrapper refactor (action.go -> method/message, hub/lib/server rewrite); Clash.Meta submodule c27f82fb -> 0f7f05ad
+- Desktop helper (Rust): adopt hub/windows service rewrite; service name kept XlclashHelperService
+- Dart bridge: adopt desktop RPC architecture; legacy lifecycle APIs (preload/shutdown/destroy/isCompleted/deleteFile) re-implemented as compatibility shims over start/stop/close
+- Android: adopt ManagedService/ProxyService/VpnService restructure and TV support; re-applied Firebase strip, applicationId com.xqd922.flclash, engine cache, VpnResidualCleaner, MTU 4064, network-switch disconnect, notification notify(), Doze guard, ALWAYS_ON, xlclash deep link, Impeller off
+- Windows/Linux/macOS: adopt runner/packaging updates; re-applied Xlclash naming and core binary install rules
+- Deps: sync with upstream pubspec (riverpod 4 codegen regenerated); version stays 7.x
+
 ## v0.8.92
 
 - Add sqlite store

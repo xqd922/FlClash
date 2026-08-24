@@ -86,7 +86,13 @@ final class WindowsHelperClient {
 
   // The Helper protocol is loopback-only; never route it through a proxy.
   static Dio _createLoopbackDio() {
-    return Dio()
+    // dio 5.9 的 Options 构造不再接受 connectTimeout,超时统一在实例上设置
+    return Dio(
+      BaseOptions(
+        connectTimeout: const Duration(milliseconds: 300),
+        receiveTimeout: const Duration(seconds: 2),
+      ),
+    )
       ..httpClientAdapter = IOHttpClientAdapter(
         createHttpClient: () {
           final client = HttpClient();
@@ -373,8 +379,6 @@ final class WindowsHelperClient {
   Options _options(ResponseType responseType, {bool acceptAnyStatus = false}) {
     return Options(
       responseType: responseType,
-      connectTimeout: const Duration(milliseconds: 300),
-      receiveTimeout: const Duration(seconds: 2),
       // The Helper reports readiness via non-2xx (400, 409, ...), so only
       // transport errors should surface as DioExceptions.
       validateStatus: acceptAnyStatus ? (_) => true : null,

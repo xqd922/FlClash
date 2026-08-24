@@ -10,11 +10,11 @@ part of '../app.dart';
 // ignore_for_file: type=lint, type=warning
 
 @ProviderFor(RealTunEnable)
-const realTunEnableProvider = RealTunEnableProvider._();
+final realTunEnableProvider = RealTunEnableProvider._();
 
 final class RealTunEnableProvider
     extends $NotifierProvider<RealTunEnable, bool> {
-  const RealTunEnableProvider._()
+  RealTunEnableProvider._()
     : super(
         from: null,
         argument: null,
@@ -47,8 +47,7 @@ abstract class _$RealTunEnable extends $Notifier<bool> {
   bool build();
   @$mustCallSuper
   @override
-  void runBuild() {
-    final created = build();
+  WhenComplete runBuild() {
     final ref = this.ref as $Ref<bool, bool>;
     final element =
         ref.element
@@ -58,15 +57,15 @@ abstract class _$RealTunEnable extends $Notifier<bool> {
               Object?,
               Object?
             >;
-    element.handleValue(ref, created);
+    return element.handleCreate(ref, build);
   }
 }
 
 @ProviderFor(Logs)
-const logsProvider = LogsProvider._();
+final logsProvider = LogsProvider._();
 
 final class LogsProvider extends $NotifierProvider<Logs, FixedList<Log>> {
-  const LogsProvider._()
+  LogsProvider._()
     : super(
         from: null,
         argument: null,
@@ -99,8 +98,7 @@ abstract class _$Logs extends $Notifier<FixedList<Log>> {
   FixedList<Log> build();
   @$mustCallSuper
   @override
-  void runBuild() {
-    final created = build();
+  WhenComplete runBuild() {
     final ref = this.ref as $Ref<FixedList<Log>, FixedList<Log>>;
     final element =
         ref.element
@@ -110,16 +108,16 @@ abstract class _$Logs extends $Notifier<FixedList<Log>> {
               Object?,
               Object?
             >;
-    element.handleValue(ref, created);
+    return element.handleCreate(ref, build);
   }
 }
 
 @ProviderFor(Requests)
-const requestsProvider = RequestsProvider._();
+final requestsProvider = RequestsProvider._();
 
 final class RequestsProvider
     extends $NotifierProvider<Requests, FixedList<TrackerInfo>> {
-  const RequestsProvider._()
+  RequestsProvider._()
     : super(
         from: null,
         argument: null,
@@ -152,8 +150,7 @@ abstract class _$Requests extends $Notifier<FixedList<TrackerInfo>> {
   FixedList<TrackerInfo> build();
   @$mustCallSuper
   @override
-  void runBuild() {
-    final created = build();
+  WhenComplete runBuild() {
     final ref =
         this.ref as $Ref<FixedList<TrackerInfo>, FixedList<TrackerInfo>>;
     final element =
@@ -164,16 +161,16 @@ abstract class _$Requests extends $Notifier<FixedList<TrackerInfo>> {
               Object?,
               Object?
             >;
-    element.handleValue(ref, created);
+    return element.handleCreate(ref, build);
   }
 }
 
 @ProviderFor(Providers)
-const providersProvider = ProvidersProvider._();
+final providersProvider = ProvidersProvider._();
 
 final class ProvidersProvider
     extends $NotifierProvider<Providers, List<ExternalProvider>> {
-  const ProvidersProvider._()
+  ProvidersProvider._()
     : super(
         from: null,
         argument: null,
@@ -206,8 +203,7 @@ abstract class _$Providers extends $Notifier<List<ExternalProvider>> {
   List<ExternalProvider> build();
   @$mustCallSuper
   @override
-  void runBuild() {
-    final created = build();
+  WhenComplete runBuild() {
     final ref =
         this.ref as $Ref<List<ExternalProvider>, List<ExternalProvider>>;
     final element =
@@ -218,16 +214,16 @@ abstract class _$Providers extends $Notifier<List<ExternalProvider>> {
               Object?,
               Object?
             >;
-    element.handleValue(ref, created);
+    return element.handleCreate(ref, build);
   }
 }
 
 @ProviderFor(Packages)
-const packagesProvider = PackagesProvider._();
+final packagesProvider = PackagesProvider._();
 
 final class PackagesProvider
     extends $NotifierProvider<Packages, List<Package>> {
-  const PackagesProvider._()
+  PackagesProvider._()
     : super(
         from: null,
         argument: null,
@@ -260,8 +256,7 @@ abstract class _$Packages extends $Notifier<List<Package>> {
   List<Package> build();
   @$mustCallSuper
   @override
-  void runBuild() {
-    final created = build();
+  WhenComplete runBuild() {
     final ref = this.ref as $Ref<List<Package>, List<Package>>;
     final element =
         ref.element
@@ -271,16 +266,16 @@ abstract class _$Packages extends $Notifier<List<Package>> {
               Object?,
               Object?
             >;
-    element.handleValue(ref, created);
+    return element.handleCreate(ref, build);
   }
 }
 
 @ProviderFor(SystemBrightness)
-const systemBrightnessProvider = SystemBrightnessProvider._();
+final systemBrightnessProvider = SystemBrightnessProvider._();
 
 final class SystemBrightnessProvider
     extends $NotifierProvider<SystemBrightness, Brightness> {
-  const SystemBrightnessProvider._()
+  SystemBrightnessProvider._()
     : super(
         from: null,
         argument: null,
@@ -313,8 +308,7 @@ abstract class _$SystemBrightness extends $Notifier<Brightness> {
   Brightness build();
   @$mustCallSuper
   @override
-  void runBuild() {
-    final created = build();
+  WhenComplete runBuild() {
     final ref = this.ref as $Ref<Brightness, Brightness>;
     final element =
         ref.element
@@ -324,16 +318,16 @@ abstract class _$SystemBrightness extends $Notifier<Brightness> {
               Object?,
               Object?
             >;
-    element.handleValue(ref, created);
+    return element.handleCreate(ref, build);
   }
 }
 
 @ProviderFor(Traffics)
-const trafficsProvider = TrafficsProvider._();
+final trafficsProvider = TrafficsProvider._();
 
 final class TrafficsProvider
     extends $NotifierProvider<Traffics, FixedList<Traffic>> {
-  const TrafficsProvider._()
+  TrafficsProvider._()
     : super(
         from: null,
         argument: null,
@@ -366,8 +360,7 @@ abstract class _$Traffics extends $Notifier<FixedList<Traffic>> {
   FixedList<Traffic> build();
   @$mustCallSuper
   @override
-  void runBuild() {
-    final created = build();
+  WhenComplete runBuild() {
     final ref = this.ref as $Ref<FixedList<Traffic>, FixedList<Traffic>>;
     final element =
         ref.element
@@ -377,16 +370,16 @@ abstract class _$Traffics extends $Notifier<FixedList<Traffic>> {
               Object?,
               Object?
             >;
-    element.handleValue(ref, created);
+    return element.handleCreate(ref, build);
   }
 }
 
 @ProviderFor(TotalTraffic)
-const totalTrafficProvider = TotalTrafficProvider._();
+final totalTrafficProvider = TotalTrafficProvider._();
 
 final class TotalTrafficProvider
     extends $NotifierProvider<TotalTraffic, Traffic> {
-  const TotalTrafficProvider._()
+  TotalTrafficProvider._()
     : super(
         from: null,
         argument: null,
@@ -419,8 +412,7 @@ abstract class _$TotalTraffic extends $Notifier<Traffic> {
   Traffic build();
   @$mustCallSuper
   @override
-  void runBuild() {
-    final created = build();
+  WhenComplete runBuild() {
     final ref = this.ref as $Ref<Traffic, Traffic>;
     final element =
         ref.element
@@ -430,15 +422,15 @@ abstract class _$TotalTraffic extends $Notifier<Traffic> {
               Object?,
               Object?
             >;
-    element.handleValue(ref, created);
+    return element.handleCreate(ref, build);
   }
 }
 
 @ProviderFor(LocalIp)
-const localIpProvider = LocalIpProvider._();
+final localIpProvider = LocalIpProvider._();
 
 final class LocalIpProvider extends $NotifierProvider<LocalIp, String?> {
-  const LocalIpProvider._()
+  LocalIpProvider._()
     : super(
         from: null,
         argument: null,
@@ -471,8 +463,7 @@ abstract class _$LocalIp extends $Notifier<String?> {
   String? build();
   @$mustCallSuper
   @override
-  void runBuild() {
-    final created = build();
+  WhenComplete runBuild() {
     final ref = this.ref as $Ref<String?, String?>;
     final element =
         ref.element
@@ -482,15 +473,15 @@ abstract class _$LocalIp extends $Notifier<String?> {
               Object?,
               Object?
             >;
-    element.handleValue(ref, created);
+    return element.handleCreate(ref, build);
   }
 }
 
 @ProviderFor(RunTime)
-const runTimeProvider = RunTimeProvider._();
+final runTimeProvider = RunTimeProvider._();
 
 final class RunTimeProvider extends $NotifierProvider<RunTime, int?> {
-  const RunTimeProvider._()
+  RunTimeProvider._()
     : super(
         from: null,
         argument: null,
@@ -523,8 +514,7 @@ abstract class _$RunTime extends $Notifier<int?> {
   int? build();
   @$mustCallSuper
   @override
-  void runBuild() {
-    final created = build();
+  WhenComplete runBuild() {
     final ref = this.ref as $Ref<int?, int?>;
     final element =
         ref.element
@@ -534,15 +524,15 @@ abstract class _$RunTime extends $Notifier<int?> {
               Object?,
               Object?
             >;
-    element.handleValue(ref, created);
+    return element.handleCreate(ref, build);
   }
 }
 
 @ProviderFor(ViewSize)
-const viewSizeProvider = ViewSizeProvider._();
+final viewSizeProvider = ViewSizeProvider._();
 
 final class ViewSizeProvider extends $NotifierProvider<ViewSize, Size> {
-  const ViewSizeProvider._()
+  ViewSizeProvider._()
     : super(
         from: null,
         argument: null,
@@ -575,8 +565,7 @@ abstract class _$ViewSize extends $Notifier<Size> {
   Size build();
   @$mustCallSuper
   @override
-  void runBuild() {
-    final created = build();
+  WhenComplete runBuild() {
     final ref = this.ref as $Ref<Size, Size>;
     final element =
         ref.element
@@ -586,15 +575,15 @@ abstract class _$ViewSize extends $Notifier<Size> {
               Object?,
               Object?
             >;
-    element.handleValue(ref, created);
+    return element.handleCreate(ref, build);
   }
 }
 
 @ProviderFor(SideWidth)
-const sideWidthProvider = SideWidthProvider._();
+final sideWidthProvider = SideWidthProvider._();
 
 final class SideWidthProvider extends $NotifierProvider<SideWidth, double> {
-  const SideWidthProvider._()
+  SideWidthProvider._()
     : super(
         from: null,
         argument: null,
@@ -627,8 +616,7 @@ abstract class _$SideWidth extends $Notifier<double> {
   double build();
   @$mustCallSuper
   @override
-  void runBuild() {
-    final created = build();
+  WhenComplete runBuild() {
     final ref = this.ref as $Ref<double, double>;
     final element =
         ref.element
@@ -638,17 +626,17 @@ abstract class _$SideWidth extends $Notifier<double> {
               Object?,
               Object?
             >;
-    element.handleValue(ref, created);
+    return element.handleCreate(ref, build);
   }
 }
 
 @ProviderFor(viewWidth)
-const viewWidthProvider = ViewWidthProvider._();
+final viewWidthProvider = ViewWidthProvider._();
 
 final class ViewWidthProvider
     extends $FunctionalProvider<double, double, double>
     with $Provider<double> {
-  const ViewWidthProvider._()
+  ViewWidthProvider._()
     : super(
         from: null,
         argument: null,
@@ -684,12 +672,12 @@ final class ViewWidthProvider
 String _$viewWidthHash() => r'5ee8f1bdebe44760f7333f88127108f5ffd70214';
 
 @ProviderFor(viewMode)
-const viewModeProvider = ViewModeProvider._();
+final viewModeProvider = ViewModeProvider._();
 
 final class ViewModeProvider
     extends $FunctionalProvider<ViewMode, ViewMode, ViewMode>
     with $Provider<ViewMode> {
-  const ViewModeProvider._()
+  ViewModeProvider._()
     : super(
         from: null,
         argument: null,
@@ -725,11 +713,11 @@ final class ViewModeProvider
 String _$viewModeHash() => r'6822e9dc28c813afe1ed743feea464f0d33c805c';
 
 @ProviderFor(isMobileView)
-const isMobileViewProvider = IsMobileViewProvider._();
+final isMobileViewProvider = IsMobileViewProvider._();
 
 final class IsMobileViewProvider extends $FunctionalProvider<bool, bool, bool>
     with $Provider<bool> {
-  const IsMobileViewProvider._()
+  IsMobileViewProvider._()
     : super(
         from: null,
         argument: null,
@@ -765,12 +753,12 @@ final class IsMobileViewProvider extends $FunctionalProvider<bool, bool, bool>
 String _$isMobileViewHash() => r'1d75bccb4f50ae206bf43b68df869a5d95e5ea5f';
 
 @ProviderFor(viewHeight)
-const viewHeightProvider = ViewHeightProvider._();
+final viewHeightProvider = ViewHeightProvider._();
 
 final class ViewHeightProvider
     extends $FunctionalProvider<double, double, double>
     with $Provider<double> {
-  const ViewHeightProvider._()
+  ViewHeightProvider._()
     : super(
         from: null,
         argument: null,
@@ -806,10 +794,10 @@ final class ViewHeightProvider
 String _$viewHeightHash() => r'dc3fc18337b5ce9fc953d994c380e8f1fa49f352';
 
 @ProviderFor(Init)
-const initProvider = InitProvider._();
+final initProvider = InitProvider._();
 
 final class InitProvider extends $NotifierProvider<Init, bool> {
-  const InitProvider._()
+  InitProvider._()
     : super(
         from: null,
         argument: null,
@@ -842,8 +830,7 @@ abstract class _$Init extends $Notifier<bool> {
   bool build();
   @$mustCallSuper
   @override
-  void runBuild() {
-    final created = build();
+  WhenComplete runBuild() {
     final ref = this.ref as $Ref<bool, bool>;
     final element =
         ref.element
@@ -853,16 +840,16 @@ abstract class _$Init extends $Notifier<bool> {
               Object?,
               Object?
             >;
-    element.handleValue(ref, created);
+    return element.handleCreate(ref, build);
   }
 }
 
 @ProviderFor(CurrentPageLabel)
-const currentPageLabelProvider = CurrentPageLabelProvider._();
+final currentPageLabelProvider = CurrentPageLabelProvider._();
 
 final class CurrentPageLabelProvider
     extends $NotifierProvider<CurrentPageLabel, PageLabel> {
-  const CurrentPageLabelProvider._()
+  CurrentPageLabelProvider._()
     : super(
         from: null,
         argument: null,
@@ -895,8 +882,7 @@ abstract class _$CurrentPageLabel extends $Notifier<PageLabel> {
   PageLabel build();
   @$mustCallSuper
   @override
-  void runBuild() {
-    final created = build();
+  WhenComplete runBuild() {
     final ref = this.ref as $Ref<PageLabel, PageLabel>;
     final element =
         ref.element
@@ -906,15 +892,15 @@ abstract class _$CurrentPageLabel extends $Notifier<PageLabel> {
               Object?,
               Object?
             >;
-    element.handleValue(ref, created);
+    return element.handleCreate(ref, build);
   }
 }
 
 @ProviderFor(SortNum)
-const sortNumProvider = SortNumProvider._();
+final sortNumProvider = SortNumProvider._();
 
 final class SortNumProvider extends $NotifierProvider<SortNum, int> {
-  const SortNumProvider._()
+  SortNumProvider._()
     : super(
         from: null,
         argument: null,
@@ -947,8 +933,7 @@ abstract class _$SortNum extends $Notifier<int> {
   int build();
   @$mustCallSuper
   @override
-  void runBuild() {
-    final created = build();
+  WhenComplete runBuild() {
     final ref = this.ref as $Ref<int, int>;
     final element =
         ref.element
@@ -958,15 +943,15 @@ abstract class _$SortNum extends $Notifier<int> {
               Object?,
               Object?
             >;
-    element.handleValue(ref, created);
+    return element.handleCreate(ref, build);
   }
 }
 
 @ProviderFor(CheckIpNum)
-const checkIpNumProvider = CheckIpNumProvider._();
+final checkIpNumProvider = CheckIpNumProvider._();
 
 final class CheckIpNumProvider extends $NotifierProvider<CheckIpNum, int> {
-  const CheckIpNumProvider._()
+  CheckIpNumProvider._()
     : super(
         from: null,
         argument: null,
@@ -999,8 +984,7 @@ abstract class _$CheckIpNum extends $Notifier<int> {
   int build();
   @$mustCallSuper
   @override
-  void runBuild() {
-    final created = build();
+  WhenComplete runBuild() {
     final ref = this.ref as $Ref<int, int>;
     final element =
         ref.element
@@ -1010,15 +994,15 @@ abstract class _$CheckIpNum extends $Notifier<int> {
               Object?,
               Object?
             >;
-    element.handleValue(ref, created);
+    return element.handleCreate(ref, build);
   }
 }
 
 @ProviderFor(BackBlock)
-const backBlockProvider = BackBlockProvider._();
+final backBlockProvider = BackBlockProvider._();
 
 final class BackBlockProvider extends $NotifierProvider<BackBlock, bool> {
-  const BackBlockProvider._()
+  BackBlockProvider._()
     : super(
         from: null,
         argument: null,
@@ -1051,8 +1035,7 @@ abstract class _$BackBlock extends $Notifier<bool> {
   bool build();
   @$mustCallSuper
   @override
-  void runBuild() {
-    final created = build();
+  WhenComplete runBuild() {
     final ref = this.ref as $Ref<bool, bool>;
     final element =
         ref.element
@@ -1062,15 +1045,15 @@ abstract class _$BackBlock extends $Notifier<bool> {
               Object?,
               Object?
             >;
-    element.handleValue(ref, created);
+    return element.handleCreate(ref, build);
   }
 }
 
 @ProviderFor(Version)
-const versionProvider = VersionProvider._();
+final versionProvider = VersionProvider._();
 
 final class VersionProvider extends $NotifierProvider<Version, int> {
-  const VersionProvider._()
+  VersionProvider._()
     : super(
         from: null,
         argument: null,
@@ -1103,8 +1086,7 @@ abstract class _$Version extends $Notifier<int> {
   int build();
   @$mustCallSuper
   @override
-  void runBuild() {
-    final created = build();
+  WhenComplete runBuild() {
     final ref = this.ref as $Ref<int, int>;
     final element =
         ref.element
@@ -1114,15 +1096,15 @@ abstract class _$Version extends $Notifier<int> {
               Object?,
               Object?
             >;
-    element.handleValue(ref, created);
+    return element.handleCreate(ref, build);
   }
 }
 
 @ProviderFor(Groups)
-const groupsProvider = GroupsProvider._();
+final groupsProvider = GroupsProvider._();
 
 final class GroupsProvider extends $NotifierProvider<Groups, List<Group>> {
-  const GroupsProvider._()
+  GroupsProvider._()
     : super(
         from: null,
         argument: null,
@@ -1155,8 +1137,7 @@ abstract class _$Groups extends $Notifier<List<Group>> {
   List<Group> build();
   @$mustCallSuper
   @override
-  void runBuild() {
-    final created = build();
+  WhenComplete runBuild() {
     final ref = this.ref as $Ref<List<Group>, List<Group>>;
     final element =
         ref.element
@@ -1166,16 +1147,16 @@ abstract class _$Groups extends $Notifier<List<Group>> {
               Object?,
               Object?
             >;
-    element.handleValue(ref, created);
+    return element.handleCreate(ref, build);
   }
 }
 
 @ProviderFor(DelayDataSource)
-const delayDataSourceProvider = DelayDataSourceProvider._();
+final delayDataSourceProvider = DelayDataSourceProvider._();
 
 final class DelayDataSourceProvider
     extends $NotifierProvider<DelayDataSource, DelayMap> {
-  const DelayDataSourceProvider._()
+  DelayDataSourceProvider._()
     : super(
         from: null,
         argument: null,
@@ -1208,8 +1189,7 @@ abstract class _$DelayDataSource extends $Notifier<DelayMap> {
   DelayMap build();
   @$mustCallSuper
   @override
-  void runBuild() {
-    final created = build();
+  WhenComplete runBuild() {
     final ref = this.ref as $Ref<DelayMap, DelayMap>;
     final element =
         ref.element
@@ -1219,16 +1199,16 @@ abstract class _$DelayDataSource extends $Notifier<DelayMap> {
               Object?,
               Object?
             >;
-    element.handleValue(ref, created);
+    return element.handleCreate(ref, build);
   }
 }
 
 @ProviderFor(SystemUiOverlayStyleState)
-const systemUiOverlayStyleStateProvider = SystemUiOverlayStyleStateProvider._();
+final systemUiOverlayStyleStateProvider = SystemUiOverlayStyleStateProvider._();
 
 final class SystemUiOverlayStyleStateProvider
     extends $NotifierProvider<SystemUiOverlayStyleState, SystemUiOverlayStyle> {
-  const SystemUiOverlayStyleStateProvider._()
+  SystemUiOverlayStyleStateProvider._()
     : super(
         from: null,
         argument: null,
@@ -1263,8 +1243,7 @@ abstract class _$SystemUiOverlayStyleState
   SystemUiOverlayStyle build();
   @$mustCallSuper
   @override
-  void runBuild() {
-    final created = build();
+  WhenComplete runBuild() {
     final ref = this.ref as $Ref<SystemUiOverlayStyle, SystemUiOverlayStyle>;
     final element =
         ref.element
@@ -1274,16 +1253,16 @@ abstract class _$SystemUiOverlayStyleState
               Object?,
               Object?
             >;
-    element.handleValue(ref, created);
+    return element.handleCreate(ref, build);
   }
 }
 
 @ProviderFor(_CoreStatus)
-const coreStatusProvider = _CoreStatusProvider._();
+final coreStatusProvider = _CoreStatusProvider._();
 
 final class _CoreStatusProvider
     extends $NotifierProvider<_CoreStatus, CoreStatus> {
-  const _CoreStatusProvider._()
+  _CoreStatusProvider._()
     : super(
         from: null,
         argument: null,
@@ -1316,8 +1295,7 @@ abstract class _$CoreStatus extends $Notifier<CoreStatus> {
   CoreStatus build();
   @$mustCallSuper
   @override
-  void runBuild() {
-    final created = build();
+  WhenComplete runBuild() {
     final ref = this.ref as $Ref<CoreStatus, CoreStatus>;
     final element =
         ref.element
@@ -1327,15 +1305,15 @@ abstract class _$CoreStatus extends $Notifier<CoreStatus> {
               Object?,
               Object?
             >;
-    element.handleValue(ref, created);
+    return element.handleCreate(ref, build);
   }
 }
 
 @ProviderFor(Query)
-const queryProvider = QueryFamily._();
+final queryProvider = QueryFamily._();
 
 final class QueryProvider extends $NotifierProvider<Query, String> {
-  const QueryProvider._({
+  QueryProvider._({
     required QueryFamily super.from,
     required QueryTag super.argument,
   }) : super(
@@ -1383,7 +1361,7 @@ String _$queryHash() => r'b6be53823f3351ee2bf1c0d147c0ccf5f31bb8b5';
 
 final class QueryFamily extends $Family
     with $ClassFamilyOverride<Query, String, String, String, QueryTag> {
-  const QueryFamily._()
+  QueryFamily._()
     : super(
         retry: null,
         name: r'queryProvider',
@@ -1406,8 +1384,7 @@ abstract class _$Query extends $Notifier<String> {
   String build(QueryTag tag);
   @$mustCallSuper
   @override
-  void runBuild() {
-    final created = build(_$args);
+  WhenComplete runBuild() {
     final ref = this.ref as $Ref<String, String>;
     final element =
         ref.element
@@ -1417,15 +1394,15 @@ abstract class _$Query extends $Notifier<String> {
               Object?,
               Object?
             >;
-    element.handleValue(ref, created);
+    return element.handleCreate(ref, () => build(_$args));
   }
 }
 
 @ProviderFor(Loading)
-const loadingProvider = LoadingFamily._();
+final loadingProvider = LoadingFamily._();
 
 final class LoadingProvider extends $NotifierProvider<Loading, bool> {
-  const LoadingProvider._({
+  LoadingProvider._({
     required LoadingFamily super.from,
     required LoadingTag super.argument,
   }) : super(
@@ -1473,7 +1450,7 @@ String _$loadingHash() => r'f4c58da7e5869c3e114b76439f3169b31d2e5b71';
 
 final class LoadingFamily extends $Family
     with $ClassFamilyOverride<Loading, bool, bool, bool, LoadingTag> {
-  const LoadingFamily._()
+  LoadingFamily._()
     : super(
         retry: null,
         name: r'loadingProvider',
@@ -1496,8 +1473,7 @@ abstract class _$Loading extends $Notifier<bool> {
   bool build(LoadingTag tag);
   @$mustCallSuper
   @override
-  void runBuild() {
-    final created = build(_$args);
+  WhenComplete runBuild() {
     final ref = this.ref as $Ref<bool, bool>;
     final element =
         ref.element
@@ -1507,16 +1483,16 @@ abstract class _$Loading extends $Notifier<bool> {
               Object?,
               Object?
             >;
-    element.handleValue(ref, created);
+    return element.handleCreate(ref, () => build(_$args));
   }
 }
 
 @ProviderFor(SelectedItems)
-const selectedItemsProvider = SelectedItemsFamily._();
+final selectedItemsProvider = SelectedItemsFamily._();
 
 final class SelectedItemsProvider
     extends $NotifierProvider<SelectedItems, Set<dynamic>> {
-  const SelectedItemsProvider._({
+  SelectedItemsProvider._({
     required SelectedItemsFamily super.from,
     required String super.argument,
   }) : super(
@@ -1571,7 +1547,7 @@ final class SelectedItemsFamily extends $Family
           Set<dynamic>,
           String
         > {
-  const SelectedItemsFamily._()
+  SelectedItemsFamily._()
     : super(
         retry: null,
         name: r'selectedItemsProvider',
@@ -1594,8 +1570,7 @@ abstract class _$SelectedItems extends $Notifier<Set<dynamic>> {
   Set<dynamic> build(String key);
   @$mustCallSuper
   @override
-  void runBuild() {
-    final created = build(_$args);
+  WhenComplete runBuild() {
     final ref = this.ref as $Ref<Set<dynamic>, Set<dynamic>>;
     final element =
         ref.element
@@ -1605,16 +1580,16 @@ abstract class _$SelectedItems extends $Notifier<Set<dynamic>> {
               Object?,
               Object?
             >;
-    element.handleValue(ref, created);
+    return element.handleCreate(ref, () => build(_$args));
   }
 }
 
 @ProviderFor(SelectedItem)
-const selectedItemProvider = SelectedItemFamily._();
+final selectedItemProvider = SelectedItemFamily._();
 
 final class SelectedItemProvider
     extends $NotifierProvider<SelectedItem, dynamic> {
-  const SelectedItemProvider._({
+  SelectedItemProvider._({
     required SelectedItemFamily super.from,
     required String super.argument,
   }) : super(
@@ -1662,7 +1637,7 @@ String _$selectedItemHash() => r'b50be0386d53ee8441c37d1a2a4c25640ce10766';
 
 final class SelectedItemFamily extends $Family
     with $ClassFamilyOverride<SelectedItem, dynamic, dynamic, dynamic, String> {
-  const SelectedItemFamily._()
+  SelectedItemFamily._()
     : super(
         retry: null,
         name: r'selectedItemProvider',
@@ -1685,8 +1660,7 @@ abstract class _$SelectedItem extends $Notifier<dynamic> {
   dynamic build(String key);
   @$mustCallSuper
   @override
-  void runBuild() {
-    final created = build(_$args);
+  WhenComplete runBuild() {
     final ref = this.ref as $Ref<dynamic, dynamic>;
     final element =
         ref.element
@@ -1696,15 +1670,15 @@ abstract class _$SelectedItem extends $Notifier<dynamic> {
               Object?,
               Object?
             >;
-    element.handleValue(ref, created);
+    return element.handleCreate(ref, () => build(_$args));
   }
 }
 
 @ProviderFor(IsUpdating)
-const isUpdatingProvider = IsUpdatingFamily._();
+final isUpdatingProvider = IsUpdatingFamily._();
 
 final class IsUpdatingProvider extends $NotifierProvider<IsUpdating, bool> {
-  const IsUpdatingProvider._({
+  IsUpdatingProvider._({
     required IsUpdatingFamily super.from,
     required String super.argument,
   }) : super(
@@ -1752,7 +1726,7 @@ String _$isUpdatingHash() => r'934cc96cbf8cf6909d27867455a31bf3008470e6';
 
 final class IsUpdatingFamily extends $Family
     with $ClassFamilyOverride<IsUpdating, bool, bool, bool, String> {
-  const IsUpdatingFamily._()
+  IsUpdatingFamily._()
     : super(
         retry: null,
         name: r'isUpdatingProvider',
@@ -1775,8 +1749,7 @@ abstract class _$IsUpdating extends $Notifier<bool> {
   bool build(String name);
   @$mustCallSuper
   @override
-  void runBuild() {
-    final created = build(_$args);
+  WhenComplete runBuild() {
     final ref = this.ref as $Ref<bool, bool>;
     final element =
         ref.element
@@ -1786,16 +1759,16 @@ abstract class _$IsUpdating extends $Notifier<bool> {
               Object?,
               Object?
             >;
-    element.handleValue(ref, created);
+    return element.handleCreate(ref, () => build(_$args));
   }
 }
 
 @ProviderFor(NetworkDetection)
-const networkDetectionProvider = NetworkDetectionProvider._();
+final networkDetectionProvider = NetworkDetectionProvider._();
 
 final class NetworkDetectionProvider
     extends $NotifierProvider<NetworkDetection, NetworkDetectionState> {
-  const NetworkDetectionProvider._()
+  NetworkDetectionProvider._()
     : super(
         from: null,
         argument: null,
@@ -1828,8 +1801,7 @@ abstract class _$NetworkDetection extends $Notifier<NetworkDetectionState> {
   NetworkDetectionState build();
   @$mustCallSuper
   @override
-  void runBuild() {
-    final created = build();
+  WhenComplete runBuild() {
     final ref = this.ref as $Ref<NetworkDetectionState, NetworkDetectionState>;
     final element =
         ref.element
@@ -1839,6 +1811,6 @@ abstract class _$NetworkDetection extends $Notifier<NetworkDetectionState> {
               Object?,
               Object?
             >;
-    element.handleValue(ref, created);
+    return element.handleCreate(ref, build);
   }
 }
