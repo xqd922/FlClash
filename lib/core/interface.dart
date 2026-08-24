@@ -29,6 +29,9 @@ mixin CoreInterface {
 
   Future<String> updateConfig(UpdateParams updateParams);
 
+  // 本地定制:部分补丁外部控制器地址(空串即关闭)
+  Future<String> updateExternalController(String externalController);
+
   Future<String> setupConfig(SetupParams setupParams);
 
   Future<ProxiesData> getProxies();
@@ -145,6 +148,16 @@ abstract class CoreHandlerInterface with CoreInterface {
     return await _invokeMethod<String>(
           method: CoreMethod.updateConfig,
           arguments: updateParams.toJson(),
+        ) ??
+        '';
+  }
+
+  // 本地定制:外部控制器开关走 updateConfig 的部分补丁语义
+  @override
+  Future<String> updateExternalController(String externalController) async {
+    return await _invokeMethod<String>(
+          method: CoreMethod.updateConfig,
+          arguments: {externalControllerKey: externalController},
         ) ??
         '';
   }

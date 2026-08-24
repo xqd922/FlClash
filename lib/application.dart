@@ -85,7 +85,11 @@ class ApplicationState extends ConsumerState<Application> {
 
   void _autoUpdateProfilesTask() {
     _autoUpdateProfilesTaskTimer = Timer(const Duration(minutes: 20), () async {
-      await ref.read(profilesActionProvider.notifier).autoUpdateProfiles();
+      // 本地定制:后台挂起时不执行自动更新任务
+      final lifecycleState = WidgetsBinding.instance.lifecycleState;
+      if (lifecycleState == AppLifecycleState.resumed) {
+        await ref.read(profilesActionProvider.notifier).autoUpdateProfiles();
+      }
       _autoUpdateProfilesTask();
     });
   }
@@ -109,8 +113,9 @@ class ApplicationState extends ConsumerState<Application> {
             commonPrint.log('connectivityChanged ${results.toString()}');
             ref.read(systemActionProvider.notifier).updateLocalIp();
             final hasVpn = results.contains(ConnectivityResult.vpn);
-            if (_preHasVpn == hasVpn) {
-              ref.read(checkIpNumProvider.notifier).add();
+            // 本地修正:仅 VPN 状态真正切换时才检查 IP
+            if (_preHasVpn != hasVpn) {
+              ref.read(setupActionProvider.notifier).tryCheckIp();
             }
             _preHasVpn = hasVpn;
           },

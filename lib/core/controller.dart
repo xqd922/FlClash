@@ -97,6 +97,11 @@ class CoreController {
     return _interface.updateConfig(updateParams);
   }
 
+  // 本地定制:停止流程用其清空外部控制器
+  Future<String> updateExternalController(String externalController) async {
+    return await _interface.updateExternalController(externalController);
+  }
+
   Future<String> setupConfig({
     required SetupParams params,
     Future<void> Function()? preloadInvoke,

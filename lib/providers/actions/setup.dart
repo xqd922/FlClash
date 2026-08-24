@@ -129,6 +129,12 @@ class SetupAction extends _$SetupAction {
   }
 
   Future<void> _stop(_RunRequest request) async {
+    // 本地定制:停止前清空外部控制器,避免 REST 端口残留暴露
+    try {
+      await coreController.updateExternalController('');
+    } catch (_) {
+      // 内核可能已退出,忽略
+    }
     await _setCoreRunning(request);
     if (!_isCurrent(request)) {
       return;
