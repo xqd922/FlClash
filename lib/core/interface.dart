@@ -29,6 +29,8 @@ mixin CoreInterface {
 
   Future<String> updateConfig(UpdateParams updateParams);
 
+  Future<String> updateExternalController(String externalController);
+
   Future<String> setupConfig(SetupParams setupParams);
 
   Future<ProxiesData> getProxies();
@@ -145,6 +147,15 @@ abstract class CoreHandlerInterface with CoreInterface {
     return await _invokeMethod<String>(
           method: CoreMethod.updateConfig,
           arguments: updateParams.toJson(),
+        ) ??
+        '';
+  }
+
+  @override
+  Future<String> updateExternalController(String externalController) async {
+    return await _invokeMethod<String>(
+          method: CoreMethod.updateConfig,
+          arguments: {externalControllerKey: externalController},
         ) ??
         '';
   }
