@@ -29,8 +29,8 @@
 			<array>
 				<string>clash</string>
 				<string>clashmeta</string>
-				<string>xlclash</string>
 				<string>flclash</string>
+				<string>xlclash</string>
 			</array>
 		</dict>
 	</array>
@@ -44,5 +44,7 @@
 	<string>MainMenu</string>
 	<key>NSPrincipalClass</key>
 	<string>NSApplication</string>
+	<key>NSLocationWhenInUseUsageDescription</key>
+	<string>Xlclash needs location access to detect WiFi network name for connectivity features.</string>
 </dict>
 </plist>

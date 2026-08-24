@@ -15,8 +15,8 @@ SolidCompression=yes
 SetupIconFile={{SETUP_ICON_FILE}}
 WizardStyle=modern
 PrivilegesRequired={{PRIVILEGES_REQUIRED}}
-ArchitecturesAllowed=x64 arm64
-ArchitecturesInstallIn64BitMode=x64 arm64
+ArchitecturesAllowed={{ARCH}}
+ArchitecturesInstallIn64BitMode={{ARCH}}
 
 [Code]
 procedure KillProcesses;
@@ -25,8 +25,7 @@ var
   i: Integer;
   ResultCode: Integer;
 begin
-  Processes := ['Xlclash.exe', 'XlclashCore.exe', 'XlclashHelperService.exe',
-    'XClash.exe', 'XClashCore.exe', 'XClashHelperService.exe'];
+  Processes := ['Xlclash.exe', 'XlclashCore.exe', 'XlclashHelperService.exe', 'XClash.exe', 'XClashCore.exe', 'XClashHelperService.exe'];
 
   for i := 0 to GetArrayLength(Processes)-1 do
   begin
@@ -34,8 +33,28 @@ begin
   end;
 end;
 
-function InitializeSetup(): Boolean;
+procedure UnregisterHelperService;
+var
+  HelperPath: String;
+  ResultCode: Integer;
 begin
+  HelperPath := ExpandConstant('{app}\\XlclashHelperService.exe');
+  if FileExists(HelperPath) then
+  begin
+    Exec(HelperPath, 'uninstall', '', SW_HIDE, ewWaitUntilTerminated, ResultCode);
+  end;
+end;
+
+function PrepareToInstall(var NeedsRestart: Boolean): String;
+begin
+  UnregisterHelperService;
+  KillProcesses;
+  Result := '';
+end;
+
+function InitializeUninstall(): Boolean;
+begin
+  UnregisterHelperService;
   KillProcesses;
   Result := True;
 end;
