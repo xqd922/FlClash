@@ -75,14 +75,14 @@ jobs:
         uses: subosito/flutter-action@v2
         with:
           channel: stable
-          flutter-version: 3.35.7
+          flutter-version: 3.44.1
           cache: true
       - name: Setup Flutter With Other
         if: startsWith(matrix.os, 'windows-11-arm') || startsWith(matrix.os, 'ubuntu-24.04-arm')
         uses: subosito/flutter-action@v2
         with:
           channel: master
-          flutter-version: 3.35.7
+          flutter-version: 3.44.1
           cache: true
 
       - name: Get Flutter Dependency
@@ -91,7 +91,7 @@ jobs:
           flutter pub get
 
       - name: Generate Code
-        run: dart run build_runner build --delete-conflicting-outputs
+        run: dart run build_runner build
 
       - name: Setup
         run: dart setup.dart ${{ matrix.platform }} ${{ matrix.arch && format('--arch {0}', matrix.arch) }} ${{ env.IS_STABLE == 'true' && '--env stable' || '' }}
