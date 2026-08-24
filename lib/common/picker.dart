@@ -7,20 +7,15 @@ import 'package:image_picker/image_picker.dart';
 import 'package:mobile_scanner/mobile_scanner.dart';
 
 class Picker {
-  // file_picker 12 稳定版 saveFile 返回 Uri?,统一转换为路径字符串
-  String? _uriToPath(Uri? uri) => uri?.toFilePath(windows: Platform.isWindows);
-
   Future<PlatformFile?> pickerFile() async {
     return FilePicker.pickFile(initialDirectory: await appPath.downloadDirPath);
   }
 
   Future<String?> saveFile(String fileName, Uint8List bytes) async {
-    final path = _uriToPath(
-      await FilePicker.saveFile(
-        fileName: fileName,
-        initialDirectory: await appPath.downloadDirPath,
-        bytes: bytes,
-      ),
+    final path = await FilePicker.saveFile(
+      fileName: fileName,
+      initialDirectory: await appPath.downloadDirPath,
+      bytes: bytes,
     );
     if (!system.isAndroid && path != null) {
       final file = File(path);
@@ -35,12 +30,10 @@ class Picker {
       await localFile.create(recursive: true);
     }
     final bytes = await localFile.readAsBytes();
-    final path = _uriToPath(
-      await FilePicker.saveFile(
-        fileName: fileName,
-        initialDirectory: await appPath.downloadDirPath,
-        bytes: bytes,
-      ),
+    final path = await FilePicker.saveFile(
+      fileName: fileName,
+      initialDirectory: await appPath.downloadDirPath,
+      bytes: bytes,
     );
     await localFile.safeDelete();
     return path;

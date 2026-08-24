@@ -1,36 +1,8 @@
 import 'dart:io';
-import 'dart:typed_data';
 
-import 'package:cross_file/cross_file.dart';
 import 'package:file_picker/file_picker.dart';
 import 'package:fl_clash/common/picker.dart';
 import 'package:test/test.dart';
-
-/// file_picker 12 稳定版的 [PlatformFile] 是抽象基类且无公开测试实现,
-/// 这里用本地文件实现一个最小替身。
-base class _IoPlatformFile extends PlatformFile {
-  final File file;
-
-  _IoPlatformFile(this.file);
-
-  @override
-  String get name => file.uri.pathSegments.last;
-
-  @override
-  Uri get uri => file.uri;
-
-  @override
-  XFile get xFile => XFile(file.path);
-
-  @override
-  Future<int> length() => file.length();
-
-  @override
-  Future<Uint8List> readAsBytes() => file.readAsBytes();
-
-  @override
-  Stream<Uint8List> readAsByteStream() => file.openRead().cast<Uint8List>();
-}
 
 void main() {
   group('PlatformFileExt.readBytes', () {
@@ -43,7 +15,11 @@ void main() {
       final file = File('${directory.path}/profile.yaml');
       await file.writeAsString('mixed-port: 7890');
 
-      final platformFile = _IoPlatformFile(file);
+      final platformFile = PlatformFile(
+        name: 'profile.yaml',
+        path: file.path,
+        size: await file.length(),
+      );
 
       final bytes = await platformFile.readBytes();
 
