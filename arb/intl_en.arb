@@ -553,5 +553,7 @@
   "geoSkipped": "{name} is already up to date",
   "geoUpdated": "{name} updated",
   "secondsCount": "{count} seconds",
-  "entriesCount": "{count} entries"
+  "entriesCount": "{count} entries",
+  "openRequests": "Requests",
+  "openRequestsDesc": "Enable to show the requests entry"
 }

@@ -628,6 +628,10 @@ class MessageLookup extends MessageLookupByLibrary {
     "onlyStatisticsProxyDesc": MessageLookupByLibrary.simpleMessage(
       "When turned on, only statistics proxy traffic",
     ),
+    "openRequests": MessageLookupByLibrary.simpleMessage("Requests"),
+    "openRequestsDesc": MessageLookupByLibrary.simpleMessage(
+      "Enable to show the requests entry",
+    ),
     "optional": MessageLookupByLibrary.simpleMessage("Optional"),
     "options": MessageLookupByLibrary.simpleMessage("Options"),
     "other": MessageLookupByLibrary.simpleMessage("Other"),

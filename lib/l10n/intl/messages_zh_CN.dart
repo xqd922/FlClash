@@ -436,6 +436,8 @@ class MessageLookup extends MessageLookupByLibrary {
     "onlyStatisticsProxyDesc": MessageLookupByLibrary.simpleMessage(
       "开启后，将只统计代理流量",
     ),
+    "openRequests": MessageLookupByLibrary.simpleMessage("请求记录"),
+    "openRequestsDesc": MessageLookupByLibrary.simpleMessage("启用将会显示请求入口"),
     "optional": MessageLookupByLibrary.simpleMessage("可选"),
     "options": MessageLookupByLibrary.simpleMessage("选项"),
     "other": MessageLookupByLibrary.simpleMessage("其他"),

@@ -4523,6 +4523,21 @@ class AppLocalizations {
       args: [count],
     );
   }
+
+  /// `Requests`
+  String get openRequests {
+    return Intl.message('Requests', name: 'openRequests', desc: '', args: []);
+  }
+
+  /// `Enable to show the requests entry`
+  String get openRequestsDesc {
+    return Intl.message(
+      'Enable to show the requests entry',
+      name: 'openRequestsDesc',
+      desc: '',
+      args: [],
+    );
+  }
 }
 
 class AppLocalizationDelegate extends LocalizationsDelegate<AppLocalizations> {

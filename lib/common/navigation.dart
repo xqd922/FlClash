@@ -8,6 +8,8 @@ class Navigation {
 
   List<NavigationItem> getItems({
     bool openLogs = false,
+    // 本地定制:请求入口开关
+    bool openRequests = false,
     bool hasProxies = false,
   }) {
     return [
@@ -39,7 +41,9 @@ class Navigation {
         builder: (_) =>
             const RequestsView(key: GlobalObjectKey(PageLabel.requests)),
         description: 'requestsDesc',
-        modes: [NavigationItemMode.desktop, NavigationItemMode.more],
+        modes: openRequests
+            ? [NavigationItemMode.desktop, NavigationItemMode.more]
+            : [],
       ),
       NavigationItem(
         icon: const Icon(Icons.ballot),

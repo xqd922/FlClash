@@ -202,23 +202,24 @@ class OpenLogsItem extends ConsumerWidget {
   }
 }
 
-class CrashlyticsItem extends ConsumerWidget {
-  const CrashlyticsItem({super.key});
+// 本地定制:请求入口开关(默认隐藏请求记录页)
+class OpenRequestsItem extends ConsumerWidget {
+  const OpenRequestsItem({super.key});
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final appLocalizations = context.appLocalizations;
-    final crashlytics = ref.watch(
-      appSettingProvider.select((state) => state.crashlytics),
+    final openRequests = ref.watch(
+      appSettingProvider.select((state) => state.openRequests),
     );
     return ListItem.toggle(
-      title: Text(appLocalizations.crashlytics),
-      subtitle: Text(appLocalizations.crashlyticsTip),
-      value: crashlytics,
+      title: Text(appLocalizations.openRequests),
+      subtitle: Text(appLocalizations.openRequestsDesc),
+      value: openRequests,
       onChanged: (bool value) {
         ref
             .read(appSettingProvider.notifier)
-            .update((state) => state.copyWith(crashlytics: value));
+            .update((state) => state.copyWith(openRequests: value));
       },
     );
   }
@@ -261,9 +262,9 @@ class ApplicationSettingView extends StatelessWidget {
       if (system.isAndroid) ...[const HiddenItem()],
       const AnimateTabItem(),
       const OpenLogsItem(),
+      const OpenRequestsItem(),
       const CloseConnectionsItem(),
       const UsageItem(),
-      if (system.isAndroid) const CrashlyticsItem(),
       const AutoCheckUpdateItem(),
     ];
     return BaseScaffold(

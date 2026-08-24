@@ -553,5 +553,7 @@
   "geoSkipped": "{name} 已是最新版本",
   "geoUpdated": "{name} 已更新",
   "secondsCount": "{count} 秒",
-  "entriesCount": "{count} 个条目"
+  "entriesCount": "{count} 个条目",
+  "openRequests": "请求记录",
+  "openRequestsDesc": "启用将会显示请求入口"
 }
