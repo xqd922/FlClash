@@ -2,14 +2,12 @@ import 'dart:math';
 
 import 'package:defer_pointer/defer_pointer.dart';
 import 'package:fl_clash/common/common.dart';
-import 'package:fl_clash/core/core.dart';
 import 'package:fl_clash/enum/enum.dart';
 import 'package:fl_clash/providers/providers.dart';
 import 'package:fl_clash/widgets/widgets.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
-import 'widgets/core_status_button.dart';
 import 'widgets/start_button.dart';
 
 typedef _IsEditWidgetBuilder = Widget Function(bool isEdit);
@@ -46,8 +44,8 @@ class _DashboardViewState extends ConsumerState<DashboardView> {
   }
 
   List<Widget> _buildActions(bool isEdit) {
+    // 本地定制:隐藏核心状态按钮与编辑入口,固定 Dashboard 布局
     return [
-      if (!isEdit && coreLib == null) const CoreStatusButton(),
       if (isEdit)
         ValueListenableBuilder(
           valueListenable: _addedWidgetsNotifier,
@@ -64,19 +62,6 @@ class _DashboardViewState extends ConsumerState<DashboardView> {
             icon: const Icon(Icons.add_circle),
           ),
         ),
-      FadeRotationScaleBox(
-        child: isEdit
-            ? IconButton(
-                key: const ValueKey(true),
-                icon: const Icon(Icons.save, key: ValueKey('save-icon')),
-                onPressed: _handleSaveAndExit,
-              )
-            : IconButton(
-                key: const ValueKey(false),
-                icon: const Icon(Icons.edit, key: ValueKey('edit-icon')),
-                onPressed: _handleEnterEdit,
-              ),
-      ),
     ];
   }
 
@@ -102,13 +87,6 @@ class _DashboardViewState extends ConsumerState<DashboardView> {
     );
   }
 
-  void _handleEnterEdit() {
-    if (_isEditNotifier.value) {
-      return;
-    }
-    _isEditNotifier.value = true;
-  }
-
   void _handleExitEdit() {
     if (!_isEditNotifier.value) {
       return;
@@ -118,16 +96,6 @@ class _DashboardViewState extends ConsumerState<DashboardView> {
       _saveDashboardWidgets(dashboardWidgets);
     }
     _isEditNotifier.value = false;
-  }
-
-  Future<void> _handleSaveAndExit() async {
-    if (!_isEditNotifier.value) {
-      return;
-    }
-    await _handleSave();
-    if (mounted) {
-      _isEditNotifier.value = false;
-    }
   }
 
   Future<void> _handleSave() async {
