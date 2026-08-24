@@ -131,15 +131,8 @@ const mainIsolate = 'XlclashMainIsolate';
 
 const serviceIsolate = 'XlclashServiceIsolate';
 
-const defaultPrimaryColors = [
-  0xFF795548,
-  0xFF03A9F4,
-  0xFFFFFF00,
-  0XFFBBC9CC,
-  0XFFABD397,
-  defaultPrimaryColor,
-  0XFF665390,
-];
+// 本地定制:内置主题色
+const defaultPrimaryColors = <int>[0xFF35618E, 0xFF67568F];
 
 const scriptTemplate = '''
 const main = (config) => {
