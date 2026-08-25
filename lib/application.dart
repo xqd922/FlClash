@@ -179,10 +179,11 @@ class ApplicationState extends ConsumerState<Application> {
           darkTheme: ThemeData(
             useMaterial3: true,
             pageTransitionsTheme: _pageTransitionsTheme,
+            // 本地定制:纯黑模式已移除
             colorScheme: _getAppColorScheme(
               brightness: Brightness.dark,
               primaryColor: themeProps.primaryColor,
-            ).toPureBlack(themeProps.pureBlack),
+            ),
           ),
           home: child!,
         );

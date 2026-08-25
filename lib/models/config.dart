@@ -193,25 +193,12 @@ abstract class ProxiesStyleProps with _$ProxiesStyleProps {
 }
 
 @freezed
-abstract class TextScale with _$TextScale {
-  const factory TextScale({
-    @Default(false) bool enable,
-    @Default(1.0) double scale,
-  }) = _TextScale;
-
-  factory TextScale.fromJson(Map<String, Object?> json) =>
-      _$TextScaleFromJson(json);
-}
-
-@freezed
 abstract class ThemeProps with _$ThemeProps {
   const factory ThemeProps({
     int? primaryColor,
     @Default(defaultPrimaryColors) List<int> primaryColors,
+    // 本地定制:纯黑模式/文字缩放/配色方案变体已在 v7.0.0 移除
     @Default(ThemeMode.dark) ThemeMode themeMode,
-    @Default(DynamicSchemeVariant.content) DynamicSchemeVariant schemeVariant,
-    @Default(false) bool pureBlack,
-    @Default(TextScale()) TextScale textScale,
   }) = _ThemeProps;
 
   factory ThemeProps.fromJson(Map<String, Object?> json) =>

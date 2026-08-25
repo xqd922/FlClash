@@ -1,9 +1,7 @@
-import 'dart:math';
 
 import 'package:fl_clash/common/common.dart';
 import 'package:fl_clash/common/theme.dart';
 import 'package:fl_clash/providers/action.dart';
-import 'package:fl_clash/providers/config.dart';
 import 'package:fl_clash/state.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -44,16 +42,8 @@ class ThemeManager extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, ref) {
-    final textScale = ref.read(
-      themeSettingProvider.select((state) => state.textScale),
-    );
-    final double textScaleFactor = max(
-      min(
-        textScale.enable ? textScale.scale : defaultTextScaleFactor,
-        maxTextScale,
-      ),
-      minTextScale,
-    );
+    // 本地定制:文字缩放已移除,跟随系统
+    final double textScaleFactor = defaultTextScaleFactor;
 
     globalState.measure = Measure.of(context, textScaleFactor);
     globalState.theme = CommonTheme.of(context, textScaleFactor);
