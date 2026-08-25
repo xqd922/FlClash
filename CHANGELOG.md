@@ -1,13 +1,16 @@
-## Xlclash upstream merge (v0.8.96 kernel, 2026-08-24)
+## Xlclash upstream merge (v0.8.96 kernel & product layer, 2026-08-25)
 
-Adopt upstream v0.8.96 kernel & low-level layers; local UI/product intent unchanged.
+Fully align with upstream v0.8.96: kernel, low-level layers AND the new
+action-provider product architecture; all Xlclash customizations ported on top.
 
-- Go core: wrapper refactor (action.go -> method/message, hub/lib/server rewrite); Clash.Meta submodule c27f82fb -> 0f7f05ad
-- Desktop helper (Rust): adopt hub/windows service rewrite; service name kept XlclashHelperService
-- Dart bridge: adopt desktop RPC architecture; legacy lifecycle APIs (preload/shutdown/destroy/isCompleted/deleteFile) re-implemented as compatibility shims over start/stop/close
-- Android: adopt ManagedService/ProxyService/VpnService restructure and TV support; re-applied Firebase strip, applicationId com.xqd922.flclash, engine cache, VpnResidualCleaner, MTU 4064, network-switch disconnect, notification notify(), Doze guard, ALWAYS_ON, xlclash deep link, Impeller off
-- Windows/Linux/macOS: adopt runner/packaging updates; re-applied Xlclash naming and core binary install rules
-- Deps: sync with upstream pubspec (riverpod 4 codegen regenerated); version stays 7.x
+- Go core: wrapper refactor (action.go -> method/message); Clash.Meta submodule c27f82fb -> 0f7f05ad
+- Product layer: adopt provider-action system (lib/providers/actions/*); legacy AppController retired
+- Desktop helper (Rust): hub/windows service rewrite; service name kept XlclashHelperService
+- Android: adopt ManagedService/VpnService restructure and TV support; re-applied Firebase strip, applicationId com.xqd922.flclash, engine cache, VpnResidualCleaner, MTU 4064, network-switch disconnect, notification notify(), Doze guard, ALWAYS_ON, xlclash deep link, Impeller off
+- Windows/Linux/macOS: runner/packaging updates with Xlclash naming and core binary rules
+- Ported customizations: HCT palette + built-in brand colors + hex labels, frozen dashboard header, requests-entry toggle, disclaimer removal, deterministic config generation (stable key order, null stripping, profile values first), stop-time external-controller close, background update guard, VPN-transition IP check
+- Tests: upstream suite adopted (714 passing), adapted for Xlclash defaults and Windows host
+- CI: Flutter 3.44.1
 
 ## v0.8.92
 
