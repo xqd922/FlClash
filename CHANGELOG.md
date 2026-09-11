@@ -1,5 +1,12 @@
 # Changelog
 
+## v0.8.97.1 (2026-09-12)
+
+**Bug Fixes**
+
+- **changelog** Accept fork-local fourth version segment in release tags (5b2874c)
+- **theme** Pin variable font wght axis to restore default CJK weight (d5c17e2)
+
 ## v0.8.97 (2026-09-10)
 
 **Features**

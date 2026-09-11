@@ -2,6 +2,29 @@
   "schemaVersion": 2,
   "versions": [
     {
+      "version": "0.8.97.1",
+      "tag": "v0.8.97.1",
+      "date": "2026-09-12",
+      "prerelease": false,
+      "groups": [
+        {
+          "type": "fix",
+          "entries": [
+            {
+              "id": "5b2874c",
+              "scope": "changelog",
+              "text": "Accept fork-local fourth version segment in release tags"
+            },
+            {
+              "id": "d5c17e2",
+              "scope": "theme",
+              "text": "Pin variable font wght axis to restore default CJK weight"
+            }
+          ]
+        }
+      ]
+    },
+    {
       "version": "0.8.97",
       "tag": "v0.8.97",
       "date": "2026-09-10",
