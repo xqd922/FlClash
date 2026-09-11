@@ -277,7 +277,11 @@ jobs:
         if: startsWith(matrix.platform,'android')
         run: |
           echo "${{ secrets.KEYSTORE }}" | base64 --decode > android/app/keystore.jks
-          echo "${{ secrets.SERVICE_JSON }}" | base64 --decode > android/app/google-services.json
+          # Keep the committed google-services.json when the secret is absent
+          # (forks); the google-services plugin fails on an empty file.
+          if [ -n "${{ secrets.SERVICE_JSON }}" ]; then
+            echo "${{ secrets.SERVICE_JSON }}" | base64 --decode > android/app/google-services.json
+          fi
           {
             echo "keyAlias=${{ secrets.KEY_ALIAS }}"
             echo "storePassword=${{ secrets.STORE_PASSWORD }}"
@@ -351,6 +355,12 @@ jobs:
       contents: write
     needs: [ build ]
     runs-on: ubuntu-latest
+    # Exposed as env so steps below can skip themselves when a fork has no
+    # optional secrets; secrets are not available in `if` expressions.
+    env:
+      TELEGRAM_BOT_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
+      HOMEBREW_SSH_DEPLOY_KEY: ${{ secrets.HOMEBREW_SSH_DEPLOY_KEY }}
+      SSH_DEPLOY_KEY: ${{ secrets.SSH_DEPLOY_KEY }}
     services:
       telegram-bot-api:
         image: aiogram/telegram-bot-api:latest
@@ -402,6 +412,7 @@ jobs:
           dart run tool/changelog.dart render telegram "${target[@]}" --out telegram.md
 
       - name: Push to telegram
+        if: ${{ env.TELEGRAM_BOT_TOKEN != '' }}
         env:
           TELEGRAM_BOT_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
           TAG: ${{ github.ref_name }}
@@ -444,7 +455,7 @@ jobs:
             ./.github/homebrew_cask_template.rb > ./brew/Casks/flclash.rb
 
       - name: Push to Homebrew tap
-        if: ${{ env.IS_STABLE == 'true' }}
+        if: ${{ env.IS_STABLE == 'true' && env.HOMEBREW_SSH_DEPLOY_KEY != '' }}
         uses: cpina/github-action-push-to-another-repository@v1.7.2
         env:
           SSH_DEPLOY_KEY: ${{ secrets.HOMEBREW_SSH_DEPLOY_KEY }}
@@ -466,7 +477,7 @@ jobs:
           echo "Files copied successfully"
 
       - name: Push to fdroid repo
-        if: ${{ env.IS_STABLE == 'true' }}
+        if: ${{ env.IS_STABLE == 'true' && env.SSH_DEPLOY_KEY != '' }}
         uses: cpina/github-action-push-to-another-repository@v1.7.2
         env:
           SSH_DEPLOY_KEY: ${{ secrets.SSH_DEPLOY_KEY }}
