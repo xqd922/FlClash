@@ -50,6 +50,27 @@ Widget buildManagerStack({
   );
 }
 
+const _pageTransitionsTheme = PageTransitionsTheme(
+  builders: <TargetPlatform, PageTransitionsBuilder>{
+    TargetPlatform.android: commonSharedXPageTransitions,
+    TargetPlatform.windows: commonSharedXPageTransitions,
+    TargetPlatform.linux: commonSharedXPageTransitions,
+    TargetPlatform.macOS: commonSharedXPageTransitions,
+  },
+);
+
+/// 钉住可变字体 wght 轴的统一入口：HyperOS 等系统的中文回退字体 MiSans 是
+/// 可变字体，若不显式指定，Flutter 3.41+ 会按 fontWeight 加重显示。
+ThemeData buildAppTheme({required ColorScheme colorScheme}) => ThemeData(
+  useMaterial3: true,
+  pageTransitionsTheme: _pageTransitionsTheme,
+  colorScheme: colorScheme,
+  typography: Typography.material2021(
+    platform: defaultTargetPlatform,
+    colorScheme: colorScheme,
+  ).toDefaultWeight,
+).withAppShapes;
+
 class Application extends ConsumerStatefulWidget {
   const Application({super.key});
 
@@ -60,15 +81,6 @@ class Application extends ConsumerStatefulWidget {
 class ApplicationState extends ConsumerState<Application> {
   Timer? _autoUpdateProfilesTaskTimer;
   bool _preHasVpn = false;
-
-  final _pageTransitionsTheme = const PageTransitionsTheme(
-    builders: <TargetPlatform, PageTransitionsBuilder>{
-      TargetPlatform.android: commonSharedXPageTransitions,
-      TargetPlatform.windows: commonSharedXPageTransitions,
-      TargetPlatform.linux: commonSharedXPageTransitions,
-      TargetPlatform.macOS: commonSharedXPageTransitions,
-    },
-  );
 
   ColorScheme _getAppColorScheme({required Brightness brightness}) {
     return ref.read(genColorSchemeProvider(brightness));
@@ -184,24 +196,8 @@ class ApplicationState extends ConsumerState<Application> {
           locale: getLocaleForString(locale),
           supportedLocales: AppLocalizations.delegate.supportedLocales,
           themeMode: themeProps.themeMode,
-          theme: ThemeData(
-            useMaterial3: true,
-            pageTransitionsTheme: _pageTransitionsTheme,
-            colorScheme: lightColorScheme,
-            typography: Typography.material2021(
-              platform: defaultTargetPlatform,
-              colorScheme: lightColorScheme,
-            ).toDefaultWeight,
-          ).withAppShapes,
-          darkTheme: ThemeData(
-            useMaterial3: true,
-            pageTransitionsTheme: _pageTransitionsTheme,
-            colorScheme: darkColorScheme,
-            typography: Typography.material2021(
-              platform: defaultTargetPlatform,
-              colorScheme: darkColorScheme,
-            ).toDefaultWeight,
-          ).withAppShapes,
+          theme: buildAppTheme(colorScheme: lightColorScheme),
+          darkTheme: buildAppTheme(colorScheme: darkColorScheme),
           home: child!,
         );
       },
