@@ -13,6 +13,7 @@ import 'package:fl_clash/plugins/app.dart';
 import 'package:fl_clash/providers/providers.dart';
 import 'package:fl_clash/state.dart';
 import 'package:material_ui/material_ui.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
@@ -149,6 +150,12 @@ class ApplicationState extends ConsumerState<Application> {
           appSettingProvider.select((state) => state.locale),
         );
         final themeProps = ref.watch(themeSettingProvider);
+        final lightColorScheme = _getAppColorScheme(
+          brightness: Brightness.light,
+        );
+        final darkColorScheme = _getAppColorScheme(
+          brightness: Brightness.dark,
+        ).toPureBlack(themeProps.pureBlack);
         return MaterialApp(
           debugShowCheckedModeBanner: false,
           navigatorKey: globalState.navigatorKey,
@@ -180,14 +187,20 @@ class ApplicationState extends ConsumerState<Application> {
           theme: ThemeData(
             useMaterial3: true,
             pageTransitionsTheme: _pageTransitionsTheme,
-            colorScheme: _getAppColorScheme(brightness: Brightness.light),
+            colorScheme: lightColorScheme,
+            typography: Typography.material2021(
+              platform: defaultTargetPlatform,
+              colorScheme: lightColorScheme,
+            ).toDefaultWeight,
           ).withAppShapes,
           darkTheme: ThemeData(
             useMaterial3: true,
             pageTransitionsTheme: _pageTransitionsTheme,
-            colorScheme: _getAppColorScheme(
-              brightness: Brightness.dark,
-            ).toPureBlack(themeProps.pureBlack),
+            colorScheme: darkColorScheme,
+            typography: Typography.material2021(
+              platform: defaultTargetPlatform,
+              colorScheme: darkColorScheme,
+            ).toDefaultWeight,
           ).withAppShapes,
           home: child!,
         );
