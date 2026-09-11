@@ -2,12 +2,17 @@ import 'dart:io';
 
 import 'models.dart';
 
-final _tagPattern = RegExp(r'^v(\d+)\.(\d+)\.(\d+)(?:-pre\.(\d+))?$');
+final _tagPattern = RegExp(
+  r'^v(\d+)\.(\d+)\.(\d+)(?:\.(\d+))?(?:-pre\.(\d+))?$',
+);
 
 const _fieldSeparator = '\u001f';
 const _recordSeparator = '\u001e';
 
-/// A release tag that matches the `vMAJOR.MINOR.PATCH[-pre.N]` contract.
+/// A release tag that matches the `vMAJOR.MINOR.PATCH[.REVISION][-pre.N]`
+/// contract. The optional fourth segment carries fork-local patches, so a
+/// fork release on top of an upstream tag sorts after it without bumping the
+/// upstream version.
 ///
 /// Every other tag in the repository is ignored on purpose: `backup-pre-squash-*`
 /// and similar bookkeeping tags used to leak into the generated changelog as
@@ -18,6 +23,7 @@ class VersionTag implements Comparable<VersionTag> {
     required this.major,
     required this.minor,
     required this.patch,
+    this.revision,
     this.pre,
   });
 
@@ -25,23 +31,27 @@ class VersionTag implements Comparable<VersionTag> {
   final int major;
   final int minor;
   final int patch;
+  final int? revision;
   final int? pre;
 
   bool get isPrerelease => pre != null;
 
-  String get version => '$major.$minor.$patch';
+  String get version =>
+      '$major.$minor.$patch${revision == null ? '' : '.$revision'}';
 
   static VersionTag? tryParse(String name) {
     final match = _tagPattern.firstMatch(name.trim());
     if (match == null) {
       return null;
     }
+    int? group(String? value) => value == null ? null : int.parse(value);
     return VersionTag(
       name: name.trim(),
       major: int.parse(match.group(1)!),
       minor: int.parse(match.group(2)!),
       patch: int.parse(match.group(3)!),
-      pre: match.group(4) == null ? null : int.parse(match.group(4)!),
+      revision: group(match.group(4)),
+      pre: group(match.group(5)),
     );
   }
 
@@ -58,6 +68,10 @@ class VersionTag implements Comparable<VersionTag> {
     final byPatch = patch.compareTo(other.patch);
     if (byPatch != 0) {
       return byPatch;
+    }
+    final byRevision = (revision ?? 0).compareTo(other.revision ?? 0);
+    if (byRevision != 0) {
+      return byRevision;
     }
     if (pre == null && other.pre == null) {
       return 0;
