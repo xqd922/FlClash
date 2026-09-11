@@ -141,4 +141,28 @@ void main() {
       );
     }
   });
+
+  test('the app theme pins the variable font wght axis', () {
+    for (final brightness in Brightness.values) {
+      final theme = buildAppTheme(
+        colorScheme: ColorScheme.fromSeed(
+          seedColor: Colors.blue,
+          brightness: brightness,
+        ),
+      );
+      for (final style in [
+        theme.textTheme.displayLarge,
+        theme.textTheme.titleLarge,
+        theme.textTheme.titleMedium,
+        theme.textTheme.bodyMedium,
+        theme.textTheme.labelLarge,
+      ]) {
+        expect(
+          style?.fontVariations,
+          contains(const FontVariation('wght', 400)),
+          reason: 'variable CJK fallback fonts must render at default weight',
+        );
+      }
+    }
+  });
 }
