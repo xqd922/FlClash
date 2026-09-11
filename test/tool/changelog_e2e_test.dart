@@ -94,6 +94,36 @@ void main() {
     expect(merged.substring(merged.indexOf('## v0.8.96')), history);
   });
 
+  test('a fork-local fourth version segment collects its own section', () {
+    git(['tag', 'v1.1.0.1']);
+
+    final versions = build().changelog.versions;
+
+    expect(versions.map((version) => version.tag), ['v1.1.0.1', 'v1.1.0']);
+    expect(versions.first.version, '1.1.0.1');
+    expect(
+      versions.first.isEmpty,
+      isTrue,
+      reason: 'chore commits do not produce changelog entries',
+    );
+  });
+
+  test(
+    'a fourth version segment sorts after its base and before the next patch',
+    () {
+      git(['tag', 'v1.1.0.1']);
+
+      final tags = Git(workingDirectory: repo.path).versionTags();
+
+      expect(tags.map((tag) => tag.name), [
+        'v1.1.0.1',
+        'v1.1.0',
+        'v1.1.0-pre.1',
+        'v1.0.0',
+      ]);
+    },
+  );
+
   test('a prerelease tag does not split the stable range', () {
     final groups = build().changelog.versions.single.groups;
     final features = groups
