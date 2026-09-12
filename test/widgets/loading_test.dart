@@ -5,6 +5,20 @@ import 'package:material_ui/material_ui.dart';
 import 'package:flutter_test/flutter_test.dart';
 
 void main() {
+  test('the default shape sequence is the fork StarBorder replica', () {
+    final sequence = CommonCircleLoading.defaultShapeSequence;
+
+    expect(sequence, hasLength(7));
+    for (var i = 0; i < sequence.length; i++) {
+      final next = sequence[(i + 1) % sequence.length];
+      expect(
+        () => Morph(sequence[i], next),
+        returnsNormally,
+        reason: 'every adjacent pair, wrapping around, must stay morphable',
+      );
+    }
+  });
+
   testWidgets('CommonCircleLoading uses the M3E default size', (tester) async {
     await tester.pumpWidget(
       const MaterialApp(home: Center(child: CommonCircleLoading())),
