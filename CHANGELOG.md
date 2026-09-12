@@ -1,5 +1,11 @@
 # Changelog
 
+## v0.8.97.3 (2026-09-13)
+
+**Bug Fixes**
+
+- **loading** Restore the v7.0.33 spinning star indicator (5e76db4)
+
 ## v0.8.97.2 (2026-09-12)
 
 **Features**
