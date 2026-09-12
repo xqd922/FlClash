@@ -30,6 +30,8 @@
 
 ### 2026-09-12 · 可变字体 wght 轴钉住，修复中文整体变粗
 
+> 详细修改思路、复用 runbook 与排错表见 [FONT_WEIGHT_PINNING.md](FONT_WEIGHT_PINNING.md)。
+
 - 基线：graphics @ v0.8.97
 - 类型：修复（渲染）
 - 文件：`lib/common/text.dart`、`lib/application.dart`、`test/common/text_test.dart`、`test/application_test.dart`
