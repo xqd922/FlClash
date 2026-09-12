@@ -1,5 +1,11 @@
 # Changelog
 
+## v0.8.97.2 (2026-09-12)
+
+**Features**
+
+- **loading** Restore the v7.0.x custom shape sequence on the M3E engine (526099d)
+
 ## v0.8.97.1 (2026-09-12)
 
 **Bug Fixes**
