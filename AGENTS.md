@@ -49,6 +49,9 @@ Read these only when the task touches their area:
   preferences, and declared return types.
 - For CI parity, verify with `flutter pub get`, `flutter analyze --no-fatal-infos`, and
   `flutter test --reporter expanded` when practical.
+- Every fork customization against upstream must be recorded: after completing one, append an
+  entry to [CUSTOMIZATIONS.md](CUSTOMIZATIONS.md) following its template, and update the
+  "未迁移" section when porting an old customization onto a new baseline.
 
 ## Repo Skills
 
