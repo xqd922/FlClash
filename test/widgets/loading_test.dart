@@ -1,38 +1,20 @@
-import 'package:fl_clash/common/shape.dart';
 import 'package:fl_clash/widgets/loading.dart';
-import 'package:material_new_shapes/material_new_shapes.dart';
-import 'package:material_ui/material_ui.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:material_ui/material_ui.dart';
 
 void main() {
-  test('the default shape sequence is the fork StarBorder replica', () {
-    final sequence = CommonCircleLoading.defaultShapeSequence;
-
-    expect(sequence, hasLength(7));
-    for (var i = 0; i < sequence.length; i++) {
-      final next = sequence[(i + 1) % sequence.length];
-      expect(
-        () => Morph(sequence[i], next),
-        returnsNormally,
-        reason: 'every adjacent pair, wrapping around, must stay morphable',
-      );
-    }
-  });
-
-  testWidgets('CommonCircleLoading uses the M3E default size', (tester) async {
+  testWidgets('CommonCircleLoading defaults to a 48 square', (tester) async {
     await tester.pumpWidget(
       const MaterialApp(home: Center(child: CommonCircleLoading())),
     );
 
-    final customPaint = find.descendant(
-      of: find.byType(CommonCircleLoading),
-      matching: find.byType(CustomPaint),
+    expect(
+      tester.getSize(find.byType(CommonCircleLoading)),
+      const Size.square(48),
     );
-
-    expect(tester.getSize(customPaint), const Size.square(48));
   });
 
-  testWidgets('CommonCircleLoading shrink-wraps when constraints are loose', (
+  testWidgets('CommonCircleLoading shrink-wraps to the shortest constraint', (
     tester,
   ) async {
     await tester.pumpWidget(
@@ -46,26 +28,6 @@ void main() {
       ),
     );
 
-    expect(
-      tester.getSize(find.byType(CommonCircleLoading)),
-      const Size.square(32),
-    );
-  });
-
-  testWidgets('CommonCircleLoading paints within the shortest constraint', (
-    tester,
-  ) async {
-    await tester.pumpWidget(
-      const MaterialApp(
-        home: Center(
-          child: SizedBox(
-            width: 100,
-            child: SizedBox.square(dimension: 32, child: CommonCircleLoading()),
-          ),
-        ),
-      ),
-    );
-
     final customPaint = find.descendant(
       of: find.byType(CommonCircleLoading),
       matching: find.byType(CustomPaint),
@@ -74,15 +36,11 @@ void main() {
     expect(tester.getSize(customPaint), const Size.square(32));
   });
 
-  testWidgets('CommonCircleLoading continuously rotates and morphs', (
+  testWidgets('CommonCircleLoading keeps rotating and morphing points', (
     tester,
   ) async {
     await tester.pumpWidget(
-      const MaterialApp(
-        home: Center(
-          child: SizedBox.square(dimension: 48, child: CommonCircleLoading()),
-        ),
-      ),
+      const MaterialApp(home: Center(child: CommonCircleLoading())),
     );
 
     final loading = find.byType(CommonCircleLoading);
@@ -97,7 +55,7 @@ void main() {
     final initialTransform = tester.widget<Transform>(transform).transform;
     final initialPainter = tester.widget<CustomPaint>(customPaint).painter!;
 
-    await tester.pump(const Duration(milliseconds: 325));
+    await tester.pump(const Duration(milliseconds: 300));
 
     final animatedTransform = tester.widget<Transform>(transform).transform;
     final animatedPainter = tester.widget<CustomPaint>(customPaint).painter!;
@@ -105,67 +63,10 @@ void main() {
     expect(animatedTransform.storage, isNot(equals(initialTransform.storage)));
     expect(animatedPainter.shouldRepaint(initialPainter), isTrue);
 
-    for (var i = 0; i < 7; i++) {
-      await tester.pump(const Duration(milliseconds: 650));
+    for (var i = 0; i < 4; i++) {
+      await tester.pump(const Duration(seconds: 1));
     }
 
     expect(tester.takeException(), isNull);
-  });
-
-  testWidgets('CommonCircleLoading exposes optional loading semantics', (
-    tester,
-  ) async {
-    await tester.pumpWidget(
-      const MaterialApp(
-        home: CommonCircleLoading(
-          semanticLabel: 'Loading profiles',
-          semanticValue: 'In progress',
-        ),
-      ),
-    );
-
-    expect(find.bySemanticsLabel('Loading profiles'), findsOneWidget);
-  });
-
-  testWidgets('CommonCircleLoading supports the contained M3E API variant', (
-    tester,
-  ) async {
-    final colorScheme = ColorScheme.fromSeed(seedColor: Colors.blue);
-    await tester.pumpWidget(
-      MaterialApp(
-        theme: ThemeData(colorScheme: colorScheme),
-        home: Center(
-          child: CommonCircleLoading(
-            variant: LoadingIndicatorM3EVariant.contained,
-            constraints: const BoxConstraints.tightFor(width: 32, height: 32),
-            padding: const EdgeInsets.all(4),
-            polygons: [
-              RoundedPolygon.star(numVerticesPerRadius: 6),
-              RoundedPolygon.star(numVerticesPerRadius: 8),
-            ],
-          ),
-        ),
-      ),
-    );
-
-    final decoratedBox = tester.widget<DecoratedBox>(
-      find.descendant(
-        of: find.byType(CommonCircleLoading),
-        matching: find.byType(DecoratedBox),
-      ),
-    );
-    final decoration = decoratedBox.decoration as BoxDecoration;
-    final customPaint = find.descendant(
-      of: find.byType(CommonCircleLoading),
-      matching: find.byType(CustomPaint),
-    );
-
-    expect(decoration.color, colorScheme.primaryContainer);
-    expect(decoration.borderRadius, AppRadius.full);
-    expect(tester.getSize(customPaint), const Size.square(32));
-    expect(
-      tester.getSize(find.byType(CommonCircleLoading)),
-      const Size.square(40),
-    );
   });
 }

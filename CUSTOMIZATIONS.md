@@ -66,23 +66,24 @@
   `v0.8.96`、`v0.8.97`，否则 CI 校验报 unknown revision）；同步新上游版本后把新的
   上游 tag 也推到 fork。
 
-### 2026-09-12 · 加载动画恢复旧版自定义形状序列
+### 2026-09-13 · 加载动画恢复 v7.0.33 的旋转星形（StarBorder）
 
-- 基线：graphics @ v0.8.97.1
+- 基线：graphics @ v0.8.97.2
 - 类型：视觉
 - 文件：`lib/widgets/loading.dart`、`test/widgets/loading_test.dart`
-- 背景：上游 v0.8.97 的 M3E 加载指示器用官方 `MaterialShapes` 预设形状；旧
-  v7.0.x 版是手调 StarBorder 参数（软爆发 10 角、9 齿 cookie 等圆齿值），观感
-  更圆润。用户要求找回旧观感、保留官方 Morph 引擎。
-- 方案：`CommonCircleLoading.defaultShapeSequence` 用 `RoundedPolygon.star(...)`
-  按旧参数逐一重建 5 个星形（points/innerRadiusRatio/pointRounding/valleyRounding
-  一一对应），pill/oval 保留官方预设；全部 `.normalized()` 保证可变形。默认序列
-  整体替换，app 内所有加载点（代理卡片、资源页、面板等）观感一致。
-- 回归保护：`test/widgets/loading_test.dart` 新增"相邻形状（含环形回绕）可变形"
-  测试；既有动画测试泵完整轮序列无异常。
-- 注意：`RoundedPolygon` 的 `CornerRounding` 与旧 `StarBorder` 的 rounding 语义
-  近似而非等价；该序列是全局默认，改动即影响所有加载点；上游若重构 loading.dart
-  需按台账重新对位。
+- 背景：用户要的动画是 v7.0.33 的样式——一颗持续旋转（3s/圈）、角数在 3↔9 连续
+  往复（1s easeInOut）的星形（StarBorder 的 points 浮点连续变形，innerRadius 0.8 /
+  齿圆角 0.5 / 谷圆角 0.1 / squash 0.5）。上游 v0.8.97 改为 M3E 离散形状序列
+  （MaterialShapes 七形状 Morph），观感完全不同；曾按七形状参数复刻并随
+  v0.8.97.2 发布，真机确认仍不是目标样式，本条目取代之。
+- 方案：绘制器整体回退为 v7.0.33 的 StarBorder 实现，仅保留新版外壳语义
+  （默认 48、被父约束钳制取短边、Loose 约束下收缩、RepaintBoundary）。
+  M3E 的离散顶点 API（RoundedPolygon.star 角数只能整数）无法实现连续点数
+  变形，经评估后明确不采用。
+- 回归保护：`test/widgets/loading_test.dart`（尺寸解析 + 旋转/点数持续动画）。
+- 注意：`CommonCircleLoading` API 收敛为 `{color}`（variant/polygons/
+  semanticLabel 等无调用点使用，已移除）；material_new_shapes 依赖仍被
+  null_status.dart 使用故保留；上游重构 loading.dart 时按本条目重新对位。
 
 ## 未迁移（旧 v7.0.x / optimize 分支，按需迁移）
 
