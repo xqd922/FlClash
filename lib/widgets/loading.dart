@@ -1,69 +1,17 @@
-import 'dart:async';
 import 'dart:math' as math;
 
-import 'package:fl_clash/common/shape.dart';
-import 'package:flutter/foundation.dart';
-import 'package:material_new_shapes/material_new_shapes.dart';
 import 'package:material_ui/material_ui.dart';
-import 'package:flutter/physics.dart';
 
-enum LoadingIndicatorM3EVariant { defaultStyle, contained }
-
+// 本地定制：恢复 v7.0.33 的加载动画——一颗持续旋转、角数在 3→9 之间连续往复
+// 变形的星形。StarBorder 的 points 支持浮点连续值，角是真实地分裂/合并的；
+// 上游 v0.8.97 的 M3E 形状序列指示器（离散顶点逐档变形）替代不了这个观感，
+// 故整体回退绘制器，勿用 RoundedPolygon/Morph 重写。
 class CommonCircleLoading extends StatefulWidget {
+  const CommonCircleLoading({super.key, this.color});
+
   static const double defaultDimension = 48;
 
-  // 本地定制：旧 v7.0.x 版 StarBorder 形状序列的参数，用官方 RoundedPolygon
-  // 引擎复刻（软爆发、9 齿 cookie 等圆齿值均为旧版手调参数）。
-  static final List<RoundedPolygon> defaultShapeSequence = [
-    _star(
-      points: 10,
-      innerRadiusRatio: 0.78,
-      pointRounding: 0.55,
-      valleyRounding: 0.35,
-    ),
-    _star(
-      points: 9,
-      innerRadiusRatio: 0.86,
-      pointRounding: 0.62,
-      valleyRounding: 0.28,
-    ),
-    _star(points: 5, innerRadiusRatio: 0.81, pointRounding: 0.25),
-    MaterialShapes.pill,
-    _star(
-      points: 8,
-      innerRadiusRatio: 0.58,
-      pointRounding: 0.52,
-      valleyRounding: 0.18,
-    ),
-    _star(
-      points: 4,
-      innerRadiusRatio: 0.78,
-      pointRounding: 0.62,
-      valleyRounding: 0.28,
-    ),
-    MaterialShapes.oval,
-  ];
-
-  final LoadingIndicatorM3EVariant variant;
   final Color? color;
-  final Color? containerColor;
-  final List<RoundedPolygon>? polygons;
-  final BoxConstraints? constraints;
-  final EdgeInsetsGeometry? padding;
-  final String? semanticLabel;
-  final String? semanticValue;
-
-  const CommonCircleLoading({
-    super.key,
-    this.variant = LoadingIndicatorM3EVariant.defaultStyle,
-    this.color,
-    this.containerColor,
-    this.polygons,
-    this.constraints,
-    this.padding,
-    this.semanticLabel,
-    this.semanticValue,
-  }) : assert(polygons == null || polygons.length > 1);
 
   @override
   State<CommonCircleLoading> createState() => _CommonCircleLoadingState();
@@ -71,138 +19,81 @@ class CommonCircleLoading extends StatefulWidget {
 
 class _CommonCircleLoadingState extends State<CommonCircleLoading>
     with TickerProviderStateMixin {
-  static const _globalRotationDuration = Duration(milliseconds: 4666);
-  static const _morphInterval = Duration(milliseconds: 650);
-  static const _fullRotation = 360.0;
-  static const _quarterRotation = _fullRotation / 4;
-  static const _activeIndicatorScale = 38 / 48;
-  static const _defaultConstraints = BoxConstraints.tightFor(
-    width: CommonCircleLoading.defaultDimension,
-    height: CommonCircleLoading.defaultDimension,
-  );
-
-  final SpringSimulation _morphAnimation = SpringSimulation(
-    SpringDescription.withDampingRatio(mass: 1, stiffness: 200, ratio: 0.6),
-    0,
-    1,
-    5,
-    snapToEnd: true,
-  );
-
-  late final AnimationController _morphController;
-  late final AnimationController _globalRotationController;
-  late final Listenable _animation;
-
-  List<RoundedPolygon>? _cachedPolygons;
-  List<Morph>? _cachedMorphs;
-
-  var _currentMorphIndex = 0;
-  var _morphRotationTargetAngle = _quarterRotation;
+  late final AnimationController _rotateController;
+  late final AnimationController _pointsController;
+  late final Animation<double> _pointsAnimation;
 
   @override
   void initState() {
     super.initState();
-    _morphController = AnimationController.unbounded(vsync: this);
-    _globalRotationController = AnimationController(
-      duration: _globalRotationDuration,
+    _rotateController = AnimationController(
+      duration: const Duration(seconds: 3),
       vsync: this,
     )..repeat();
-    _animation = Listenable.merge([
-      _morphController,
-      _globalRotationController,
-    ]);
-    unawaited(_runMorphLoop());
+
+    _pointsController = AnimationController(
+      duration: const Duration(seconds: 1),
+      vsync: this,
+    )..repeat(reverse: true);
+
+    _pointsAnimation = Tween<double>(begin: 3.0, end: 9.0).animate(
+      CurvedAnimation(parent: _pointsController, curve: Curves.easeInOut),
+    );
   }
 
   @override
   void dispose() {
-    _morphController.dispose();
-    _globalRotationController.dispose();
+    _rotateController.dispose();
+    _pointsController.dispose();
     super.dispose();
   }
 
-  @override
-  void didUpdateWidget(covariant CommonCircleLoading oldWidget) {
-    super.didUpdateWidget(oldWidget);
-    if (widget.polygons != oldWidget.polygons &&
-        _currentMorphIndex >= _shapeCount) {
-      _currentMorphIndex = 0;
+  double _resolveDimension(BoxConstraints constraints) {
+    final maxWidth = math.min(
+      constraints.maxWidth,
+      CommonCircleLoading.defaultDimension,
+    );
+    final maxHeight = math.min(
+      constraints.maxHeight,
+      CommonCircleLoading.defaultDimension,
+    );
+    if (maxWidth.isFinite && maxHeight.isFinite) {
+      return math.min(maxWidth, maxHeight);
     }
+    if (maxWidth.isFinite) {
+      return maxWidth;
+    }
+    if (maxHeight.isFinite) {
+      return maxHeight;
+    }
+    return CommonCircleLoading.defaultDimension;
   }
 
   @override
   Widget build(BuildContext context) {
-    final colorScheme = Theme.of(context).colorScheme;
-    final activeColor = switch (widget.variant) {
-      LoadingIndicatorM3EVariant.defaultStyle =>
-        widget.color ?? colorScheme.primary,
-      LoadingIndicatorM3EVariant.contained =>
-        widget.color ?? colorScheme.onPrimaryContainer,
-    };
-    final backgroundColor = switch (widget.variant) {
-      LoadingIndicatorM3EVariant.defaultStyle =>
-        widget.containerColor ?? Colors.transparent,
-      LoadingIndicatorM3EVariant.contained =>
-        widget.containerColor ?? colorScheme.primaryContainer,
-    };
-    final shapeSequence =
-        widget.polygons ?? CommonCircleLoading.defaultShapeSequence;
-    final morphs = _morphsFor(shapeSequence);
-    final padding = (widget.padding ?? EdgeInsets.zero).resolve(
-      Directionality.of(context),
-    );
+    final color = widget.color ?? Theme.of(context).colorScheme.primary;
 
     return LayoutBuilder(
       builder: (context, constraints) {
-        final indicatorConstraints = constraints.deflate(padding);
-        final dimension = _resolveDimension(
-          indicatorConstraints,
-          widget.constraints ?? _defaultConstraints,
-        );
-        final currentMorphIndex = _currentMorphIndex % shapeSequence.length;
+        final side = _resolveDimension(constraints);
         return Align(
           widthFactor: 1,
           heightFactor: 1,
-          child: Semantics(
-            label: widget.semanticLabel,
-            value: widget.semanticValue,
-            child: DecoratedBox(
-              decoration: BoxDecoration(
-                color: backgroundColor,
-                borderRadius: AppRadius.full,
-              ),
-              child: Padding(
-                padding: padding,
-                child: RepaintBoundary(
-                  child: SizedBox.square(
-                    dimension: dimension,
-                    child: AnimatedBuilder(
-                      animation: _animation,
-                      builder: (context, child) {
-                        final morphProgress = _morphController.value.clamp(
-                          0.0,
-                          1.0,
-                        );
-                        final rotationDegrees =
-                            morphProgress * _quarterRotation +
-                            _morphRotationTargetAngle +
-                            _globalRotationController.value * _fullRotation;
-                        return Transform.rotate(
-                          angle: rotationDegrees * math.pi / 180,
-                          child: CustomPaint(
-                            painter: _MorphPainter(
-                              morph: morphs[currentMorphIndex],
-                              progress: morphProgress,
-                              color: activeColor,
-                              scaleFactor: _activeIndicatorScale,
-                            ),
-                            child: child,
-                          ),
-                        );
-                      },
-                      child: const SizedBox.expand(),
-                    ),
-                  ),
+          child: RepaintBoundary(
+            child: RotationTransition(
+              turns: _rotateController,
+              child: SizedBox.square(
+                dimension: side,
+                child: AnimatedBuilder(
+                  animation: _pointsAnimation,
+                  builder: (context, child) {
+                    return CustomPaint(
+                      painter: _StarPainter(
+                        points: _pointsAnimation.value,
+                        color: color,
+                      ),
+                    );
+                  },
                 ),
               ),
             ),
@@ -211,126 +102,33 @@ class _CommonCircleLoadingState extends State<CommonCircleLoading>
       },
     );
   }
-
-  int get _shapeCount =>
-      widget.polygons?.length ??
-      CommonCircleLoading.defaultShapeSequence.length;
-
-  List<Morph> _morphsFor(List<RoundedPolygon> polygons) {
-    final cachedMorphs = _cachedMorphs;
-    if (cachedMorphs != null && listEquals(_cachedPolygons, polygons)) {
-      return cachedMorphs;
-    }
-    _cachedPolygons = polygons;
-    return _cachedMorphs = [
-      for (var i = 0; i < polygons.length; i++)
-        Morph(polygons[i], polygons[(i + 1) % polygons.length]),
-    ];
-  }
-
-  double _resolveDimension(
-    BoxConstraints parentConstraints,
-    BoxConstraints preferredConstraints,
-  ) {
-    final effectiveConstraints = preferredConstraints.enforce(
-      BoxConstraints(
-        maxWidth: parentConstraints.maxWidth,
-        maxHeight: parentConstraints.maxHeight,
-      ),
-    );
-    final maxWidth = effectiveConstraints.maxWidth;
-    final maxHeight = effectiveConstraints.maxHeight;
-
-    if (maxWidth.isFinite && maxHeight.isFinite) {
-      return maxWidth < maxHeight ? maxWidth : maxHeight;
-    }
-
-    if (maxWidth.isFinite) {
-      return maxWidth;
-    }
-
-    if (maxHeight.isFinite) {
-      return maxHeight;
-    }
-
-    return CommonCircleLoading.defaultDimension;
-  }
-
-  Future<void> _runMorphLoop() async {
-    while (mounted) {
-      final startedAt = DateTime.now();
-      try {
-        await _morphController.animateWith(_morphAnimation).orCancel;
-      } on TickerCanceled {
-        return;
-      }
-
-      final elapsed = DateTime.now().difference(startedAt);
-      if (elapsed < _morphInterval) {
-        await Future<void>.delayed(_morphInterval - elapsed);
-      }
-      if (!mounted) {
-        return;
-      }
-
-      setState(() {
-        _currentMorphIndex = (_currentMorphIndex + 1) % _shapeCount;
-        _morphRotationTargetAngle =
-            (_morphRotationTargetAngle + _quarterRotation) % _fullRotation;
-        _morphController.value = 0;
-      });
-    }
-  }
 }
 
-class _MorphPainter extends CustomPainter {
-  final Morph morph;
-  final double progress;
+class _StarPainter extends CustomPainter {
+  final double points;
   final Color color;
-  final double scaleFactor;
   final Paint _paint;
 
-  _MorphPainter({
-    required this.morph,
-    required this.progress,
-    required this.color,
-    required this.scaleFactor,
-  }) : _paint = Paint()
-         ..style = PaintingStyle.fill
-         ..isAntiAlias = true
-         ..color = color;
+  _StarPainter({required this.points, required this.color})
+    : _paint = Paint()..color = color;
 
   @override
   void paint(Canvas canvas, Size size) {
-    final scale = size.width * scaleFactor;
-    final offset = (size.width - scale) / 2;
-    canvas.save();
-    canvas.translate(offset, offset);
-    canvas.scale(scale);
-    canvas.drawPath(morph.toPath(progress: progress), _paint);
-    canvas.restore();
+    final rect = Offset.zero & size;
+    final starBorder = StarBorder(
+      points: points,
+      innerRadiusRatio: 0.8,
+      pointRounding: 0.5,
+      valleyRounding: 0.1,
+      squash: 0.5,
+    );
+
+    final path = starBorder.getOuterPath(rect);
+    canvas.drawPath(path, _paint);
   }
 
   @override
-  bool shouldRepaint(covariant _MorphPainter oldDelegate) {
-    return oldDelegate.morph != morph ||
-        oldDelegate.progress != progress ||
-        oldDelegate.color != color ||
-        oldDelegate.scaleFactor != scaleFactor;
+  bool shouldRepaint(covariant _StarPainter oldDelegate) {
+    return oldDelegate.points != points || oldDelegate.color != color;
   }
-}
-
-RoundedPolygon _star({
-  required int points,
-  required double innerRadiusRatio,
-  required double pointRounding,
-  double valleyRounding = 0,
-}) {
-  return RoundedPolygon.star(
-    numVerticesPerRadius: points,
-    radius: 1,
-    innerRadius: innerRadiusRatio,
-    rounding: CornerRounding(radius: pointRounding),
-    innerRounding: CornerRounding(radius: valleyRounding),
-  ).normalized();
 }
