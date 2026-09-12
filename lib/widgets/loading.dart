@@ -12,6 +12,38 @@ enum LoadingIndicatorM3EVariant { defaultStyle, contained }
 class CommonCircleLoading extends StatefulWidget {
   static const double defaultDimension = 48;
 
+  // 本地定制：旧 v7.0.x 版 StarBorder 形状序列的参数，用官方 RoundedPolygon
+  // 引擎复刻（软爆发、9 齿 cookie 等圆齿值均为旧版手调参数）。
+  static final List<RoundedPolygon> defaultShapeSequence = [
+    _star(
+      points: 10,
+      innerRadiusRatio: 0.78,
+      pointRounding: 0.55,
+      valleyRounding: 0.35,
+    ),
+    _star(
+      points: 9,
+      innerRadiusRatio: 0.86,
+      pointRounding: 0.62,
+      valleyRounding: 0.28,
+    ),
+    _star(points: 5, innerRadiusRatio: 0.81, pointRounding: 0.25),
+    MaterialShapes.pill,
+    _star(
+      points: 8,
+      innerRadiusRatio: 0.58,
+      pointRounding: 0.52,
+      valleyRounding: 0.18,
+    ),
+    _star(
+      points: 4,
+      innerRadiusRatio: 0.78,
+      pointRounding: 0.62,
+      valleyRounding: 0.28,
+    ),
+    MaterialShapes.oval,
+  ];
+
   final LoadingIndicatorM3EVariant variant;
   final Color? color;
   final Color? containerColor;
@@ -48,16 +80,6 @@ class _CommonCircleLoadingState extends State<CommonCircleLoading>
     width: CommonCircleLoading.defaultDimension,
     height: CommonCircleLoading.defaultDimension,
   );
-
-  static final List<RoundedPolygon> _defaultShapeSequence = [
-    MaterialShapes.softBurst,
-    MaterialShapes.cookie9Sided,
-    MaterialShapes.pentagon,
-    MaterialShapes.pill,
-    MaterialShapes.sunny,
-    MaterialShapes.cookie4Sided,
-    MaterialShapes.oval,
-  ];
 
   final SpringSimulation _morphAnimation = SpringSimulation(
     SpringDescription.withDampingRatio(mass: 1, stiffness: 200, ratio: 0.6),
@@ -123,7 +145,8 @@ class _CommonCircleLoadingState extends State<CommonCircleLoading>
       LoadingIndicatorM3EVariant.contained =>
         widget.containerColor ?? colorScheme.primaryContainer,
     };
-    final shapeSequence = widget.polygons ?? _defaultShapeSequence;
+    final shapeSequence =
+        widget.polygons ?? CommonCircleLoading.defaultShapeSequence;
     final morphs = _morphsFor(shapeSequence);
     final padding = (widget.padding ?? EdgeInsets.zero).resolve(
       Directionality.of(context),
@@ -190,7 +213,8 @@ class _CommonCircleLoadingState extends State<CommonCircleLoading>
   }
 
   int get _shapeCount =>
-      widget.polygons?.length ?? _defaultShapeSequence.length;
+      widget.polygons?.length ??
+      CommonCircleLoading.defaultShapeSequence.length;
 
   List<Morph> _morphsFor(List<RoundedPolygon> polygons) {
     final cachedMorphs = _cachedMorphs;
@@ -294,4 +318,19 @@ class _MorphPainter extends CustomPainter {
         oldDelegate.color != color ||
         oldDelegate.scaleFactor != scaleFactor;
   }
+}
+
+RoundedPolygon _star({
+  required int points,
+  required double innerRadiusRatio,
+  required double pointRounding,
+  double valleyRounding = 0,
+}) {
+  return RoundedPolygon.star(
+    numVerticesPerRadius: points,
+    radius: 1,
+    innerRadius: innerRadiusRatio,
+    rounding: CornerRounding(radius: pointRounding),
+    innerRounding: CornerRounding(radius: valleyRounding),
+  ).normalized();
 }

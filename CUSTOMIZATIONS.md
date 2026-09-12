@@ -66,6 +66,24 @@
   `v0.8.96`、`v0.8.97`，否则 CI 校验报 unknown revision）；同步新上游版本后把新的
   上游 tag 也推到 fork。
 
+### 2026-09-12 · 加载动画恢复旧版自定义形状序列
+
+- 基线：graphics @ v0.8.97.1
+- 类型：视觉
+- 文件：`lib/widgets/loading.dart`、`test/widgets/loading_test.dart`
+- 背景：上游 v0.8.97 的 M3E 加载指示器用官方 `MaterialShapes` 预设形状；旧
+  v7.0.x 版是手调 StarBorder 参数（软爆发 10 角、9 齿 cookie 等圆齿值），观感
+  更圆润。用户要求找回旧观感、保留官方 Morph 引擎。
+- 方案：`CommonCircleLoading.defaultShapeSequence` 用 `RoundedPolygon.star(...)`
+  按旧参数逐一重建 5 个星形（points/innerRadiusRatio/pointRounding/valleyRounding
+  一一对应），pill/oval 保留官方预设；全部 `.normalized()` 保证可变形。默认序列
+  整体替换，app 内所有加载点（代理卡片、资源页、面板等）观感一致。
+- 回归保护：`test/widgets/loading_test.dart` 新增"相邻形状（含环形回绕）可变形"
+  测试；既有动画测试泵完整轮序列无异常。
+- 注意：`RoundedPolygon` 的 `CornerRounding` 与旧 `StarBorder` 的 rounding 语义
+  近似而非等价；该序列是全局默认，改动即影响所有加载点；上游若重构 loading.dart
+  需按台账重新对位。
+
 ## 未迁移（旧 v7.0.x / optimize 分支，按需迁移）
 
 以下定制留在 `optimize` 分支，尚未带到新基线；迁移时移入上方清单并注明迁移提交：
