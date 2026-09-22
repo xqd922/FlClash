@@ -141,4 +141,28 @@ void main() {
       );
     }
   });
+
+  test('the app theme pins the wght axis on text styles', () {
+    for (final brightness in Brightness.values) {
+      final theme = buildAppTheme(
+        colorScheme: ColorScheme.fromSeed(
+          seedColor: Colors.blue,
+          brightness: brightness,
+        ),
+      );
+
+      for (final style in [
+        theme.textTheme.displayLarge,
+        theme.textTheme.headlineLarge,
+        theme.textTheme.titleMedium,
+        theme.textTheme.bodyLarge,
+        theme.textTheme.labelLarge,
+      ]) {
+        expect(
+          style?.fontVariations,
+          contains(const FontVariation('wght', 400)),
+        );
+      }
+    }
+  });
 }

@@ -13,6 +13,7 @@ import 'package:fl_clash/plugins/app.dart';
 import 'package:fl_clash/providers/providers.dart';
 import 'package:fl_clash/state.dart';
 import 'package:material_ui/material_ui.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
@@ -49,6 +50,26 @@ Widget buildManagerStack({
   );
 }
 
+const _pageTransitionsTheme = PageTransitionsTheme(
+  builders: <TargetPlatform, PageTransitionsBuilder>{
+    TargetPlatform.android: commonSharedXPageTransitions,
+    TargetPlatform.windows: commonSharedXPageTransitions,
+    TargetPlatform.linux: commonSharedXPageTransitions,
+    TargetPlatform.macOS: commonSharedXPageTransitions,
+  },
+);
+
+/// 钉住可变字体 wght 的统一入口（背景见 text.dart）；typography 与 colorScheme 必须传入同一实例，否则深浅色文字着色错乱。
+ThemeData buildAppTheme({required ColorScheme colorScheme}) => ThemeData(
+  useMaterial3: true,
+  pageTransitionsTheme: _pageTransitionsTheme,
+  colorScheme: colorScheme,
+  typography: Typography.material2021(
+    platform: defaultTargetPlatform,
+    colorScheme: colorScheme,
+  ).toDefaultWeight,
+).withAppShapes;
+
 class Application extends ConsumerStatefulWidget {
   const Application({super.key});
 
@@ -59,15 +80,6 @@ class Application extends ConsumerStatefulWidget {
 class ApplicationState extends ConsumerState<Application> {
   Timer? _autoUpdateProfilesTaskTimer;
   bool _preHasVpn = false;
-
-  final _pageTransitionsTheme = const PageTransitionsTheme(
-    builders: <TargetPlatform, PageTransitionsBuilder>{
-      TargetPlatform.android: commonSharedXPageTransitions,
-      TargetPlatform.windows: commonSharedXPageTransitions,
-      TargetPlatform.linux: commonSharedXPageTransitions,
-      TargetPlatform.macOS: commonSharedXPageTransitions,
-    },
-  );
 
   ColorScheme _getAppColorScheme({required Brightness brightness}) {
     return ref.read(genColorSchemeProvider(brightness));
@@ -149,6 +161,12 @@ class ApplicationState extends ConsumerState<Application> {
           appSettingProvider.select((state) => state.locale),
         );
         final themeProps = ref.watch(themeSettingProvider);
+        final lightColorScheme = _getAppColorScheme(
+          brightness: Brightness.light,
+        );
+        final darkColorScheme = _getAppColorScheme(
+          brightness: Brightness.dark,
+        ).toPureBlack(themeProps.pureBlack);
         return MaterialApp(
           debugShowCheckedModeBanner: false,
           navigatorKey: globalState.navigatorKey,
@@ -177,18 +195,8 @@ class ApplicationState extends ConsumerState<Application> {
           locale: getLocaleForString(locale),
           supportedLocales: AppLocalizations.delegate.supportedLocales,
           themeMode: themeProps.themeMode,
-          theme: ThemeData(
-            useMaterial3: true,
-            pageTransitionsTheme: _pageTransitionsTheme,
-            colorScheme: _getAppColorScheme(brightness: Brightness.light),
-          ).withAppShapes,
-          darkTheme: ThemeData(
-            useMaterial3: true,
-            pageTransitionsTheme: _pageTransitionsTheme,
-            colorScheme: _getAppColorScheme(
-              brightness: Brightness.dark,
-            ).toPureBlack(themeProps.pureBlack),
-          ).withAppShapes,
+          theme: buildAppTheme(colorScheme: lightColorScheme),
+          darkTheme: buildAppTheme(colorScheme: darkColorScheme),
           home: child!,
         );
       },
