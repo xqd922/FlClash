@@ -2,12 +2,15 @@ import 'dart:io';
 
 import 'models.dart';
 
-final _tagPattern = RegExp(r'^v(\d+)\.(\d+)\.(\d+)(?:-pre\.(\d+))?$');
+final _tagPattern = RegExp(
+  r'^v(\d+)\.(\d+)\.(\d+)(?:\.(\d+))?(?:-pre\.(\d+))?$',
+);
 
 const _fieldSeparator = '\u001f';
 const _recordSeparator = '\u001e';
 
-/// A release tag that matches the `vMAJOR.MINOR.PATCH[-pre.N]` contract.
+/// A release tag that matches the `vMAJOR.MINOR.PATCH[.LOCAL][-pre.N]` contract,
+/// where `LOCAL` is the fork's own patch segment on top of an upstream tag.
 ///
 /// Every other tag in the repository is ignored on purpose: `backup-pre-squash-*`
 /// and similar bookkeeping tags used to leak into the generated changelog as
@@ -18,6 +21,7 @@ class VersionTag implements Comparable<VersionTag> {
     required this.major,
     required this.minor,
     required this.patch,
+    this.local,
     this.pre,
   });
 
@@ -25,11 +29,13 @@ class VersionTag implements Comparable<VersionTag> {
   final int major;
   final int minor;
   final int patch;
+  final int? local;
   final int? pre;
 
   bool get isPrerelease => pre != null;
 
-  String get version => '$major.$minor.$patch';
+  String get version =>
+      local == null ? '$major.$minor.$patch' : '$major.$minor.$patch.$local';
 
   static VersionTag? tryParse(String name) {
     final match = _tagPattern.firstMatch(name.trim());
@@ -41,7 +47,8 @@ class VersionTag implements Comparable<VersionTag> {
       major: int.parse(match.group(1)!),
       minor: int.parse(match.group(2)!),
       patch: int.parse(match.group(3)!),
-      pre: match.group(4) == null ? null : int.parse(match.group(4)!),
+      local: match.group(4) == null ? null : int.parse(match.group(4)!),
+      pre: match.group(5) == null ? null : int.parse(match.group(5)!),
     );
   }
 
@@ -58,6 +65,10 @@ class VersionTag implements Comparable<VersionTag> {
     final byPatch = patch.compareTo(other.patch);
     if (byPatch != 0) {
       return byPatch;
+    }
+    final byLocal = (local ?? 0).compareTo(other.local ?? 0);
+    if (byLocal != 0) {
+      return byLocal;
     }
     if (pre == null && other.pre == null) {
       return 0;

@@ -110,6 +110,29 @@ void main() {
     expect(tags.map((tag) => tag.name), ['v1.1.0', 'v1.1.0-pre.1', 'v1.0.0']);
   });
 
+  test('a local patch tag extends the stable release series', () {
+    git(['tag', 'v1.1.0.1']);
+    commit('fix(d): fork patch fix');
+    git(['tag', 'v1.1.0.2']);
+    final scoped = Git(workingDirectory: repo.path);
+
+    expect(scoped.versionTags().map((tag) => tag.name), [
+      'v1.1.0.2',
+      'v1.1.0.1',
+      'v1.1.0',
+      'v1.1.0-pre.1',
+      'v1.0.0',
+    ]);
+
+    final versions = build().changelog.versions;
+    expect(versions.map((version) => version.tag), [
+      'v1.1.0.2',
+      'v1.1.0.1',
+      'v1.1.0',
+    ]);
+    expect(versions.first.version, '1.1.0.2');
+  });
+
   test('lifts breaking changes into their own group', () {
     final groups = build().changelog.versions.single.groups;
 
