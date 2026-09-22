@@ -18,9 +18,10 @@
 
 ## 分支与版本约定
 
-- `graphics` 分支：当前活跃基线，直接切自上游稳定 tag（当前 v0.8.97），定制在其上叠加。
-- 版本号：tag 用 `v<上游版本>.<本地补丁号>`（如 `v0.8.97.1`）；pubspec 用三段式
-  `0.8.97+<YYYYMMDD><序号>`（上游限制 pubspec 只能三段，补丁号由 tag 承载）。
+- `baseline` 分支：当前活跃基线，直接切自上游稳定 tag（当前 v0.8.98），定制在其上叠加。
+  2026-09-22 自 v0.8.98 重启基线；旧 v0.8.97 线（`graphics`）不合入，定制按本清单原样迁入。
+- 版本号：tag 用 `v<上游版本>.<本地补丁号>`（如 `v0.8.98.1`）；pubspec 用三段式
+  `0.8.98+<YYYYMMDD><序号>`（上游限制 pubspec 只能三段，补丁号由 tag 承载）。
 - 发版：改 pubspec 版本号 → `dart run tool/changelog.dart release --version <版本>` → 提交
   `chore(release): vX.Y.Z.N` → 推 tag 触发上游工作流构建并发布 Release。
 - 本机跑 Flutter 命令带 `PUB_HOSTED_URL=https://pub.dev`，否则 CN 镜像会静默重解析
