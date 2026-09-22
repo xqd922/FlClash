@@ -2,6 +2,49 @@
   "schemaVersion": 2,
   "versions": [
     {
+      "version": "0.8.98.1",
+      "tag": "v0.8.98.1",
+      "date": "2026-09-22",
+      "prerelease": false,
+      "groups": [
+        {
+          "type": "feat",
+          "entries": [
+            {
+              "id": "f9e404e",
+              "scope": "loading",
+              "text": "Restore the v7.0.x custom shape sequence on the M3E engine"
+            }
+          ]
+        },
+        {
+          "type": "fix",
+          "entries": [
+            {
+              "id": "8262618",
+              "scope": "proxies",
+              "text": "Restore the thin circular delay-test spinner on proxy cards"
+            },
+            {
+              "id": "0ceb057",
+              "scope": "loading",
+              "text": "Restore the v7.0.33 spinning star indicator"
+            },
+            {
+              "id": "351e6c6",
+              "scope": "changelog",
+              "text": "Accept fork-local fourth version segment in release tags"
+            },
+            {
+              "id": "fc52a53",
+              "scope": "theme",
+              "text": "Pin variable font wght axis to restore default CJK weight"
+            }
+          ]
+        }
+      ]
+    },
+    {
       "version": "0.8.98",
       "tag": "v0.8.98",
       "date": "2026-09-14",

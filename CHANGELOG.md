@@ -1,5 +1,18 @@
 # Changelog
 
+## v0.8.98.1 (2026-09-22)
+
+**Features**
+
+- **loading** Restore the v7.0.x custom shape sequence on the M3E engine (f9e404e)
+
+**Bug Fixes**
+
+- **proxies** Restore the thin circular delay-test spinner on proxy cards (8262618)
+- **loading** Restore the v7.0.33 spinning star indicator (0ceb057)
+- **changelog** Accept fork-local fourth version segment in release tags (351e6c6)
+- **theme** Pin variable font wght axis to restore default CJK weight (fc52a53)
+
 ## v0.8.98 (2026-09-14)
 
 **Bug Fixes**
