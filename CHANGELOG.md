@@ -1,5 +1,11 @@
 # Changelog
 
+## v0.8.98.2 (2026-09-23)
+
+**Bug Fixes**
+
+- **text** Fix text rendering overall bold on variable-font CJK fallbacks (2c4e414)
+
 ## v0.8.98 (2026-09-14)
 
 **Bug Fixes**
