@@ -1,5 +1,17 @@
 # Changelog
 
+## v0.8.98.3 (2026-09-23)
+
+**Features**
+
+- **proxies** Default the proxy page card size to compact (41f9aef)
+- **settings** Turn off unified delay, tab animation, and automatic update checks by default (cd8afc0)
+- **theme** Use system theme mode, tonal spot, and automatic color on first launch (2fd7efe)
+
+**Bug Fixes**
+
+- **bootstrap** Skip the first-run disclaimer and data-collection prompts (981e413)
+
 ## v0.8.98.2 (2026-09-23)
 
 **Bug Fixes**
