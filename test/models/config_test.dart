@@ -314,14 +314,17 @@ void main() {
       const props = ThemeProps();
       expect(props.primaryColor, null);
       expect(props.primaryColors, defaultPrimaryColors);
-      expect(props.themeMode, ThemeMode.dark);
+      expect(props.themeMode, ThemeMode.system);
+      expect(props.schemeVariant, DynamicSchemeVariant.tonalSpot);
       expect(props.pureBlack, false);
       expect(props.textScale.scale, 1.0);
     });
 
     test('safeFromJson returns default on null', () {
       final result = ThemeProps.safeFromJson(null);
-      expect(result.themeMode, ThemeMode.dark);
+      expect(result.themeMode, ThemeMode.system);
+      expect(result.schemeVariant, DynamicSchemeVariant.tonalSpot);
+      expect(result.primaryColor, null);
     });
 
     test('round-trip with custom values', () {
