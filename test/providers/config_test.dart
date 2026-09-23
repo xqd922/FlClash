@@ -183,6 +183,7 @@ void main() {
     test('default values', () {
       final value = container.read(proxiesStyleSettingProvider);
       expect(value.type, ProxiesType.tab);
+      expect(value.cardType, ProxyCardType.shrink);
     });
 
     test('can update state', () {

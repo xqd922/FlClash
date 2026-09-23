@@ -294,6 +294,7 @@ void main() {
       expect(props.type, ProxiesType.tab);
       expect(props.sortType, ProxiesSortType.none);
       expect(props.layout, ProxiesLayout.standard);
+      expect(props.cardType, ProxyCardType.shrink);
     });
 
     test('round-trip with custom values', () {
