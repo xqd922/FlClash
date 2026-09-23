@@ -225,11 +225,6 @@ class Bootstrap {
     )) {
       return;
     }
-    await dialogs.showMessage(
-      title: currentAppLocalizations.dataCollectionTip,
-      cancelable: false,
-      message: TextSpan(text: currentAppLocalizations.dataCollectionContent),
-    );
     _container
         .read(appSettingProvider.notifier)
         .update((state) => state.copyWith(crashlyticsTip: true));
@@ -240,10 +235,6 @@ class Bootstrap {
       appSettingProvider.select((state) => state.disclaimerAccepted),
     )) {
       return;
-    }
-    final isDisclaimerAccepted = await dialogs.showDisclaimer();
-    if (!isDisclaimerAccepted) {
-      await _container.read(systemActionProvider.notifier).handleExit();
     }
     _container
         .read(appSettingProvider.notifier)
