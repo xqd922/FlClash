@@ -427,7 +427,7 @@ _PatchClashConfig _$PatchClashConfigFromJson(Map<String, dynamic> json) =>
       keepAliveInterval:
           (json['keep-alive-interval'] as num?)?.toInt() ??
           defaultKeepAliveInterval,
-      unifiedDelay: json['unified-delay'] as bool? ?? true,
+      unifiedDelay: json['unified-delay'] as bool? ?? false,
       tcpConcurrent: json['tcp-concurrent'] as bool? ?? true,
       tun: json['tun'] == null
           ? defaultTun

@@ -103,8 +103,8 @@ void main() {
       expect(restored.autoRun, false);
       expect(restored.openLogs, false);
       expect(restored.closeConnections, true);
-      expect(restored.isAnimateToPage, true);
-      expect(restored.autoCheckUpdate, true);
+      expect(restored.isAnimateToPage, false);
+      expect(restored.autoCheckUpdate, false);
       expect(restored.showLabel, false);
       expect(restored.minimizeOnExit, true);
       expect(restored.restoreStrategy, RestoreStrategy.compatible);
@@ -249,6 +249,7 @@ void main() {
       expect(config.geodataLoader, GeodataLoader.memconservative);
       expect(config.interfaceNameMode, InterfaceNameMode.clear);
       expect(config.interfaceName, '');
+      expect(config.unifiedDelay, false);
     });
 
     test('custom values survive round-trip', () {
