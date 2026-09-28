@@ -2,6 +2,24 @@
   "schemaVersion": 2,
   "versions": [
     {
+      "version": "0.8.98.5",
+      "tag": "v0.8.98.5",
+      "date": "2026-09-28",
+      "prerelease": false,
+      "groups": [
+        {
+          "type": "feat",
+          "entries": [
+            {
+              "id": "b68285b",
+              "scope": "brand",
+              "text": "Rename the app to XlClash"
+            }
+          ]
+        }
+      ]
+    },
+    {
       "version": "0.8.98.3",
       "tag": "v0.8.98.3",
       "date": "2026-09-23",
