@@ -1,3 +1,15 @@
+## v(7.0.33)
+
+### 🔄 重构
+
+- 统一所有平台的应用名称为 XlClash
+  - Android: XlClash (Release), XlClash Debug (Debug)
+  - Windows: XlClash.exe, XlClashCore.exe, XlClashHelperService.exe
+  - macOS: XlClash.app, XlClashCore
+  - Linux: XlClash, XlClashCore（AppImage、DEB、RPM 包）
+- 更新核心二进制路径和锁文件命名
+- 更新所有打包配置中的应用显示名称和关键词
+
 ## v(7.0.32)
 
 ### ✨ 新功能
