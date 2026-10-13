@@ -4,7 +4,11 @@
 
 **Features**
 
-- **android** Change the applicationId to com.xlclash.app so the app can coexist with upstream FlClash (f8f67b6)
+- **android** Change applicationId to com.xlclash.app (f8f67b6)
+
+**Bug Fixes**
+
+- **android** Disable Firebase to fix processDebugGoogleServices (c0bfba3)
 
 ## v0.8.98.5 (2026-09-28)
 

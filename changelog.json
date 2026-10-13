@@ -13,7 +13,17 @@
             {
               "id": "f8f67b6",
               "scope": "android",
-              "text": "Change the applicationId to com.xlclash.app so the app can coexist with upstream FlClash"
+              "text": "Change applicationId to com.xlclash.app"
+            }
+          ]
+        },
+        {
+          "type": "fix",
+          "entries": [
+            {
+              "id": "c0bfba3",
+              "scope": "android",
+              "text": "Disable Firebase to fix processDebugGoogleServices"
             }
           ]
         }
