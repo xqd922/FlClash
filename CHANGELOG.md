@@ -1,5 +1,11 @@
 # Changelog
 
+## v0.8.98.6 (2026-10-13)
+
+**Features**
+
+- **android** Change the applicationId to com.xlclash.app so the app can coexist with upstream FlClash (f8f67b6)
+
 ## v0.8.98.5 (2026-09-28)
 
 **Features**
