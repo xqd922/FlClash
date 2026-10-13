@@ -4,8 +4,8 @@ import android.app.ActivityManager
 import android.app.Application
 import android.os.Build
 import android.util.Log
-import com.google.firebase.FirebaseApp
-import com.google.firebase.crashlytics.FirebaseCrashlytics
+// import com.google.firebase.FirebaseApp
+// import com.google.firebase.crashlytics.FirebaseCrashlytics
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.SupervisorJob
@@ -37,16 +37,19 @@ object GlobalState : CoroutineScope by CoroutineScope(SupervisorJob() + Dispatch
     }
 
     fun setCrashlytics(enable: Boolean) {
-        FirebaseApp.initializeApp(application)
-        FirebaseCrashlytics.getInstance().isCrashlyticsCollectionEnabled = enable
+        // Firebase disabled (applicationId no longer matches google-services.json).
+        // FirebaseApp.initializeApp(application)
+        // FirebaseCrashlytics.getInstance().isCrashlyticsCollectionEnabled = enable
         if (enable) {
-            log("Crashlytics enabled")
+            log("Crashlytics disabled (Firebase removed from build)")
         }
     }
 
     fun didCrashOnPreviousExecution(): Boolean {
-        FirebaseApp.initializeApp(application)
-        return FirebaseCrashlytics.getInstance().didCrashOnPreviousExecution()
+        // Firebase disabled (applicationId no longer matches google-services.json).
+        // FirebaseApp.initializeApp(application)
+        // return FirebaseCrashlytics.getInstance().didCrashOnPreviousExecution()
+        return false
     }
 
     fun lastExitInfo(): Map<String, Any?>? {
