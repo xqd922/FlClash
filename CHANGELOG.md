@@ -1,5 +1,11 @@
 # Changelog
 
+## v0.8.98.8 (2026-10-15)
+
+**Bug Fixes**
+
+- **ui** Restore the standard action button size on the proxy and profile pages (1d3fdcc)
+
 ## v0.8.98.7 (2026-10-15)
 
 **Features**
@@ -9,7 +15,7 @@
 **Bug Fixes**
 
 - **proxies** Tap the delay test button again to measure afresh (6cc9daf)
-- **proxies** Keep the delay test button tappable while a test runs (19b2d44)
+- **proxies** Stop a running delay test instead of waiting it out (19b2d44)
 
 ## v0.8.98.6 (2026-10-13)
 
