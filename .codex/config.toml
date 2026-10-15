@@ -4,5 +4,7 @@ matcher = "apply_patch|Bash"
 [[hooks.PostToolUse.hooks]]
 type = "command"
 command = "bash tool/check_comment_density.sh"
+# Windows: Codex runs hooks through PowerShell, where `bash` may not resolve.
+commandWindows = 'D:\Git\bin\bash.exe tool/check_comment_density.sh'
 timeout = 15
 statusMessage = "Checking comment density"
