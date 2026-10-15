@@ -1,0 +1,4 @@
+# 统一以 LF 落盘：仓库里存的本来就是 LF，Windows 的 core.autocrlf=true 会把工作区
+# 写成 CRLF，而 Codex 在 Windows 上解析到的 bash 是 WSL 的，CRLF 会让 shell 脚本
+# 在首行就报 '$'\r': command not found' 而失败。属性优先于 autocrlf。
+* text=auto eol=lf
