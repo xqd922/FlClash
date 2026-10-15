@@ -390,72 +390,27 @@ class _ProxyGroupViewState extends ConsumerState<ProxyGroupView> {
   }
 }
 
-class DelayTestButton extends StatefulWidget {
+class DelayTestButton extends ConsumerWidget {
   final Future Function() onClick;
 
   const DelayTestButton({super.key, required this.onClick});
 
   @override
-  State<DelayTestButton> createState() => _DelayTestButtonState();
-}
-
-class _DelayTestButtonState extends State<DelayTestButton>
-    with SingleTickerProviderStateMixin {
-  late AnimationController _controller;
-  late Animation<double> _animation;
-
-  bool _running = false;
-
-  Future<void> _healthcheck() async {
-    if (_running) {
-      return;
-    }
-    _running = true;
-    unawaited(_controller.forward());
-    try {
-      await widget.onClick();
-    } finally {
-      _running = false;
-      if (mounted) {
-        unawaited(_controller.reverse());
-      }
-    }
-  }
-
-  @override
-  void initState() {
-    super.initState();
-    _controller = AnimationController(
-      vsync: this,
-      duration: const Duration(milliseconds: 400),
-    );
-    _animation = Tween<double>(begin: 1.0, end: 0.0).animate(
-      CurvedAnimation(parent: _controller, curve: Curves.easeInOutBack),
-    );
-  }
-
-  @override
-  void dispose() {
-    _controller.dispose();
-    super.dispose();
-  }
-
-  @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
     final appLocalizations = context.appLocalizations;
-    return AnimatedBuilder(
-      animation: _controller.view,
-      builder: (_, child) {
-        return FadeTransition(
-          opacity: _animation,
-          child: ScaleTransition(scale: _animation, child: child),
-        );
-      },
-      child: CommonFloatingActionButton(
-        onPressed: _healthcheck,
-        tooltip: appLocalizations.delayTest,
-        icon: const Icon(Icons.network_ping),
-      ),
+    // Pending keys are global rather than per-group, so any in-flight test
+    // keeps this button on stop, and tapping it cancels every tracked job.
+    final isTesting = ref.watch(
+      pendingDelayTestsProvider.select((state) => state.isNotEmpty),
+    );
+    return CommonFloatingActionButton(
+      onPressed: isTesting
+          ? () => ref.read(proxiesActionProvider.notifier).cancelDelayTests()
+          : () => unawaited(onClick()),
+      tooltip: isTesting
+          ? appLocalizations.stopDelayTest
+          : appLocalizations.delayTest,
+      icon: Icon(isTesting ? Icons.stop : Icons.network_ping),
     );
   }
 }

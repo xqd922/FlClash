@@ -785,6 +785,7 @@ class MessageLookup extends MessageLookupByLibrary {
     "status": MessageLookupByLibrary.simpleMessage("状态"),
     "statusDesc": MessageLookupByLibrary.simpleMessage("关闭后将使用系统DNS"),
     "stop": MessageLookupByLibrary.simpleMessage("暂停"),
+    "stopDelayTest": MessageLookupByLibrary.simpleMessage("停止测速"),
     "stopVpn": MessageLookupByLibrary.simpleMessage("正在停止VPN..."),
     "style": MessageLookupByLibrary.simpleMessage("风格"),
     "subRule": MessageLookupByLibrary.simpleMessage("子规则"),

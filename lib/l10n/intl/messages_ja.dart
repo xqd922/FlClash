@@ -913,6 +913,7 @@ class MessageLookup extends MessageLookupByLibrary {
     "status": MessageLookupByLibrary.simpleMessage("状態"),
     "statusDesc": MessageLookupByLibrary.simpleMessage("無効にすると、システムDNSを使用します"),
     "stop": MessageLookupByLibrary.simpleMessage("停止"),
+    "stopDelayTest": MessageLookupByLibrary.simpleMessage("遅延テストを停止"),
     "stopVpn": MessageLookupByLibrary.simpleMessage("VPNを停止しています..."),
     "style": MessageLookupByLibrary.simpleMessage("スタイル"),
     "subRule": MessageLookupByLibrary.simpleMessage("サブルール"),

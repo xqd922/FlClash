@@ -451,6 +451,7 @@
   "restoreAllData": "Restore all data",
   "addProfile": "Add profile",
   "delayTest": "Delay test",
+  "stopDelayTest": "Stop delay test",
   "proxyGroupEmpty": "Proxy group is empty",
   "proxyGroupNameEmpty": "Proxy group name cannot be empty",
   "proxyGroupNameDuplicate": "Duplicate proxy group name",
