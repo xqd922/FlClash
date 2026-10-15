@@ -2,24 +2,6 @@
   "schemaVersion": 2,
   "versions": [
     {
-      "version": "0.8.98.8",
-      "tag": "v0.8.98.8",
-      "date": "2026-10-15",
-      "prerelease": false,
-      "groups": [
-        {
-          "type": "fix",
-          "entries": [
-            {
-              "id": "1d3fdcc",
-              "scope": "ui",
-              "text": "Restore the standard action button size on the proxy and profile pages"
-            }
-          ]
-        }
-      ]
-    },
-    {
       "version": "0.8.98.7",
       "tag": "v0.8.98.7",
       "date": "2026-10-15",
@@ -38,6 +20,11 @@
         {
           "type": "fix",
           "entries": [
+            {
+              "id": "1d3fdcc",
+              "scope": "ui",
+              "text": "Restore the standard action button size on the proxy and profile pages"
+            },
             {
               "id": "6cc9daf",
               "scope": "proxies",
