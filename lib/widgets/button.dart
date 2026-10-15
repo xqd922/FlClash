@@ -17,7 +17,7 @@ class CommonFloatingActionButton extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return FloatingActionButton.small(
+    return FloatingActionButton(
       heroTag: null,
       tooltip: tooltip,
       onPressed: onPressed,

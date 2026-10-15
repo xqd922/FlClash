@@ -46,6 +46,15 @@ void main() {
     expect(started, 1);
   });
 
+  testWidgets('keeps the standard fab size without a label', (tester) async {
+    await pumpButton(tester, () async {});
+
+    expect(
+      tester.getSize(find.byType(FloatingActionButton)),
+      const Size.square(56),
+    );
+  });
+
   testWidgets('a tap while a test is pending drops it and starts over', (
     tester,
   ) async {
