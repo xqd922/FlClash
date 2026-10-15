@@ -21,9 +21,14 @@
           "type": "fix",
           "entries": [
             {
+              "id": "6cc9daf",
+              "scope": "proxies",
+              "text": "Tap the delay test button again to measure afresh"
+            },
+            {
               "id": "19b2d44",
               "scope": "proxies",
-              "text": "Stop a running delay test instead of waiting it out"
+              "text": "Keep the delay test button tappable while a test runs"
             }
           ]
         }
