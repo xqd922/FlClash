@@ -2,6 +2,34 @@
   "schemaVersion": 2,
   "versions": [
     {
+      "version": "0.8.98.7",
+      "tag": "v0.8.98.7",
+      "date": "2026-10-15",
+      "prerelease": false,
+      "groups": [
+        {
+          "type": "feat",
+          "entries": [
+            {
+              "id": "63b1df3",
+              "scope": "ui",
+              "text": "Use small icon-only action buttons on the proxy and profile pages"
+            }
+          ]
+        },
+        {
+          "type": "fix",
+          "entries": [
+            {
+              "id": "19b2d44",
+              "scope": "proxies",
+              "text": "Stop a running delay test instead of waiting it out"
+            }
+          ]
+        }
+      ]
+    },
+    {
       "version": "0.8.98.6",
       "tag": "v0.8.98.6",
       "date": "2026-10-13",

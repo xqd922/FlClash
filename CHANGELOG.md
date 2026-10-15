@@ -1,5 +1,15 @@
 # Changelog
 
+## v0.8.98.7 (2026-10-15)
+
+**Features**
+
+- **ui** Use small icon-only action buttons on the proxy and profile pages (63b1df3)
+
+**Bug Fixes**
+
+- **proxies** Stop a running delay test instead of waiting it out (19b2d44)
+
 ## v0.8.98.6 (2026-10-13)
 
 **Features**
