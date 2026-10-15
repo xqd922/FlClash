@@ -397,20 +397,15 @@ class DelayTestButton extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final appLocalizations = context.appLocalizations;
-    // Pending keys are global rather than per-group, so any in-flight test
-    // keeps this button on stop, and tapping it cancels every tracked job.
-    final isTesting = ref.watch(
-      pendingDelayTestsProvider.select((state) => state.isNotEmpty),
-    );
     return CommonFloatingActionButton(
-      onPressed: isTesting
-          ? () => ref.read(proxiesActionProvider.notifier).cancelDelayTests()
-          : () => unawaited(onClick()),
-      tooltip: isTesting
-          ? appLocalizations.stopDelayTest
-          : appLocalizations.delayTest,
-      icon: Icon(isTesting ? Icons.stop : Icons.network_ping),
+      // Tapping again interrupts the running test and measures afresh; the
+      // dropped job must not land its late delays on top of the new ones.
+      onPressed: () {
+        ref.read(proxiesActionProvider.notifier).cancelDelayTests();
+        unawaited(onClick());
+      },
+      tooltip: context.appLocalizations.delayTest,
+      icon: const Icon(Icons.network_ping),
     );
   }
 }

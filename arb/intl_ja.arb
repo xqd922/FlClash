@@ -451,7 +451,6 @@
   "restoreAllData": "すべてのデータを復元",
   "addProfile": "プロファイルを追加",
   "delayTest": "遅延テスト",
-  "stopDelayTest": "遅延テストを停止",
   "proxyGroupEmpty": "プロキシグループが空です",
   "proxyGroupNameEmpty": "プロキシグループ名は空にできません",
   "proxyGroupNameDuplicate": "プロキシグループ名が重複しています",
