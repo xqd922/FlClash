@@ -102,7 +102,7 @@ class _ProfilesViewState extends ConsumerState<ProfilesView> {
     return CommonFloatingActionButton(
       onPressed: _handleShowAddExtendPage,
       icon: const Icon(Icons.add),
-      label: context.appLocalizations.addProfile,
+      tooltip: context.appLocalizations.addProfile,
     );
   }
 

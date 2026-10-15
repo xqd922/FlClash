@@ -263,7 +263,7 @@ class _EditProfileViewState extends ConsumerState<EditProfileView> {
               child: CommonFloatingActionButton(
                 onPressed: _handleConfirm,
                 icon: const Icon(Icons.save),
-                label: appLocalizations.save,
+                tooltip: appLocalizations.save,
               ),
             ),
             child: Form(

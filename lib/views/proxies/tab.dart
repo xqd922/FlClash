@@ -453,7 +453,7 @@ class _DelayTestButtonState extends State<DelayTestButton>
       },
       child: CommonFloatingActionButton(
         onPressed: _healthcheck,
-        label: appLocalizations.delayTest,
+        tooltip: appLocalizations.delayTest,
         icon: const Icon(Icons.network_ping),
       ),
     );

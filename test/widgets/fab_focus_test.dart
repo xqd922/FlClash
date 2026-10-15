@@ -18,7 +18,7 @@ Widget _buildPage({bool wrapNavigator = false}) {
     floatingActionButton: CommonFloatingActionButton(
       onPressed: () {},
       icon: const Icon(Icons.add),
-      label: 'add',
+      tooltip: 'add',
     ),
   );
   final scopedPage = PageFocusScope(child: page);

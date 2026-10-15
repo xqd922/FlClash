@@ -8,7 +8,7 @@ Widget _action() {
     key: const ValueKey('action'),
     onPressed: () {},
     icon: const Icon(Icons.add),
-    label: 'action',
+    tooltip: 'action',
   );
 }
 
