@@ -68,7 +68,7 @@ class ProxiesTabViewState extends ConsumerState<ProxiesTabView>
     }
     await ref
         .read(proxiesActionProvider.notifier)
-        .delayTest(group.all, group.testUrl);
+        .delayTest(group.all, group.testUrl, group.timeout);
   }
 
   Group? get currentGroup {
@@ -379,6 +379,7 @@ class _ProxyGroupViewState extends ConsumerState<ProxyGroupView> {
           final proxy = proxies[index];
           return ProxyCard(
             testUrl: group.testUrl,
+            timeout: group.timeout,
             groupType: group.type,
             type: widget.cardType,
             proxy: proxy,

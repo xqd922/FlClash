@@ -5,11 +5,13 @@ class _DelayTestTarget {
     required this.proxyName,
     required this.testUrl,
     required this.key,
+    this.timeout,
   });
 
   final String proxyName;
   final String testUrl;
   final String key;
+  final Duration? timeout;
 }
 
 class _DelayTestJob {
@@ -230,18 +232,23 @@ class ProxiesAction extends _$ProxiesAction {
     }
   }
 
-  Future<void> proxyDelayTest(Proxy proxy, [String? testUrl]) {
-    return _runDelayTests([proxy], testUrl);
+  Future<void> proxyDelayTest(Proxy proxy, [String? testUrl, int? timeout]) {
+    return _runDelayTests([proxy], testUrl, timeout);
   }
 
-  Future<void> delayTest(List<Proxy> proxies, [String? testUrl]) async {
-    await _runDelayTests(proxies, testUrl);
+  Future<void> delayTest(
+    List<Proxy> proxies, [
+    String? testUrl,
+    int? timeout,
+  ]) async {
+    await _runDelayTests(proxies, testUrl, timeout);
     ref.read(sortNumProvider.notifier).add();
   }
 
   List<_DelayTestTarget> _resolveDelayTestTargets(
     List<Proxy> proxies,
     String? testUrl,
+    int? timeout,
   ) {
     final groups = ref.read(groupsProvider);
     final selectedMap = ref.read(
@@ -264,19 +271,31 @@ class ProxiesAction extends _$ProxiesAction {
       if (!seen.add(key)) {
         continue;
       }
+      final configuredTimeout = state.timeout;
+      final effectiveTimeout =
+          configuredTimeout != null && configuredTimeout > 0
+          ? configuredTimeout
+          : (timeout ?? 0);
       targets.add(
         _DelayTestTarget(
           proxyName: state.proxyName,
           testUrl: currentTestUrl,
           key: key,
+          timeout: effectiveTimeout > 0
+              ? Duration(milliseconds: effectiveTimeout)
+              : null,
         ),
       );
     }
     return targets;
   }
 
-  Future<void> _runDelayTests(List<Proxy> proxies, String? testUrl) async {
-    final targets = _resolveDelayTestTargets(proxies, testUrl);
+  Future<void> _runDelayTests(
+    List<Proxy> proxies,
+    String? testUrl,
+    int? timeout,
+  ) async {
+    final targets = _resolveDelayTestTargets(proxies, testUrl, timeout);
     if (targets.isEmpty) {
       return;
     }
@@ -303,7 +322,11 @@ class ProxiesAction extends _$ProxiesAction {
       return;
     }
     try {
-      final delay = await _core.getDelay(target.testUrl, target.proxyName);
+      final delay = await _core.getDelay(
+        target.testUrl,
+        target.proxyName,
+        target.timeout,
+      );
       if (delay != null && !job.cancelled) {
         setDelay(delay);
       }

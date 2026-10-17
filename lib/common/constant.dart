@@ -49,12 +49,19 @@ String _randomPipeId() {
 final defaultTextScaleFactor =
     WidgetsBinding.instance.platformDispatcher.textScaleFactor;
 
-/// How long the Core may spend on one delay test. It spends this twice in the
-/// worst case - once queueing for a slot, once on the probe itself - so the
-/// guard below has to outlast twice this value.
+/// How long the Core may spend on one delay test when the proxy group does not
+/// configure a timeout of its own. The Core spends the timeout twice in the
+/// worst case - once queueing for a slot, once on the probe itself.
 const delayTestTimeoutDuration = Duration(seconds: 8);
 
 const delayTestGuardDuration = Duration(seconds: 30);
+
+/// Keeps the IPC guard above the two timeout rounds the Core can spend, while
+/// never dropping under the default budget.
+Duration delayTestGuardFor(Duration timeout) {
+  final guard = timeout * 2 + const Duration(seconds: 10);
+  return guard > delayTestGuardDuration ? guard : delayTestGuardDuration;
+}
 
 const coreConnectionWaitDuration = Duration(seconds: 10);
 

@@ -170,6 +170,7 @@ _Group _$GroupFromJson(Map<String, dynamic> json) => _Group(
   now: json['now'] as String?,
   hidden: json['hidden'] as bool?,
   testUrl: json['testUrl'] as String?,
+  timeout: (json['timeout'] as num?)?.toInt(),
   icon: json['icon'] as String? ?? '',
   name: json['name'] as String,
 );
@@ -180,6 +181,7 @@ Map<String, dynamic> _$GroupToJson(_Group instance) => <String, dynamic>{
   'now': instance.now,
   'hidden': instance.hidden,
   'testUrl': instance.testUrl,
+  'timeout': instance.timeout,
   'icon': instance.icon,
   'name': instance.name,
 };

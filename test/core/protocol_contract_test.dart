@@ -1,6 +1,7 @@
 import 'dart:convert';
 import 'dart:io';
 
+import 'package:fl_clash/common/constant.dart';
 import 'package:fl_clash/core/event.dart';
 import 'package:fl_clash/core/desktop/model.dart';
 import 'package:fl_clash/core/interface.dart';
@@ -11,6 +12,7 @@ import 'package:flutter_test/flutter_test.dart';
 
 class _RecordingCoreHandler extends CoreHandlerInterface {
   final Map<CoreMethod, Object?> calls = {};
+  final Map<CoreMethod, Duration?> guards = {};
 
   @override
   Future<CoreLifecycleResult> start() async => const CoreLifecycleResult(
@@ -34,6 +36,7 @@ class _RecordingCoreHandler extends CoreHandlerInterface {
     Duration? timeout,
   }) async {
     calls[method] = arguments;
+    guards[method] = timeout;
     final result = switch (method) {
       CoreMethod.initClash => true as T,
       CoreMethod.getTraffic ||
@@ -167,6 +170,36 @@ void main() {
     }
     expect(handler.calls[CoreMethod.clearEffect], 42);
   });
+
+  test(
+    'asyncTestDelay sends the configured timeout and scaled guard',
+    () async {
+      final handler = _RecordingCoreHandler();
+
+      await handler.asyncTestDelay(
+        'https://example.com',
+        'DIRECT',
+        const Duration(milliseconds: 2000),
+      );
+
+      final arguments = handler.calls[CoreMethod.asyncTestDelay] as Map;
+      expect(arguments['timeout'], 2000);
+      expect(handler.guards[CoreMethod.asyncTestDelay], delayTestGuardDuration);
+    },
+  );
+
+  test(
+    'asyncTestDelay sends the default timeout when none is configured',
+    () async {
+      final handler = _RecordingCoreHandler();
+
+      await handler.asyncTestDelay('https://example.com', 'DIRECT');
+
+      final arguments = handler.calls[CoreMethod.asyncTestDelay] as Map;
+      expect(arguments['timeout'], delayTestTimeoutDuration.inMilliseconds);
+      expect(handler.guards[CoreMethod.asyncTestDelay], delayTestGuardDuration);
+    },
+  );
 
   test('event contract accepts batches and legacy single events', () async {
     final fixture =

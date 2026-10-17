@@ -13,6 +13,7 @@ class ProxyCard extends ConsumerWidget {
   final GroupType groupType;
   final ProxyCardType type;
   final String? testUrl;
+  final int? timeout;
 
   const ProxyCard({
     super.key,
@@ -21,12 +22,15 @@ class ProxyCard extends ConsumerWidget {
     required this.proxy,
     required this.groupType,
     required this.type,
+    this.timeout,
   });
 
   Measure get measure => globalState.measure;
 
   void _handleTestCurrentDelay(WidgetRef ref) {
-    ref.read(proxiesActionProvider.notifier).proxyDelayTest(proxy, testUrl);
+    ref
+        .read(proxiesActionProvider.notifier)
+        .proxyDelayTest(proxy, testUrl, timeout);
   }
 
   Widget _buildDelayText() {
