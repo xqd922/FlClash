@@ -1,5 +1,13 @@
 # Changelog
 
+## v0.8.98.8 (2026-10-17)
+
+**Bug Fixes**
+
+- **ui** Keep the delay test button visible and tappable while a test runs (0147d17)
+- **ui** Bring back the delay test button's fade-out on tap (610bef0)
+- **ui** Restore the instant press feedback on the floating action buttons (770d1ac)
+
 ## v0.8.98.7 (2026-10-15)
 
 **Features**

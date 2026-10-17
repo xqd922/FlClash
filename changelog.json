@@ -2,6 +2,34 @@
   "schemaVersion": 2,
   "versions": [
     {
+      "version": "0.8.98.8",
+      "tag": "v0.8.98.8",
+      "date": "2026-10-17",
+      "prerelease": false,
+      "groups": [
+        {
+          "type": "fix",
+          "entries": [
+            {
+              "id": "0147d17",
+              "scope": "ui",
+              "text": "Keep the delay test button visible and tappable while a test runs"
+            },
+            {
+              "id": "610bef0",
+              "scope": "ui",
+              "text": "Bring back the delay test button's fade-out on tap"
+            },
+            {
+              "id": "770d1ac",
+              "scope": "ui",
+              "text": "Restore the instant press feedback on the floating action buttons"
+            }
+          ]
+        }
+      ]
+    },
+    {
       "version": "0.8.98.7",
       "tag": "v0.8.98.7",
       "date": "2026-10-15",
