@@ -21,9 +21,9 @@ class CommonFloatingActionButton extends StatelessWidget {
       // The FAB's Tooltip defaults to a long-press recognizer, which holds the
       // press highlight back until the pointer lifts. Manual registers none,
       // and hover and semantics stay on the tooltip either way.
-      data: TooltipTheme.of(context).copyWith(
-        triggerMode: TooltipTriggerMode.manual,
-      ),
+      data: TooltipTheme.of(
+        context,
+      ).copyWith(triggerMode: TooltipTriggerMode.manual),
       child: FloatingActionButton(
         heroTag: null,
         tooltip: tooltip,
