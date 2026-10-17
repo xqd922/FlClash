@@ -1,5 +1,11 @@
 # Changelog
 
+## v0.8.98.10 (2026-10-17)
+
+**Bug Fixes**
+
+- **proxies** Manual delay tests always run on a fixed two-second timeout (3c59e41)
+
 ## v0.8.98.9 (2026-10-17)
 
 **Features**
