@@ -2,6 +2,24 @@
   "schemaVersion": 2,
   "versions": [
     {
+      "version": "0.8.98.9",
+      "tag": "v0.8.98.9",
+      "date": "2026-10-17",
+      "prerelease": false,
+      "groups": [
+        {
+          "type": "feat",
+          "entries": [
+            {
+              "id": "95668c2",
+              "scope": "proxies",
+              "text": "Manual delay tests now use the timeout configured on each proxy group"
+            }
+          ]
+        }
+      ]
+    },
+    {
       "version": "0.8.98.8",
       "tag": "v0.8.98.8",
       "date": "2026-10-17",
@@ -18,7 +36,7 @@
             {
               "id": "610bef0",
               "scope": "ui",
-              "text": "Bring back the delay test button's fade-out on tap"
+              "text": "Bring back the delay test button's fade-out while a test runs"
             },
             {
               "id": "770d1ac",
