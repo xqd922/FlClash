@@ -404,8 +404,6 @@ class _DelayTestButtonState extends ConsumerState<DelayTestButton>
   late final AnimationController _controller;
   late final Animation<double> _animation;
 
-  int _runId = 0;
-
   @override
   void initState() {
     super.initState();
@@ -416,25 +414,19 @@ class _DelayTestButtonState extends ConsumerState<DelayTestButton>
     _animation = Tween<double>(begin: 1.0, end: 0.0).animate(
       CurvedAnimation(parent: _controller, curve: Curves.easeInOutBack),
     );
+    // The pulse belongs to the tap, not the test: the button is back long
+    // before the group finishes, so another tap can interrupt and measure.
+    _controller.addStatusListener((status) {
+      if (status == AnimationStatus.completed) {
+        _controller.reverse();
+      }
+    });
   }
 
   @override
   void dispose() {
     _controller.dispose();
     super.dispose();
-  }
-
-  Future<void> _delayTest() async {
-    final runId = ++_runId;
-    unawaited(_controller.forward());
-    try {
-      await widget.onClick();
-    } finally {
-      // Only the latest run may bring the button back.
-      if (mounted && runId == _runId) {
-        unawaited(_controller.reverse());
-      }
-    }
   }
 
   @override
@@ -452,7 +444,8 @@ class _DelayTestButtonState extends ConsumerState<DelayTestButton>
         // dropped job must not land its late delays on top of the new ones.
         onPressed: () {
           ref.read(proxiesActionProvider.notifier).cancelDelayTests();
-          unawaited(_delayTest());
+          unawaited(_controller.forward());
+          unawaited(widget.onClick());
         },
         tooltip: context.appLocalizations.delayTest,
         icon: const Icon(Icons.network_ping),

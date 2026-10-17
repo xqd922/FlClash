@@ -87,7 +87,7 @@ void main() {
     expect(find.byIcon(Icons.network_ping), findsOneWidget);
   });
 
-  testWidgets('fades out while the test runs and comes back afterwards', (
+  testWidgets('fades out and straight back while the test keeps running', (
     tester,
   ) async {
     final completer = Completer<void>();
@@ -99,14 +99,15 @@ void main() {
 
     expect(opacityOf(tester), 0);
 
-    completer.complete();
-    await tester.pump();
-    await tester.pump(const Duration(milliseconds: 400));
+    await tester.pumpAndSettle();
 
     expect(opacityOf(tester), 1);
+    expect(completer.isCompleted, isFalse);
+
+    completer.complete();
   });
 
-  testWidgets('a tap during the fade starts over and stays faded out', (
+  testWidgets('a tap during the pulse restarts it from where it is', (
     tester,
   ) async {
     final first = Completer<void>();
@@ -120,21 +121,21 @@ void main() {
     await tester.tap(find.byType(FloatingActionButton));
     await tester.pump();
     await tester.pump(const Duration(milliseconds: 200));
+    final halfway = opacityOf(tester);
 
     await tester.tap(find.byType(FloatingActionButton));
     await tester.pump();
-    await tester.pump(const Duration(milliseconds: 400));
-
-    first.complete();
-    await tester.pump();
-    await tester.pump(const Duration(milliseconds: 400));
 
     expect(started, 2);
-    expect(opacityOf(tester), 0);
+    expect(opacityOf(tester), halfway);
 
-    second.complete();
     await tester.pumpAndSettle();
 
     expect(opacityOf(tester), 1);
+    expect(first.isCompleted, isFalse);
+    expect(second.isCompleted, isFalse);
+
+    first.complete();
+    second.complete();
   });
 }
