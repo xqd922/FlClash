@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:fl_clash/l10n/l10n.dart';
 import 'package:fl_clash/providers/app.dart';
 import 'package:fl_clash/views/proxies/tab.dart';
@@ -32,6 +34,18 @@ void main() {
         ),
       ),
     );
+  }
+
+  double opacityOf(WidgetTester tester) {
+    return tester
+        .widget<FadeTransition>(
+          find.descendant(
+            of: find.byType(DelayTestButton),
+            matching: find.byType(FadeTransition),
+          ),
+        )
+        .opacity
+        .value;
   }
 
   testWidgets('runs the current group test', (tester) async {
@@ -71,5 +85,56 @@ void main() {
     expect(started, 1);
     expect(container.read(pendingDelayTestsProvider), isEmpty);
     expect(find.byIcon(Icons.network_ping), findsOneWidget);
+  });
+
+  testWidgets('fades out while the test runs and comes back afterwards', (
+    tester,
+  ) async {
+    final completer = Completer<void>();
+    await pumpButton(tester, () => completer.future);
+
+    await tester.tap(find.byType(FloatingActionButton));
+    await tester.pump();
+    await tester.pump(const Duration(milliseconds: 400));
+
+    expect(opacityOf(tester), 0);
+
+    completer.complete();
+    await tester.pump();
+    await tester.pump(const Duration(milliseconds: 400));
+
+    expect(opacityOf(tester), 1);
+  });
+
+  testWidgets('a tap during the fade starts over and stays faded out', (
+    tester,
+  ) async {
+    final first = Completer<void>();
+    final second = Completer<void>();
+    var started = 0;
+    await pumpButton(tester, () {
+      started++;
+      return started == 1 ? first.future : second.future;
+    });
+
+    await tester.tap(find.byType(FloatingActionButton));
+    await tester.pump();
+    await tester.pump(const Duration(milliseconds: 200));
+
+    await tester.tap(find.byType(FloatingActionButton));
+    await tester.pump();
+    await tester.pump(const Duration(milliseconds: 400));
+
+    first.complete();
+    await tester.pump();
+    await tester.pump(const Duration(milliseconds: 400));
+
+    expect(started, 2);
+    expect(opacityOf(tester), 0);
+
+    second.complete();
+    await tester.pumpAndSettle();
+
+    expect(opacityOf(tester), 1);
   });
 }

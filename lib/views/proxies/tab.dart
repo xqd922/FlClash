@@ -390,22 +390,73 @@ class _ProxyGroupViewState extends ConsumerState<ProxyGroupView> {
   }
 }
 
-class DelayTestButton extends ConsumerWidget {
+class DelayTestButton extends ConsumerStatefulWidget {
   final Future Function() onClick;
 
   const DelayTestButton({super.key, required this.onClick});
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
-    return CommonFloatingActionButton(
-      // Tapping again interrupts the running test and measures afresh; the
-      // dropped job must not land its late delays on top of the new ones.
-      onPressed: () {
-        ref.read(proxiesActionProvider.notifier).cancelDelayTests();
-        unawaited(onClick());
+  ConsumerState<DelayTestButton> createState() => _DelayTestButtonState();
+}
+
+class _DelayTestButtonState extends ConsumerState<DelayTestButton>
+    with SingleTickerProviderStateMixin {
+  late final AnimationController _controller;
+  late final Animation<double> _animation;
+
+  int _runId = 0;
+
+  @override
+  void initState() {
+    super.initState();
+    _controller = AnimationController(
+      vsync: this,
+      duration: const Duration(milliseconds: 400),
+    );
+    _animation = Tween<double>(begin: 1.0, end: 0.0).animate(
+      CurvedAnimation(parent: _controller, curve: Curves.easeInOutBack),
+    );
+  }
+
+  @override
+  void dispose() {
+    _controller.dispose();
+    super.dispose();
+  }
+
+  Future<void> _delayTest() async {
+    final runId = ++_runId;
+    unawaited(_controller.forward());
+    try {
+      await widget.onClick();
+    } finally {
+      // Only the latest run may bring the button back.
+      if (mounted && runId == _runId) {
+        unawaited(_controller.reverse());
+      }
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return AnimatedBuilder(
+      animation: _controller.view,
+      builder: (_, child) {
+        return FadeTransition(
+          opacity: _animation,
+          child: ScaleTransition(scale: _animation, child: child),
+        );
       },
-      tooltip: context.appLocalizations.delayTest,
-      icon: const Icon(Icons.network_ping),
+      child: CommonFloatingActionButton(
+        // Tapping again interrupts the running test and measures afresh; the
+        // dropped job must not land its late delays on top of the new ones.
+        onPressed: () {
+          ref.read(proxiesActionProvider.notifier).cancelDelayTests();
+          unawaited(_delayTest());
+        },
+        tooltip: context.appLocalizations.delayTest,
+        icon: const Icon(Icons.network_ping),
+      ),
     );
   }
 }
