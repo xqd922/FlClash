@@ -76,53 +76,6 @@ void main() {
       expect(state.testUrl, 'http://test-b.com');
     });
 
-    test('resolves multi-hop timeout from the closest group', () {
-      final groups = [
-        const Group(
-          name: 'group-a',
-          type: GroupType.Selector,
-          timeout: 8000,
-          all: [Proxy(name: 'group-b', type: 'URLTest')],
-        ),
-        const Group(
-          name: 'group-b',
-          type: GroupType.URLTest,
-          timeout: 2000,
-          all: [Proxy(name: 'proxy-leaf', type: 'ss')],
-        ),
-      ];
-      final selectedMap = {'group-a': 'group-b', 'group-b': 'proxy-leaf'};
-      final state = computeRealSelectedProxyState(
-        'group-a',
-        groups: groups,
-        selectedMap: selectedMap,
-      );
-      expect(state.timeout, 2000);
-    });
-
-    test('keeps the outer timeout when the inner group has none', () {
-      final groups = [
-        const Group(
-          name: 'group-a',
-          type: GroupType.Selector,
-          timeout: 8000,
-          all: [Proxy(name: 'group-b', type: 'URLTest')],
-        ),
-        const Group(
-          name: 'group-b',
-          type: GroupType.URLTest,
-          all: [Proxy(name: 'proxy-leaf', type: 'ss')],
-        ),
-      ];
-      final selectedMap = {'group-a': 'group-b', 'group-b': 'proxy-leaf'};
-      final state = computeRealSelectedProxyState(
-        'group-a',
-        groups: groups,
-        selectedMap: selectedMap,
-      );
-      expect(state.timeout, 8000);
-    });
-
     test('stops at group when selectedMap has no entry', () {
       final groups = [
         const Group(

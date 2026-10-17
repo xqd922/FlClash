@@ -297,7 +297,6 @@ abstract class SelectedProxyState with _$SelectedProxyState {
     required String proxyName,
     @Default(false) bool group,
     String? testUrl,
-    int? timeout,
   }) = _SelectedProxyState;
 }
 

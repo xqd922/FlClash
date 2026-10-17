@@ -1,24 +1,7 @@
-import 'package:fl_clash/common/common.dart';
 import 'package:fl_clash/models/common.dart';
 import 'package:test/test.dart';
 
 void main() {
-  group('delayTestGuardFor', () {
-    test('keeps the floor guard for a short timeout', () {
-      expect(
-        delayTestGuardFor(const Duration(milliseconds: 2000)),
-        delayTestGuardDuration,
-      );
-    });
-
-    test('scales with twice the timeout plus slack', () {
-      expect(
-        delayTestGuardFor(const Duration(seconds: 20)),
-        const Duration(seconds: 50),
-      );
-    });
-  });
-
   group('DelayStateExt.priority', () {
     test('returns 0 for positive delay', () {
       expect(const DelayState(delay: 100, group: false).priority, 0);

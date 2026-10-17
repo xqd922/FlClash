@@ -25,11 +25,7 @@ mixin CoreInterface {
 
   Future<Map<String, dynamic>> getConfig(String path);
 
-  Future<Delay?> asyncTestDelay(
-    String url,
-    String proxyName, [
-    Duration? timeout,
-  ]);
+  Future<Delay?> asyncTestDelay(String url, String proxyName);
 
   Future<String> updateConfig(UpdateParams updateParams);
 
@@ -346,21 +342,16 @@ abstract class CoreHandlerInterface with CoreInterface {
   }
 
   @override
-  Future<Delay?> asyncTestDelay(
-    String url,
-    String proxyName, [
-    Duration? timeout,
-  ]) async {
-    final effectiveTimeout = timeout ?? delayTestTimeoutDuration;
+  Future<Delay?> asyncTestDelay(String url, String proxyName) async {
     final delayParams = {
       'proxy-name': proxyName,
-      'timeout': effectiveTimeout.inMilliseconds,
+      'timeout': delayTestTimeoutDuration.inMilliseconds,
       'test-url': url,
     };
     final data = await _invokeMethod<Map<String, dynamic>>(
       method: CoreMethod.asyncTestDelay,
       arguments: delayParams,
-      timeout: delayTestGuardFor(effectiveTimeout),
+      timeout: delayTestGuardDuration,
     );
     return data == null ? null : Delay.fromJson(data);
   }

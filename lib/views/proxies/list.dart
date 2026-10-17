@@ -104,7 +104,6 @@ class _ProxiesListViewState extends ConsumerState<ProxiesListView> {
             height: getItemHeight(cardType),
             child: ProxyCard(
               testUrl: group.testUrl,
-              timeout: group.timeout,
               type: cardType,
               groupType: group.type,
               key: ValueKey('$groupName.${proxy.name}'),
@@ -383,11 +382,7 @@ class _ListHeaderState extends ConsumerState<ListHeader> {
     try {
       await ref
           .read(proxiesActionProvider.notifier)
-          .delayTest(
-            widget.group.all,
-            widget.group.testUrl,
-            widget.group.timeout,
-          );
+          .delayTest(widget.group.all, widget.group.testUrl);
     } finally {
       isLock = false;
     }

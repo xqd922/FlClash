@@ -9,7 +9,6 @@ import (
 	"os"
 	"path/filepath"
 	"runtime"
-	"strconv"
 	"strings"
 	"sync"
 	"sync/atomic"
@@ -61,10 +60,6 @@ var (
 	isSuspended atomic.Bool
 	sdkVersion  atomic.Int32
 	testURL     atomic.Pointer[string]
-
-	// Groups without a configured `timeout` are absent rather than defaulted,
-	// so the host keeps its own fallback instead of mihomo's 5s health-check one.
-	groupTimeouts atomic.Pointer[map[string]int]
 
 	delayTestSlots = make(chan struct{}, delayTestConcurrency)
 
@@ -375,50 +370,7 @@ func loadConfig(path string) (*config.Config, error) {
 	if err != nil {
 		return nil, err
 	}
-	cfg, err := executor.ParseWithBytes(buf)
-	if err != nil {
-		return nil, err
-	}
-	setGroupTimeouts(buf)
-	return cfg, nil
-}
-
-func setGroupTimeouts(buf []byte) {
-	rawCfg, err := config.UnmarshalRawConfig(buf)
-	if err != nil {
-		return
-	}
-	timeouts := make(map[string]int, len(rawCfg.ProxyGroup))
-	for _, group := range rawCfg.ProxyGroup {
-		name, ok := group["name"].(string)
-		if !ok || name == "" {
-			continue
-		}
-		ms, ok := groupTimeoutMillis(group["timeout"])
-		if !ok || ms <= 0 {
-			continue
-		}
-		timeouts[name] = ms
-	}
-	groupTimeouts.Store(&timeouts)
-}
-
-func groupTimeoutMillis(value any) (int, bool) {
-	switch v := value.(type) {
-	case int:
-		return v, true
-	case int64:
-		return int(v), true
-	case uint64:
-		return int(v), true
-	case float64:
-		return int(v), true
-	case string:
-		ms, err := strconv.Atoi(strings.TrimSpace(v))
-		return ms, err == nil
-	default:
-		return 0, false
-	}
+	return executor.ParseWithBytes(buf)
 }
 
 func applyConfig(params *SetupParams) error {

@@ -49,25 +49,20 @@ String _randomPipeId() {
 final defaultTextScaleFactor =
     WidgetsBinding.instance.platformDispatcher.textScaleFactor;
 
-/// How long the Core may spend on one delay test when the proxy group does not
-/// configure a timeout of its own. The Core spends the timeout twice in the
-/// worst case - once queueing for a slot, once on the probe itself.
-const delayTestTimeoutDuration = Duration(seconds: 8);
+/// How long the Core may spend on one delay test. It spends this twice in the
+/// worst case - once queueing for a slot, once on the probe itself - so the
+/// guard below has to outlast twice this value.
+const delayTestTimeoutDuration = Duration(seconds: 2);
 
 const delayTestGuardDuration = Duration(seconds: 30);
-
-/// Keeps the IPC guard above the two timeout rounds the Core can spend, while
-/// never dropping under the default budget.
-Duration delayTestGuardFor(Duration timeout) {
-  final guard = timeout * 2 + const Duration(seconds: 10);
-  return guard > delayTestGuardDuration ? guard : delayTestGuardDuration;
-}
 
 const coreConnectionWaitDuration = Duration(seconds: 10);
 
 /// Keep at or below the Core's delay-test concurrency (`delayTestConcurrency`
-/// in core/common.go).
-const maxConcurrentDelayTests = 16;
+/// in core/common.go) - matching it exactly means every request the pool sends
+/// gets a Core slot at once, and no probe of ours burns its whole timeout
+/// queueing behind a full wave.
+const maxConcurrentDelayTests = 50;
 const animateDuration = Duration(milliseconds: 100);
 const midDuration = Duration(milliseconds: 200);
 const commonDuration = Duration(milliseconds: 300);

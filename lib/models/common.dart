@@ -405,7 +405,6 @@ abstract class Group with _$Group {
     String? now,
     bool? hidden,
     String? testUrl,
-    int? timeout,
     @Default('') String icon,
     required String name,
   }) = _Group;

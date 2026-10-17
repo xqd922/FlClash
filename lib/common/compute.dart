@@ -73,11 +73,7 @@ SelectedProxyState getRealSelectedProxyState(
     return newState;
   }
   return getRealSelectedProxyState(
-    newState.copyWith(
-      proxyName: currentSelectedName,
-      testUrl: group.testUrl,
-      timeout: group.timeout ?? newState.timeout,
-    ),
+    newState.copyWith(proxyName: currentSelectedName, testUrl: group.testUrl),
     groups: groups,
     selectedMap: selectedMap,
   );

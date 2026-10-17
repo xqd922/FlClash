@@ -260,33 +260,6 @@ void main() {
       expect(result?.value, 100);
     });
 
-    test('getDelay forwards an explicit timeout', () async {
-      when(
-        () => mock.asyncTestDelay(
-          'test.com',
-          'P1',
-          const Duration(milliseconds: 2000),
-        ),
-      ).thenAnswer(
-        (_) async => const Delay(name: 'P1', value: 100, url: 'test.com'),
-      );
-
-      final result = await controller.getDelay(
-        'test.com',
-        'P1',
-        const Duration(milliseconds: 2000),
-      );
-
-      expect(result?.value, 100);
-      verify(
-        () => mock.asyncTestDelay(
-          'test.com',
-          'P1',
-          const Duration(milliseconds: 2000),
-        ),
-      ).called(1);
-    });
-
     test('startListener delegates', () async {
       when(() => mock.startListener()).thenAnswer((_) async => true);
       final result = await controller.startListener();

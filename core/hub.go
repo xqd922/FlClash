@@ -3,7 +3,6 @@ package main
 import (
 	"cmp"
 	"context"
-	"encoding/json"
 	"errors"
 	"net"
 	"net/url"
@@ -89,7 +88,6 @@ func handleShutdown() bool {
 	updater.StopGeoUpdater()
 	executor.Shutdown()
 	currentConfig = nil
-	groupTimeouts.Store(nil)
 	isInit.Store(false)
 	configMu.Unlock()
 
@@ -146,25 +144,6 @@ func proxyGroupNames(
 	return names
 }
 
-// The group adapter keeps `timeout` unexported; this puts it back on the wire.
-type timedProxy struct {
-	constant.Proxy
-	timeout int
-}
-
-func (p timedProxy) MarshalJSON() ([]byte, error) {
-	raw, err := p.Proxy.MarshalJSON()
-	if err != nil {
-		return nil, err
-	}
-	mapping := map[string]any{}
-	if err = json.Unmarshal(raw, &mapping); err != nil {
-		return nil, err
-	}
-	mapping["timeout"] = p.timeout
-	return json.Marshal(mapping)
-}
-
 func handleGetProxies() ProxiesData {
 	proxies := tunnel.AllProxies()
 
@@ -175,17 +154,6 @@ func handleGetProxies() ProxiesData {
 		}
 		return p.Type(), true
 	})
-
-	if timeouts := groupTimeouts.Load(); timeouts != nil {
-		timed := make(map[string]constant.Proxy, len(proxies))
-		for name, p := range proxies {
-			if timeout, ok := (*timeouts)[name]; ok {
-				p = timedProxy{Proxy: p, timeout: timeout}
-			}
-			timed[name] = p
-		}
-		proxies = timed
-	}
 
 	return ProxiesData{
 		All:     allNames,

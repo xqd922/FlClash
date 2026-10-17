@@ -8088,7 +8088,7 @@ as List<DashboardWidget>,
 /// @nodoc
 mixin _$SelectedProxyState {
 
- String get proxyName; bool get group; String? get testUrl; int? get timeout;
+ String get proxyName; bool get group; String? get testUrl;
 /// Create a copy of SelectedProxyState
 /// with the given fields replaced by the non-null parameter values.
 @JsonKey(includeFromJson: false, includeToJson: false)
@@ -8100,20 +8100,20 @@ $SelectedProxyStateCopyWith<SelectedProxyState> get copyWith => _$SelectedProxyS
 @override
 bool operator ==(Object other) {
   final _this = this as SelectedProxyState;
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is SelectedProxyState&&(identical(other.proxyName, _this.proxyName) || other.proxyName == _this.proxyName)&&(identical(other.group, _this.group) || other.group == _this.group)&&(identical(other.testUrl, _this.testUrl) || other.testUrl == _this.testUrl)&&(identical(other.timeout, _this.timeout) || other.timeout == _this.timeout));
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is SelectedProxyState&&(identical(other.proxyName, _this.proxyName) || other.proxyName == _this.proxyName)&&(identical(other.group, _this.group) || other.group == _this.group)&&(identical(other.testUrl, _this.testUrl) || other.testUrl == _this.testUrl));
 }
 
 
 @override
 int get hashCode {
   final _this = this as SelectedProxyState;
-  return Object.hash(runtimeType,_this.proxyName,_this.group,_this.testUrl,_this.timeout);
+  return Object.hash(runtimeType,_this.proxyName,_this.group,_this.testUrl);
 }
 
 @override
 String toString() {
   final _this = this as SelectedProxyState;
-  return 'SelectedProxyState(proxyName: ${_this.proxyName}, group: ${_this.group}, testUrl: ${_this.testUrl}, timeout: ${_this.timeout})';
+  return 'SelectedProxyState(proxyName: ${_this.proxyName}, group: ${_this.group}, testUrl: ${_this.testUrl})';
 }
 
 
@@ -8124,7 +8124,7 @@ abstract mixin class $SelectedProxyStateCopyWith<$Res>  {
   factory $SelectedProxyStateCopyWith(SelectedProxyState value, $Res Function(SelectedProxyState) _then) = _$SelectedProxyStateCopyWithImpl;
 @useResult
 $Res call({
- String proxyName, bool group, String? testUrl, int? timeout
+ String proxyName, bool group, String? testUrl
 });
 
 
@@ -8141,13 +8141,12 @@ class _$SelectedProxyStateCopyWithImpl<$Res>
 
 /// Create a copy of SelectedProxyState
 /// with the given fields replaced by the non-null parameter values.
-@pragma('vm:prefer-inline') @override $Res call({Object? proxyName = null,Object? group = null,Object? testUrl = freezed,Object? timeout = freezed,}) {
+@pragma('vm:prefer-inline') @override $Res call({Object? proxyName = null,Object? group = null,Object? testUrl = freezed,}) {
   return _then(SelectedProxyState(
 proxyName: null == proxyName ? _self.proxyName : proxyName // ignore: cast_nullable_to_non_nullable
 as String,group: null == group ? _self.group : group // ignore: cast_nullable_to_non_nullable
 as bool,testUrl: freezed == testUrl ? _self.testUrl : testUrl // ignore: cast_nullable_to_non_nullable
-as String?,timeout: freezed == timeout ? _self.timeout : timeout // ignore: cast_nullable_to_non_nullable
-as int?,
+as String?,
   ));
 }
 
@@ -8232,10 +8231,10 @@ return $default(_that);case _:
 /// }
 /// ```
 
-@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function( String proxyName,  bool group,  String? testUrl,  int? timeout)?  $default,{required TResult orElse(),}) {final _that = this;
+@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function( String proxyName,  bool group,  String? testUrl)?  $default,{required TResult orElse(),}) {final _that = this;
 switch (_that) {
 case _SelectedProxyState() when $default != null:
-return $default(_that.proxyName,_that.group,_that.testUrl,_that.timeout);case _:
+return $default(_that.proxyName,_that.group,_that.testUrl);case _:
   return orElse();
 
 }
@@ -8253,10 +8252,10 @@ return $default(_that.proxyName,_that.group,_that.testUrl,_that.timeout);case _:
 /// }
 /// ```
 
-@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function( String proxyName,  bool group,  String? testUrl,  int? timeout)  $default,) {final _that = this;
+@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function( String proxyName,  bool group,  String? testUrl)  $default,) {final _that = this;
 switch (_that) {
 case _SelectedProxyState():
-return $default(_that.proxyName,_that.group,_that.testUrl,_that.timeout);case _:
+return $default(_that.proxyName,_that.group,_that.testUrl);case _:
   throw StateError('Unexpected subclass');
 
 }
@@ -8273,10 +8272,10 @@ return $default(_that.proxyName,_that.group,_that.testUrl,_that.timeout);case _:
 /// }
 /// ```
 
-@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function( String proxyName,  bool group,  String? testUrl,  int? timeout)?  $default,) {final _that = this;
+@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function( String proxyName,  bool group,  String? testUrl)?  $default,) {final _that = this;
 switch (_that) {
 case _SelectedProxyState() when $default != null:
-return $default(_that.proxyName,_that.group,_that.testUrl,_that.timeout);case _:
+return $default(_that.proxyName,_that.group,_that.testUrl);case _:
   return null;
 
 }
@@ -8288,13 +8287,12 @@ return $default(_that.proxyName,_that.group,_that.testUrl,_that.timeout);case _:
 
 
 class _SelectedProxyState implements SelectedProxyState {
-  const _SelectedProxyState({required this.proxyName, this.group = false, this.testUrl, this.timeout});
+  const _SelectedProxyState({required this.proxyName, this.group = false, this.testUrl});
   
 
 @override final  String proxyName;
 @override@JsonKey() final  bool group;
 @override final  String? testUrl;
-@override final  int? timeout;
 
 /// Create a copy of SelectedProxyState
 /// with the given fields replaced by the non-null parameter values.
@@ -8306,18 +8304,18 @@ _$SelectedProxyStateCopyWith<_SelectedProxyState> get copyWith => __$SelectedPro
 
 @override
 bool operator ==(Object other) {
-    return identical(this, other) || (other.runtimeType == runtimeType&&other is _SelectedProxyState&&(identical(other.proxyName, proxyName) || other.proxyName == proxyName)&&(identical(other.group, group) || other.group == group)&&(identical(other.testUrl, testUrl) || other.testUrl == testUrl)&&(identical(other.timeout, timeout) || other.timeout == timeout));
+    return identical(this, other) || (other.runtimeType == runtimeType&&other is _SelectedProxyState&&(identical(other.proxyName, proxyName) || other.proxyName == proxyName)&&(identical(other.group, group) || other.group == group)&&(identical(other.testUrl, testUrl) || other.testUrl == testUrl));
 }
 
 
 @override
 int get hashCode {
-    return Object.hash(runtimeType,proxyName,group,testUrl,timeout);
+    return Object.hash(runtimeType,proxyName,group,testUrl);
 }
 
 @override
 String toString() {
-    return 'SelectedProxyState(proxyName: $proxyName, group: $group, testUrl: $testUrl, timeout: $timeout)';
+    return 'SelectedProxyState(proxyName: $proxyName, group: $group, testUrl: $testUrl)';
 }
 
 
@@ -8328,7 +8326,7 @@ abstract mixin class _$SelectedProxyStateCopyWith<$Res> implements $SelectedProx
   factory _$SelectedProxyStateCopyWith(_SelectedProxyState value, $Res Function(_SelectedProxyState) _then) = __$SelectedProxyStateCopyWithImpl;
 @override @useResult
 $Res call({
- String proxyName, bool group, String? testUrl, int? timeout
+ String proxyName, bool group, String? testUrl
 });
 
 
@@ -8345,13 +8343,12 @@ class __$SelectedProxyStateCopyWithImpl<$Res>
 
 /// Create a copy of SelectedProxyState
 /// with the given fields replaced by the non-null parameter values.
-@override @pragma('vm:prefer-inline') $Res call({Object? proxyName = null,Object? group = null,Object? testUrl = freezed,Object? timeout = freezed,}) {
+@override @pragma('vm:prefer-inline') $Res call({Object? proxyName = null,Object? group = null,Object? testUrl = freezed,}) {
   return _then(_SelectedProxyState(
 proxyName: null == proxyName ? _self.proxyName : proxyName // ignore: cast_nullable_to_non_nullable
 as String,group: null == group ? _self.group : group // ignore: cast_nullable_to_non_nullable
 as bool,testUrl: freezed == testUrl ? _self.testUrl : testUrl // ignore: cast_nullable_to_non_nullable
-as String?,timeout: freezed == timeout ? _self.timeout : timeout // ignore: cast_nullable_to_non_nullable
-as int?,
+as String?,
   ));
 }
 
