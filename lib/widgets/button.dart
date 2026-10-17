@@ -17,11 +17,19 @@ class CommonFloatingActionButton extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return FloatingActionButton(
-      heroTag: null,
-      tooltip: tooltip,
-      onPressed: onPressed,
-      child: icon,
+    return TooltipTheme(
+      // The FAB's Tooltip defaults to a long-press recognizer, which holds the
+      // press highlight back until the pointer lifts. Manual registers none,
+      // and hover and semantics stay on the tooltip either way.
+      data: TooltipTheme.of(context).copyWith(
+        triggerMode: TooltipTriggerMode.manual,
+      ),
+      child: FloatingActionButton(
+        heroTag: null,
+        tooltip: tooltip,
+        onPressed: onPressed,
+        child: icon,
+      ),
     );
   }
 }
