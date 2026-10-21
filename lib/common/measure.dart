@@ -19,9 +19,9 @@ class Measure {
   final Map<_TextMeasureKey, Size> _textSizeCache = {};
   final Map<_TextMeasureKey, bool> _textOverflowCache = {};
 
-  Measure.of(this.context, double textScaleFactor)
+  Measure.of(this.context, TextScaler textScaler)
     : _measureMap = {},
-      _textScaler = TextScaler.linear(textScaleFactor);
+      _textScaler = textScaler;
 
   TextPainter _computeText(Text text, {TextStyle? style, double? maxWidth}) {
     return TextPainter(

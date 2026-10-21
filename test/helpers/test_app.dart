@@ -39,7 +39,7 @@ class TestApp extends StatelessWidget {
       ],
       supportedLocales: AppLocalizations.delegate.supportedLocales,
       builder: (context, child) {
-        globalState.measure = Measure.of(context, 1);
+        globalState.measure = Measure.of(context, TextScaler.noScaling);
         if (setTheme) {
           globalState.theme = CommonTheme.of(context, 1);
         }

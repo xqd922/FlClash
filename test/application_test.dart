@@ -142,27 +142,33 @@ void main() {
     }
   });
 
-  test('the app theme pins the wght axis on text styles', () {
+  test('the Android app theme uses the system font family', () {
     for (final brightness in Brightness.values) {
       final theme = buildAppTheme(
+        platform: TargetPlatform.android,
         colorScheme: ColorScheme.fromSeed(
           seedColor: Colors.blue,
           brightness: brightness,
         ),
       );
 
-      for (final style in [
-        theme.textTheme.displayLarge,
-        theme.textTheme.headlineLarge,
-        theme.textTheme.titleMedium,
-        theme.textTheme.bodyLarge,
-        theme.textTheme.labelLarge,
-      ]) {
-        expect(
-          style?.fontVariations,
-          contains(const FontVariation('wght', 400)),
-        );
-      }
+      expect(theme.textTheme.bodyMedium?.fontFamily, 'sans-serif');
+      expect(theme.textTheme.titleMedium?.fontFamily, 'sans-serif');
+    }
+  });
+
+  test('other platforms keep the Material typography font', () {
+    for (final platform in [
+      TargetPlatform.windows,
+      TargetPlatform.macOS,
+      TargetPlatform.linux,
+    ]) {
+      final theme = buildAppTheme(
+        platform: platform,
+        colorScheme: ColorScheme.fromSeed(seedColor: Colors.blue),
+      );
+
+      expect(theme.textTheme.bodyMedium?.fontFamily, isNot('sans-serif'));
     }
   });
 }

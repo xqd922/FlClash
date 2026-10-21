@@ -8,7 +8,7 @@ Future<Measure> _measureIn(WidgetTester tester, {double scale = 1}) async {
     MaterialApp(
       home: Builder(
         builder: (context) {
-          measure = Measure.of(context, scale);
+          measure = Measure.of(context, TextScaler.linear(scale));
           return const SizedBox.shrink();
         },
       ),

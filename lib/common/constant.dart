@@ -46,9 +46,6 @@ String _randomPipeId() {
   ).join();
 }
 
-final defaultTextScaleFactor =
-    WidgetsBinding.instance.platformDispatcher.textScaleFactor;
-
 /// How long the Core may spend on one delay test. It spends this twice in the
 /// worst case - once queueing for a slot, once on the probe itself - so the
 /// guard below has to outlast twice this value.

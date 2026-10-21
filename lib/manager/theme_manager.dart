@@ -1,5 +1,3 @@
-import 'dart:math';
-
 import 'package:fl_clash/common/common.dart';
 import 'package:fl_clash/common/theme.dart';
 import 'package:fl_clash/providers/action.dart';
@@ -47,21 +45,19 @@ class ThemeManager extends ConsumerWidget {
     final textScale = ref.read(
       themeSettingProvider.select((state) => state.textScale),
     );
-    final double textScaleFactor = max(
-      min(
-        textScale.enable ? textScale.scale : defaultTextScaleFactor,
-        maxTextScale,
-      ),
-      minTextScale,
-    );
+    final systemTextScaler = MediaQuery.textScalerOf(context);
+    final textScaler = textScale.enable
+        ? TextScaler.linear(textScale.scale)
+        : systemTextScaler;
+    final textScaleFactor = textScale.enable ? textScale.scale : 1.0;
 
-    globalState.measure = Measure.of(context, textScaleFactor);
+    globalState.measure = Measure.of(context, textScaler);
     globalState.theme = CommonTheme.of(context, textScaleFactor);
     final padding = MediaQuery.of(context).padding;
     final height = MediaQuery.of(context).size.height;
     return MediaQuery(
       data: MediaQuery.of(context).copyWith(
-        textScaler: TextScaler.linear(textScaleFactor),
+        textScaler: textScaler,
         padding: padding.copyWith(
           top: padding.top > height * 0.3 ? 20.0 : padding.top,
         ),

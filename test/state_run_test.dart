@@ -44,7 +44,7 @@ void main() {
           ],
           supportedLocales: AppLocalizations.delegate.supportedLocales,
           builder: (context, child) {
-            globalState.measure = Measure.of(context, 1);
+            globalState.measure = Measure.of(context, TextScaler.noScaling);
             globalState.theme = CommonTheme.of(context, 1);
             return StatusManager(child: child!);
           },

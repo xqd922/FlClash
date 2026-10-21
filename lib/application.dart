@@ -59,16 +59,22 @@ const _pageTransitionsTheme = PageTransitionsTheme(
   },
 );
 
-/// 钉住可变字体 wght 的统一入口（背景见 text.dart）；typography 与 colorScheme 必须传入同一实例，否则深浅色文字着色错乱。
-ThemeData buildAppTheme({required ColorScheme colorScheme}) => ThemeData(
-  useMaterial3: true,
-  pageTransitionsTheme: _pageTransitionsTheme,
-  colorScheme: colorScheme,
-  typography: Typography.material2021(
-    platform: defaultTargetPlatform,
+ThemeData buildAppTheme({
+  required ColorScheme colorScheme,
+  TargetPlatform? platform,
+}) {
+  final targetPlatform = platform ?? defaultTargetPlatform;
+  return ThemeData(
+    useMaterial3: true,
+    pageTransitionsTheme: _pageTransitionsTheme,
     colorScheme: colorScheme,
-  ).toDefaultWeight,
-).withAppShapes;
+    fontFamily: targetPlatform == TargetPlatform.android ? 'sans-serif' : null,
+    typography: Typography.material2021(
+      platform: targetPlatform,
+      colorScheme: colorScheme,
+    ),
+  ).withAppShapes;
+}
 
 class Application extends ConsumerStatefulWidget {
   const Application({super.key});
