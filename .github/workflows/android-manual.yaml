@@ -3,6 +3,11 @@ name: Android manual build
 on:
   workflow_dispatch:
     inputs:
+      build_ref:
+        description: Branch or tag to build
+        required: true
+        default: main
+        type: string
       arch:
         description: Android ABI
         required: true
@@ -45,6 +50,7 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
         with:
+          ref: ${{ inputs.build_ref }}
           submodules: recursive
 
       - name: Setup Flutter
@@ -77,6 +83,7 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
         with:
+          ref: ${{ inputs.build_ref }}
           submodules: recursive
 
       - name: Setup Flutter
