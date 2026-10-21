@@ -1,0 +1,130 @@
+name: Android manual build
+
+on:
+  workflow_dispatch:
+    inputs:
+      arch:
+        description: Android ABI
+        required: true
+        default: arm64
+        type: choice
+        options:
+          - arm64
+          - arm
+          - amd64
+      env:
+        description: App environment
+        required: true
+        default: pre
+        type: choice
+        options:
+          - pre
+          - dev
+          - stable
+      run_checks:
+        description: Run analyze and tests before building
+        required: true
+        default: false
+        type: boolean
+
+concurrency:
+  group: android-manual-${{ github.ref }}-${{ inputs.arch }}-${{ inputs.env }}
+  cancel-in-progress: true
+
+env:
+  FLUTTER_VERSION: '3.47.1'
+  GO_VERSION: '1.26.4'
+  NDK_VERSION: r28c
+
+jobs:
+  verify:
+    if: ${{ inputs.run_checks }}
+    name: Analyze and test
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          submodules: recursive
+
+      - name: Setup Flutter
+        uses: subosito/flutter-action@v2
+        with:
+          channel: stable
+          flutter-version: ${{ env.FLUTTER_VERSION }}
+          cache: true
+
+      - name: Install dependencies
+        run: flutter pub get
+
+      - name: Check format
+        run: dart format --output=none --set-exit-if-changed lib test tool plugins setup.dart
+
+      - name: Analyze
+        run: flutter analyze --no-fatal-infos
+
+      - name: Skip native build hooks
+        run: |
+          yq -i '.hooks.user_defines.setup.build_assets = false | .hooks.user_defines.rust_api.build_assets = false' pubspec.yaml
+
+      - name: Run tests
+        run: flutter test --reporter expanded
+
+  build:
+    name: Build APK
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          submodules: recursive
+
+      - name: Setup Flutter
+        uses: subosito/flutter-action@v2
+        with:
+          channel: stable
+          flutter-version: ${{ env.FLUTTER_VERSION }}
+          cache: true
+
+      - name: Setup Go
+        uses: actions/setup-go@v5
+        with:
+          go-version: ${{ env.GO_VERSION }}
+          cache-dependency-path: core/go.sum
+
+      - name: Setup Java
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '17'
+
+      - name: Setup NDK
+        uses: nttld/setup-ndk@v1
+        id: ndk
+        with:
+          ndk-version: ${{ env.NDK_VERSION }}
+          add-to-path: true
+          link-to-sdk: true
+
+      - name: Setup Gradle
+        uses: gradle/actions/setup-gradle@v6
+
+      - name: Install dependencies
+        run: flutter pub get
+
+      - name: Build
+        env:
+          ANDROID_NDK_HOME: ${{ steps.ndk.outputs.ndk-path }}
+        run: |
+          dart setup.dart android \
+            --targets apk \
+            --arch ${{ inputs.arch }} \
+            --env ${{ inputs.env }} \
+            -v
+
+      - name: Upload APK
+        uses: actions/upload-artifact@v4
+        with:
+          name: xlclash-android-${{ inputs.arch }}-${{ inputs.env }}
+          path: dist/*.apk
+          if-no-files-found: error
