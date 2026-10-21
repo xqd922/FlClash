@@ -47,6 +47,17 @@ void main() {
     );
   });
 
+  testWidgets('uses the theme title weight for the label', (tester) async {
+    await tester.pumpWidget(
+      const MaterialApp(home: NullStatus(label: 'Nothing here')),
+    );
+
+    final theme = Theme.of(tester.element(find.byType(NullStatus)));
+    final text = tester.widget<Text>(find.text('Nothing here'));
+
+    expect(text.style?.fontWeight, theme.textTheme.titleMedium?.fontWeight);
+  });
+
   testWidgets('staggers its entrance when shown on its own', (tester) async {
     await tester.pumpWidget(
       const MaterialApp(

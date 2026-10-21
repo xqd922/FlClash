@@ -105,7 +105,7 @@ class NullStatus extends StatelessWidget {
             delay: _staggerStep,
             child: Text(
               label,
-              style: Theme.of(context).textTheme.titleMedium?.toBold.toLight,
+              style: Theme.of(context).textTheme.titleMedium?.toLight,
             ),
           ),
           if (description != null) ...[
