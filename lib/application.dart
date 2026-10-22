@@ -170,9 +170,7 @@ class ApplicationState extends ConsumerState<Application> {
         final lightColorScheme = _getAppColorScheme(
           brightness: Brightness.light,
         );
-        final darkColorScheme = _getAppColorScheme(
-          brightness: Brightness.dark,
-        ).toPureBlack(themeProps.pureBlack);
+        final darkColorScheme = _getAppColorScheme(brightness: Brightness.dark);
         return MaterialApp(
           debugShowCheckedModeBanner: false,
           navigatorKey: globalState.navigatorKey,

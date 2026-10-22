@@ -318,8 +318,6 @@ void main() {
       expect(props.primaryColors, defaultPrimaryColors);
       expect(props.themeMode, ThemeMode.system);
       expect(props.schemeVariant, DynamicSchemeVariant.tonalSpot);
-      expect(props.pureBlack, false);
-      expect(props.textScale.scale, 1.0);
     });
 
     test('safeFromJson returns default on null', () {
@@ -333,14 +331,10 @@ void main() {
       const props = ThemeProps(
         primaryColor: 0xFF123456,
         themeMode: ThemeMode.light,
-        pureBlack: true,
-        textScale: TextScale(enable: true, scale: 1.5),
       );
       final restored = roundTrip(() => props.toJson(), ThemeProps.fromJson);
       expect(restored.primaryColor, 0xFF123456);
       expect(restored.themeMode, ThemeMode.light);
-      expect(restored.pureBlack, true);
-      expect(restored.textScale.scale, 1.5);
     });
   });
 

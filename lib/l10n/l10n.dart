@@ -1460,16 +1460,6 @@ class AppLocalizations {
     );
   }
 
-  /// `Pure black mode`
-  String get pureBlackMode {
-    return Intl.message(
-      'Pure black mode',
-      name: 'pureBlackMode',
-      desc: '',
-      args: [],
-    );
-  }
-
   /// `TCP keep-alive interval`
   String get keepAliveIntervalDesc {
     return Intl.message(
@@ -2708,11 +2698,6 @@ class AppLocalizations {
   /// `Clear data`
   String get clearData {
     return Intl.message('Clear data', name: 'clearData', desc: '', args: []);
-  }
-
-  /// `Text scaling`
-  String get textScale {
-    return Intl.message('Text scaling', name: 'textScale', desc: '', args: []);
   }
 
   /// `Internet`

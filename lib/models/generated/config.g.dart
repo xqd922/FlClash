@@ -274,14 +274,6 @@ const _$ProxyCardTypeEnumMap = {
   ProxyCardType.min: 'min',
 };
 
-_TextScale _$TextScaleFromJson(Map<String, dynamic> json) => _TextScale(
-  enable: json['enable'] as bool? ?? false,
-  scale: (json['scale'] as num?)?.toDouble() ?? 1.0,
-);
-
-Map<String, dynamic> _$TextScaleToJson(_TextScale instance) =>
-    <String, dynamic>{'enable': instance.enable, 'scale': instance.scale};
-
 _ThemeProps _$ThemePropsFromJson(Map<String, dynamic> json) => _ThemeProps(
   primaryColor: (json['primaryColor'] as num?)?.toInt(),
   primaryColors:
@@ -298,10 +290,6 @@ _ThemeProps _$ThemePropsFromJson(Map<String, dynamic> json) => _ThemeProps(
         json['schemeVariant'],
       ) ??
       DynamicSchemeVariant.tonalSpot,
-  pureBlack: json['pureBlack'] as bool? ?? false,
-  textScale: json['textScale'] == null
-      ? const TextScale()
-      : TextScale.fromJson(json['textScale'] as Map<String, dynamic>),
 );
 
 Map<String, dynamic> _$ThemePropsToJson(_ThemeProps instance) =>
@@ -310,8 +298,6 @@ Map<String, dynamic> _$ThemePropsToJson(_ThemeProps instance) =>
       'primaryColors': instance.primaryColors,
       'themeMode': _$ThemeModeEnumMap[instance.themeMode]!,
       'schemeVariant': _$DynamicSchemeVariantEnumMap[instance.schemeVariant]!,
-      'pureBlack': instance.pureBlack,
-      'textScale': instance.textScale,
     };
 
 const _$ThemeModeEnumMap = {

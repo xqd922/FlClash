@@ -1,7 +1,6 @@
 import 'package:fl_clash/common/common.dart';
 import 'package:fl_clash/common/theme.dart';
 import 'package:fl_clash/providers/action.dart';
-import 'package:fl_clash/providers/config.dart';
 import 'package:fl_clash/state.dart';
 import 'package:material_ui/material_ui.dart';
 import 'package:flutter/services.dart';
@@ -42,22 +41,12 @@ class ThemeManager extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, ref) {
-    final textScale = ref.read(
-      themeSettingProvider.select((state) => state.textScale),
-    );
-    final systemTextScaler = MediaQuery.textScalerOf(context);
-    final textScaler = textScale.enable
-        ? TextScaler.linear(textScale.scale)
-        : systemTextScaler;
-    final textScaleFactor = textScale.enable ? textScale.scale : 1.0;
-
-    globalState.measure = Measure.of(context, textScaler);
-    globalState.theme = CommonTheme.of(context, textScaleFactor);
+    globalState.measure = Measure.of(context, MediaQuery.textScalerOf(context));
+    globalState.theme = CommonTheme.of(context, 1);
     final padding = MediaQuery.of(context).padding;
     final height = MediaQuery.of(context).size.height;
     return MediaQuery(
       data: MediaQuery.of(context).copyWith(
-        textScaler: textScaler,
         padding: padding.copyWith(
           top: padding.top > height * 0.3 ? 20.0 : padding.top,
         ),

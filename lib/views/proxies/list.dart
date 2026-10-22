@@ -282,7 +282,6 @@ class _ProxiesListViewState extends ConsumerState<ProxiesListView> {
     return Consumer(
       builder: (_, ref, _) {
         final state = ref.watch(proxiesListStateProvider);
-        ref.watch(themeSettingProvider.select((state) => state.textScale));
         final proxiesLayout = ref.watch(
           proxiesStyleSettingProvider.select((state) => state.layout),
         );
