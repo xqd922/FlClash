@@ -26,6 +26,14 @@ on:
           - pre
           - dev
           - stable
+      build_mode:
+        description: Build mode
+        required: true
+        default: release
+        type: choice
+        options:
+          - release
+          - debug
       run_checks:
         description: Run analyze and tests before building
         required: true
@@ -120,6 +128,7 @@ jobs:
         run: flutter pub get
 
       - name: Build
+        if: inputs.build_mode == 'release'
         env:
           ANDROID_NDK_HOME: ${{ steps.ndk.outputs.ndk-path }}
         run: |
@@ -129,9 +138,28 @@ jobs:
             --env ${{ inputs.env }} \
             -v
 
-      - name: Upload APK
+      - name: Build debug APK
+        if: inputs.build_mode == 'debug'
+        env:
+          ANDROID_NDK_HOME: ${{ steps.ndk.outputs.ndk-path }}
+        run: |
+          flutter build apk \
+            --debug \
+            --target-platform android-arm64 \
+            --dart-define=APP_ENV=${{ inputs.env }}
+
+      - name: Upload release APK
+        if: inputs.build_mode == 'release'
         uses: actions/upload-artifact@v4
         with:
-          name: xlclash-android-${{ inputs.arch }}-${{ inputs.env }}
+          name: xlclash-android-${{ inputs.arch }}-${{ inputs.env }}-release
           path: dist/*.apk
+          if-no-files-found: error
+
+      - name: Upload debug APK
+        if: inputs.build_mode == 'debug'
+        uses: actions/upload-artifact@v4
+        with:
+          name: xlclash-android-${{ inputs.arch }}-${{ inputs.env }}-debug
+          path: build/app/outputs/flutter-apk/app-debug.apk
           if-no-files-found: error
