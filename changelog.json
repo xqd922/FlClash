@@ -2,8 +2,8 @@
   "schemaVersion": 2,
   "versions": [
     {
-      "version": "0.8.99",
-      "tag": "v0.8.99",
+      "version": "0.8.98.11",
+      "tag": "v0.8.98.11",
       "date": "2026-10-22",
       "prerelease": false,
       "groups": [
@@ -25,6 +25,11 @@
         {
           "type": "fix",
           "entries": [
+            {
+              "id": "1973565",
+              "scope": "android",
+              "text": "Keep the compact text sizes"
+            },
             {
               "id": "2ab4055",
               "scope": "android",

@@ -1,6 +1,6 @@
 # Changelog
 
-## v0.8.99 (2026-10-22)
+## v0.8.98.11 (2026-10-22)
 
 **Features**
 
@@ -9,6 +9,7 @@
 
 **Bug Fixes**
 
+- **android** Keep the compact text sizes (1973565)
 - **android** Match Android system text sizes and weight (2ab4055)
 - **ui** Make empty-state text use the system font weight (d9d0c23)
 - **android** Follow Android system font size and weight (9bf48af)
