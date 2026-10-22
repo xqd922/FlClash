@@ -74,7 +74,7 @@ ThemeData buildAppTheme({
     colorScheme: colorScheme,
     fontFamily: targetPlatform == TargetPlatform.android ? 'sans-serif' : null,
     typography: targetPlatform == TargetPlatform.android
-        ? typography.withAndroidSystemSizes
+        ? typography.withSystemWeights
         : typography,
   ).withAppShapes;
 }

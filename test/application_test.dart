@@ -158,10 +158,6 @@ void main() {
       expect(theme.textTheme.titleMedium?.fontWeight, FontWeight.w400);
       expect(theme.textTheme.bodyMedium?.fontWeight, FontWeight.w400);
       expect(theme.textTheme.labelMedium?.fontWeight, FontWeight.w400);
-      expect(theme.textTheme.titleLarge?.fontSize, 22);
-      expect(theme.textTheme.titleMedium?.fontSize, 18);
-      expect(theme.textTheme.bodyMedium?.fontSize, 16);
-      expect(theme.textTheme.labelMedium?.fontSize, 14);
     }
   });
 
