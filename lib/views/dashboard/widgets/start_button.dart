@@ -17,7 +17,7 @@ TextStyle? _runTimeTextStyle(BuildContext context) {
 TextStyle? _hundredsTextStyle(BuildContext context) {
   return context.textTheme.titleMedium?.toSoftBold.copyWith(
     color: context.colorScheme.primary,
-    fontWeight: FontWeight.w600,
+    fontWeight: FontWeight.w500,
   );
 }
 

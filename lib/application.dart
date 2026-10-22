@@ -64,15 +64,18 @@ ThemeData buildAppTheme({
   TargetPlatform? platform,
 }) {
   final targetPlatform = platform ?? defaultTargetPlatform;
+  final typography = Typography.material2021(
+    platform: targetPlatform,
+    colorScheme: colorScheme,
+  );
   return ThemeData(
     useMaterial3: true,
     pageTransitionsTheme: _pageTransitionsTheme,
     colorScheme: colorScheme,
     fontFamily: targetPlatform == TargetPlatform.android ? 'sans-serif' : null,
-    typography: Typography.material2021(
-      platform: targetPlatform,
-      colorScheme: colorScheme,
-    ),
+    typography: targetPlatform == TargetPlatform.android
+        ? typography.withAndroidSystemSizes
+        : typography,
   ).withAppShapes;
 }
 

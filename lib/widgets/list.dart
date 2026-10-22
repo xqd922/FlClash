@@ -519,7 +519,7 @@ class ListHeader extends StatelessWidget {
                   overflow: TextOverflow.ellipsis,
                   style: context.textTheme.labelLarge?.copyWith(
                     color: context.colorScheme.onSurfaceVariant.opacity80,
-                    fontWeight: FontWeight.w600,
+                    fontWeight: FontWeight.w400,
                   ),
                 ),
                 if (subTitle != null)

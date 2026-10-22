@@ -335,7 +335,7 @@ class _ToneGrid extends StatelessWidget {
                           style: TextStyle(
                             color: textColor,
                             fontSize: 12,
-                            fontWeight: FontWeight.w600,
+                            fontWeight: FontWeight.w400,
                           ),
                         ),
                       ),
