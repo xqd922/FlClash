@@ -2,6 +2,49 @@
   "schemaVersion": 2,
   "versions": [
     {
+      "version": "0.8.99",
+      "tag": "v0.8.99",
+      "date": "2026-10-22",
+      "prerelease": false,
+      "groups": [
+        {
+          "type": "feat",
+          "entries": [
+            {
+              "id": "31f97f1",
+              "scope": "theme",
+              "text": "Add the HyperOS system theme color"
+            },
+            {
+              "id": "8bc87b8",
+              "scope": "settings",
+              "text": "Remove the text scaling and pure black mode settings"
+            }
+          ]
+        },
+        {
+          "type": "fix",
+          "entries": [
+            {
+              "id": "2ab4055",
+              "scope": "android",
+              "text": "Match Android system text sizes and weight"
+            },
+            {
+              "id": "d9d0c23",
+              "scope": "ui",
+              "text": "Make empty-state text use the system font weight"
+            },
+            {
+              "id": "9bf48af",
+              "scope": "android",
+              "text": "Follow Android system font size and weight"
+            }
+          ]
+        }
+      ]
+    },
+    {
       "version": "0.8.98.10",
       "tag": "v0.8.98.10",
       "date": "2026-10-17",

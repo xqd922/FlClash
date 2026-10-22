@@ -1,5 +1,18 @@
 # Changelog
 
+## v0.8.99 (2026-10-22)
+
+**Features**
+
+- **theme** Add the HyperOS system theme color (31f97f1)
+- **settings** Remove the text scaling and pure black mode settings (8bc87b8)
+
+**Bug Fixes**
+
+- **android** Match Android system text sizes and weight (2ab4055)
+- **ui** Make empty-state text use the system font weight (d9d0c23)
+- **android** Follow Android system font size and weight (9bf48af)
+
 ## v0.8.98.10 (2026-10-17)
 
 **Bug Fixes**
