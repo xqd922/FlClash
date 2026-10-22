@@ -26,6 +26,11 @@
           "type": "fix",
           "entries": [
             {
+              "id": "8405ffa",
+              "scope": "release",
+              "text": "Keep the pubspec version parseable"
+            },
+            {
               "id": "1973565",
               "scope": "android",
               "text": "Keep the compact text sizes"

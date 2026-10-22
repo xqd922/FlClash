@@ -9,6 +9,7 @@
 
 **Bug Fixes**
 
+- **release** Keep the pubspec version parseable (8405ffa)
 - **android** Keep the compact text sizes (1973565)
 - **android** Match Android system text sizes and weight (2ab4055)
 - **ui** Make empty-state text use the system font weight (d9d0c23)
