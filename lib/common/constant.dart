@@ -128,6 +128,7 @@ const defaultPrimaryColors = [
   0XFFABD397,
   defaultPrimaryColor,
   0XFF665390,
+  0XFF7D6EAA,
 ];
 
 const scriptTemplate = '''

@@ -316,6 +316,7 @@ void main() {
       const props = ThemeProps();
       expect(props.primaryColor, null);
       expect(props.primaryColors, defaultPrimaryColors);
+      expect(props.primaryColors, contains(0XFF7D6EAA));
       expect(props.themeMode, ThemeMode.system);
       expect(props.schemeVariant, DynamicSchemeVariant.tonalSpot);
     });

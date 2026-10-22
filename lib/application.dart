@@ -86,6 +86,7 @@ class Application extends ConsumerStatefulWidget {
 class ApplicationState extends ConsumerState<Application> {
   Timer? _autoUpdateProfilesTaskTimer;
   bool _preHasVpn = false;
+  bool _fontDiagnosticsLogged = false;
 
   ColorScheme _getAppColorScheme({required Brightness brightness}) {
     return ref.read(genColorSchemeProvider(brightness));
@@ -180,6 +181,22 @@ class ApplicationState extends ConsumerState<Application> {
             ...GlobalMaterialLocalizations.delegates,
           ],
           builder: (context, child) {
+            if (kDebugMode && !_fontDiagnosticsLogged) {
+              WidgetsBinding.instance.addPostFrameCallback((_) {
+                if (_fontDiagnosticsLogged) return;
+                _fontDiagnosticsLogged = true;
+                final theme = Theme.of(context);
+                final textTheme = theme.textTheme;
+                final scaler = MediaQuery.textScalerOf(context);
+                commonPrint.log(
+                  'FONT_DIAG scale=${scaler.scale(10) / 10} '
+                  'titleLarge=${_fontDiag(textTheme.titleLarge)} '
+                  'titleMedium=${_fontDiag(textTheme.titleMedium)} '
+                  'bodyMedium=${_fontDiag(textTheme.bodyMedium)} '
+                  'labelMedium=${_fontDiag(textTheme.labelMedium)}',
+                );
+              });
+            }
             // The bridge's legacy Theme swaps in its own default IconTheme color,
             // which material_ui IconButton.filled reads as custom and loses onPrimary.
             // ignore: deprecated_member_use
@@ -214,4 +231,13 @@ class ApplicationState extends ConsumerState<Application> {
     _autoUpdateProfilesTaskTimer?.cancel();
     super.dispose();
   }
+}
+
+String _fontDiag(TextStyle? style) {
+  if (style == null) return 'null';
+  return 'family=${style.fontFamily} '
+      'size=${style.fontSize} '
+      'weight=${style.fontWeight?.value} '
+      'height=${style.height} '
+      'spacing=${style.letterSpacing}';
 }
