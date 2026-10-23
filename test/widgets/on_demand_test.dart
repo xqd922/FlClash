@@ -171,7 +171,7 @@ void main() {
   testWidgets('the authorize action sits on its own line under the text', (
     tester,
   ) async {
-    await pumpView(tester, isMacOS: true, locale: const Locale('ru'));
+    await pumpView(tester, isMacOS: true, locale: const Locale('zh', 'CN'));
 
     final appLocalizations = AppLocalizations.of(
       tester.element(find.byType(OnDemandView)),

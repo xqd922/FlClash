@@ -318,13 +318,11 @@ void main() {
       expect(props.primaryColors, defaultPrimaryColors);
       expect(props.primaryColors, contains(0XFF7D6EAA));
       expect(props.themeMode, ThemeMode.system);
-      expect(props.schemeVariant, DynamicSchemeVariant.tonalSpot);
     });
 
     test('safeFromJson returns default on null', () {
       final result = ThemeProps.safeFromJson(null);
       expect(result.themeMode, ThemeMode.system);
-      expect(result.schemeVariant, DynamicSchemeVariant.tonalSpot);
       expect(result.primaryColor, null);
     });
 

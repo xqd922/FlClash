@@ -284,12 +284,6 @@ _ThemeProps _$ThemePropsFromJson(Map<String, dynamic> json) => _ThemeProps(
   themeMode:
       $enumDecodeNullable(_$ThemeModeEnumMap, json['themeMode']) ??
       ThemeMode.system,
-  schemeVariant:
-      $enumDecodeNullable(
-        _$DynamicSchemeVariantEnumMap,
-        json['schemeVariant'],
-      ) ??
-      DynamicSchemeVariant.tonalSpot,
 );
 
 Map<String, dynamic> _$ThemePropsToJson(_ThemeProps instance) =>
@@ -297,25 +291,12 @@ Map<String, dynamic> _$ThemePropsToJson(_ThemeProps instance) =>
       'primaryColor': instance.primaryColor,
       'primaryColors': instance.primaryColors,
       'themeMode': _$ThemeModeEnumMap[instance.themeMode]!,
-      'schemeVariant': _$DynamicSchemeVariantEnumMap[instance.schemeVariant]!,
     };
 
 const _$ThemeModeEnumMap = {
   ThemeMode.system: 'system',
   ThemeMode.light: 'light',
   ThemeMode.dark: 'dark',
-};
-
-const _$DynamicSchemeVariantEnumMap = {
-  DynamicSchemeVariant.tonalSpot: 'tonalSpot',
-  DynamicSchemeVariant.fidelity: 'fidelity',
-  DynamicSchemeVariant.monochrome: 'monochrome',
-  DynamicSchemeVariant.neutral: 'neutral',
-  DynamicSchemeVariant.vibrant: 'vibrant',
-  DynamicSchemeVariant.expressive: 'expressive',
-  DynamicSchemeVariant.content: 'content',
-  DynamicSchemeVariant.rainbow: 'rainbow',
-  DynamicSchemeVariant.fruitSalad: 'fruitSalad',
 };
 
 _Config _$ConfigFromJson(Map<String, dynamic> json) => _Config(

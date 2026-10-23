@@ -84,11 +84,10 @@ void main() {
   });
 
   group('ThemeSetting provider', () {
-    test('defaults to auto color, system mode, and tonal spot', () {
+    test('defaults to auto color and system mode', () {
       final value = container.read(themeSettingProvider);
       expect(value.primaryColor, null);
       expect(value.themeMode, ThemeMode.system);
-      expect(value.schemeVariant, DynamicSchemeVariant.tonalSpot);
     });
 
     test('can update state', () {

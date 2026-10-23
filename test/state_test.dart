@@ -30,23 +30,13 @@ void main() {
           accentColor: const Color(defaultPrimaryColor),
         );
 
-    final variant = container.read(themeSettingProvider).schemeVariant;
-
     expect(
       container.read(genColorSchemeProvider(Brightness.light)),
-      ColorScheme.fromSeed(
-        seedColor: lightSeed,
-        brightness: Brightness.light,
-        dynamicSchemeVariant: variant,
-      ),
+      ColorScheme.fromSeed(seedColor: lightSeed, brightness: Brightness.light),
     );
     expect(
       container.read(genColorSchemeProvider(Brightness.dark)),
-      ColorScheme.fromSeed(
-        seedColor: darkSeed,
-        brightness: Brightness.dark,
-        dynamicSchemeVariant: variant,
-      ),
+      ColorScheme.fromSeed(seedColor: darkSeed, brightness: Brightness.dark),
     );
   });
 
@@ -60,13 +50,7 @@ void main() {
 
     expect(
       container.read(genColorSchemeProvider(Brightness.light)),
-      ColorScheme.fromSeed(
-        seedColor: accent,
-        brightness: Brightness.light,
-        dynamicSchemeVariant: container
-            .read(themeSettingProvider)
-            .schemeVariant,
-      ),
+      ColorScheme.fromSeed(seedColor: accent, brightness: Brightness.light),
     );
   });
 }

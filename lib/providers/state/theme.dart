@@ -34,12 +34,7 @@ ColorScheme genColorScheme(
   bool ignoreConfig = false,
 }) {
   final themeSetting = ref.watch(
-    themeSettingProvider.select(
-      (state) => (
-        primaryColor: state.primaryColor,
-        schemeVariant: state.schemeVariant,
-      ),
-    ),
+    themeSettingProvider.select((state) => (primaryColor: state.primaryColor)),
   );
   final dynamicColor = ref.watch(dynamicColorProvider);
   if (color == null &&
@@ -51,13 +46,11 @@ ColorScheme genColorScheme(
     return ColorScheme.fromSeed(
       seedColor: seed ?? dynamicColor.accentColor,
       brightness: brightness,
-      dynamicSchemeVariant: themeSetting.schemeVariant,
     );
   }
   return ColorScheme.fromSeed(
     seedColor: color ?? Color(themeSetting.primaryColor!),
     brightness: brightness,
-    dynamicSchemeVariant: themeSetting.schemeVariant,
   );
 }
 

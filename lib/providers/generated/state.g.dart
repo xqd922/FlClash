@@ -640,7 +640,7 @@ final class GenColorSchemeProvider
   }
 }
 
-String _$genColorSchemeHash() => r'2b413948f7d0fbcd3b1263a0053c3d35cbbd4db5';
+String _$genColorSchemeHash() => r'd5e13ef64cc20087178abff35bc7776e31e1749e';
 
 final class GenColorSchemeFamily extends $Family
     with

@@ -120,16 +120,7 @@ const pausedMaxRequestsLength = maxRequestsLength * 2;
 
 const trafficSampleLength = 30;
 
-const defaultPrimaryColors = [
-  0xFF795548,
-  0xFF03A9F4,
-  0xFFFFFF00,
-  0XFFBBC9CC,
-  0XFFABD397,
-  defaultPrimaryColor,
-  0XFF665390,
-  0XFF7D6EAA,
-];
+const defaultPrimaryColors = [0XFF7D6EAA, 0XFF4F7AA8];
 
 const scriptTemplate = '''
 const main = (config) => {

@@ -223,7 +223,6 @@ abstract class ThemeProps with _$ThemeProps {
     int? primaryColor,
     @Default(defaultPrimaryColors) List<int> primaryColors,
     @Default(ThemeMode.system) ThemeMode themeMode,
-    @Default(DynamicSchemeVariant.tonalSpot) DynamicSchemeVariant schemeVariant,
   }) = _ThemeProps;
 
   factory ThemeProps.fromJson(Map<String, Object?> json) =>

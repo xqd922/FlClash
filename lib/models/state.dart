@@ -263,7 +263,6 @@ abstract class ThemeColorsSelectorState with _$ThemeColorsSelectorState {
   const factory ThemeColorsSelectorState({
     required int? primaryColor,
     required List<int> primaryColors,
-    required DynamicSchemeVariant schemeVariant,
     required bool isDefault,
   }) = _ThemeColorsSelectorState;
 }

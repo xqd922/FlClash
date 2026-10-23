@@ -167,7 +167,6 @@ class _PrimaryColorItemState extends ConsumerState<_PrimaryColorItem> {
       return state.copyWith(
         primaryColors: defaultPrimaryColors,
         primaryColor: null,
-        schemeVariant: DynamicSchemeVariant.tonalSpot,
       );
     });
   }
@@ -231,26 +230,6 @@ class _PrimaryColorItemState extends ConsumerState<_PrimaryColorItem> {
     });
   }
 
-  Future<void> _handleChangeSchemeVariant() async {
-    final schemeVariant = ref.read(
-      themeSettingProvider.select((state) => state.schemeVariant),
-    );
-    final value = await dialogs.showCommonDialog<DynamicSchemeVariant>(
-      child: OptionsDialog<DynamicSchemeVariant>(
-        title: context.appLocalizations.colorSchemes,
-        options: DynamicSchemeVariant.values,
-        textBuilder: (item) => item.label,
-        value: schemeVariant,
-      ),
-    );
-    if (value == null) {
-      return;
-    }
-    ref.read(themeSettingProvider.notifier).update((state) {
-      return state.copyWith(schemeVariant: value);
-    });
-  }
-
   @override
   Widget build(BuildContext context) {
     final appLocalizations = context.appLocalizations;
@@ -259,20 +238,14 @@ class _PrimaryColorItemState extends ConsumerState<_PrimaryColorItem> {
         (state) => ThemeColorsSelectorState(
           primaryColor: state.primaryColor,
           primaryColors: state.primaryColors,
-          schemeVariant: state.schemeVariant,
           isDefault:
               state.primaryColor == null &&
-              intListEquality.equals(
-                state.primaryColors,
-                defaultPrimaryColors,
-              ) &&
-              state.schemeVariant == DynamicSchemeVariant.tonalSpot,
+              intListEquality.equals(state.primaryColors, defaultPrimaryColors),
         ),
       ),
     );
     final primaryColor = themeColors.primaryColor;
     final primaryColors = [null, ...themeColors.primaryColors];
-    final schemeVariant = themeColors.schemeVariant;
     final isEquals = themeColors.isDefault;
 
     return SliverToBoxAdapter(
@@ -292,14 +265,6 @@ class _PrimaryColorItemState extends ConsumerState<_PrimaryColorItem> {
             iconData: Icons.palette,
           ),
           actions: genActions([
-            if (_removablePrimaryColor == null)
-              FilledButton(
-                style: FilledButton.styleFrom(
-                  visualDensity: VisualDensity.compact,
-                ),
-                onPressed: _handleChangeSchemeVariant,
-                child: Text(schemeVariant.label),
-              ),
             if (_removablePrimaryColor != null)
               FilledButton(
                 style: FilledButton.styleFrom(

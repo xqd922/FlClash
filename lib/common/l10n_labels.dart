@@ -98,30 +98,11 @@ extension RestoreStrategyL10n on RestoreStrategy {
   }
 }
 
-extension DynamicSchemeVariantL10n on DynamicSchemeVariant {
-  String get label {
-    final appLocalizations = currentAppLocalizations;
-    return switch (this) {
-      DynamicSchemeVariant.tonalSpot => appLocalizations.tonalSpotScheme,
-      DynamicSchemeVariant.fidelity => appLocalizations.fidelityScheme,
-      DynamicSchemeVariant.monochrome => appLocalizations.monochromeScheme,
-      DynamicSchemeVariant.neutral => appLocalizations.neutralScheme,
-      DynamicSchemeVariant.vibrant => appLocalizations.vibrantScheme,
-      DynamicSchemeVariant.expressive => appLocalizations.expressiveScheme,
-      DynamicSchemeVariant.content => appLocalizations.contentScheme,
-      DynamicSchemeVariant.rainbow => appLocalizations.rainbowScheme,
-      DynamicSchemeVariant.fruitSalad => appLocalizations.fruitSaladScheme,
-    };
-  }
-}
-
 extension LocaleL10n on Locale {
   String get label {
     final appLocalizations = currentAppLocalizations;
     return switch (toString()) {
       'en' => appLocalizations.en,
-      'ja' => appLocalizations.ja,
-      'ru' => appLocalizations.ru,
       'zh_CN' => appLocalizations.zhCN,
       final code => code,
     };
