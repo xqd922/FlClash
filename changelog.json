@@ -2,6 +2,24 @@
   "schemaVersion": 2,
   "versions": [
     {
+      "version": "0.8.98.12",
+      "tag": "v0.8.98.12",
+      "date": "2026-10-23",
+      "prerelease": false,
+      "groups": [
+        {
+          "type": "feat",
+          "entries": [
+            {
+              "id": "86a80e9",
+              "scope": "theme",
+              "text": "Simplify color and language options"
+            }
+          ]
+        }
+      ]
+    },
+    {
       "version": "0.8.98.11",
       "tag": "v0.8.98.11",
       "date": "2026-10-22",

@@ -1,5 +1,11 @@
 # Changelog
 
+## v0.8.98.12 (2026-10-23)
+
+**Features**
+
+- **theme** Simplify color and language options (86a80e9)
+
 ## v0.8.98.11 (2026-10-22)
 
 **Features**
