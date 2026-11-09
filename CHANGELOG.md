@@ -1,5 +1,11 @@
 # Changelog
 
+## v0.8.98.13 (2026-11-09)
+
+**Bug Fixes**
+
+- **proxies** Delay tests let high-latency nodes finish instead of reporting Timeout (aea3317)
+
 ## v0.8.98.12 (2026-10-23)
 
 **Features**

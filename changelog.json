@@ -2,6 +2,24 @@
   "schemaVersion": 2,
   "versions": [
     {
+      "version": "0.8.98.13",
+      "tag": "v0.8.98.13",
+      "date": "2026-11-09",
+      "prerelease": false,
+      "groups": [
+        {
+          "type": "fix",
+          "entries": [
+            {
+              "id": "aea3317",
+              "scope": "proxies",
+              "text": "Delay tests let high-latency nodes finish instead of reporting Timeout"
+            }
+          ]
+        }
+      ]
+    },
+    {
       "version": "0.8.98.12",
       "tag": "v0.8.98.12",
       "date": "2026-10-23",
