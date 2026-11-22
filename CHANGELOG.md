@@ -1,5 +1,11 @@
 # Changelog
 
+## v0.8.98.15 (2026-11-22)
+
+**Features**
+
+- **network** Add the mips TUN stack option to network settings (7152bbd)
+
 ## v0.8.98.14 (2026-11-22)
 
 **Features**

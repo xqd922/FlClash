@@ -2,6 +2,24 @@
   "schemaVersion": 2,
   "versions": [
     {
+      "version": "0.8.98.15",
+      "tag": "v0.8.98.15",
+      "date": "2026-11-22",
+      "prerelease": false,
+      "groups": [
+        {
+          "type": "feat",
+          "entries": [
+            {
+              "id": "7152bbd",
+              "scope": "network",
+              "text": "Add the mips TUN stack option to network settings"
+            }
+          ]
+        }
+      ]
+    },
+    {
       "version": "0.8.98.14",
       "tag": "v0.8.98.14",
       "date": "2026-11-22",
