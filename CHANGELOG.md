@@ -1,5 +1,11 @@
 # Changelog
 
+## v0.8.98.14 (2026-11-22)
+
+**Features**
+
+- **core** Update the core to upstream stable mihomo v1.19.34 (a2afc94)
+
 ## v0.8.98.13 (2026-11-09)
 
 **Bug Fixes**
