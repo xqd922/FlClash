@@ -128,6 +128,17 @@ void main() {
       expect(container.read(patchClashConfigProvider).tun.stack, target);
     });
 
+    testWidgets('the stack picker supports selecting mips', (tester) async {
+      await pumpItem(tester, const TunStackItem());
+
+      await tester.tap(find.byType(ListTile).first);
+      await tester.pumpAndSettle();
+      await tester.tap(find.text(TunStack.mips.name).last);
+      await tester.pumpAndSettle();
+
+      expect(container.read(patchClashConfigProvider).tun.stack, TunStack.mips);
+    });
+
     testWidgets('the route mode picker writes the chosen mode', (tester) async {
       await pumpItem(tester, const RouteModeItem());
       final initial = container.read(networkSettingProvider).routeMode;

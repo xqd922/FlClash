@@ -440,4 +440,14 @@ void main() {
       expect(restored.windowProps.height, 720);
     });
   });
+
+  group('Tun JSON round-trip', () {
+    test('round-trips mips stack', () {
+      const tun = Tun(stack: TunStack.mips);
+      final encoded = tun.toJson();
+      expect(encoded['stack'], 'mips');
+      final restored = roundTrip(() => tun.toJson(), Tun.fromJson);
+      expect(restored.stack, TunStack.mips);
+    });
+  });
 }
